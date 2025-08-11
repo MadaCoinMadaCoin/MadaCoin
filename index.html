@@ -20,6 +20,7 @@
   <meta name="twitter:description" content="Støt udvikling i Madagaskar gennem MadaCoin.">
 
   <style>
+    /* Base layout */
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -256,7 +257,7 @@
       if (d) d.src = pub('images','MadaCoin_D.png');
     }
 
-    /* Roadmap-billeder (public buckets roadmap1..4 med Roadmap_X_pic_Y.png) */
+    /* Roadmap-billeder (public buckets: roadmap1..4 med Roadmap_X_pic_Y.png) */
     const buckets = ["roadmap1", "roadmap2", "roadmap3", "roadmap4"];
     const steps = [
       { title: "Køb byggegrund - Opret projekt kontor", desc: "Når målet er opfyldt, køber vi byggegrund og opretter projektkontor." },
@@ -283,14 +284,22 @@
         root.appendChild(box);
 
         const wrap = document.getElementById(`imgs-${stepIndex}`);
+
         for (let i = 1; i <= 10; i++) {
-          const src = `${base}/${bucket}/Roadmap_${stepIndex}_pic_${i}.png`;
+          const url = `${base}/${bucket}/Roadmap_${stepIndex}_pic_${i}.png`;
           const img = document.createElement('img');
-          img.alt = \`Roadmap ${stepIndex} billede ${i}\`;
-          img.src = src;
+          img.alt = `Roadmap ${stepIndex} billede ${i}`;
+          img.src = url;
           img.onerror = () => img.remove();
           wrap.appendChild(img);
         }
+
+        // Hvis ingen billeder blev vist, vis en lille tekst i stedet
+        setTimeout(() => {
+          if (!wrap.querySelector('img')) {
+            wrap.innerHTML = `<p style="color:#666;margin:6px 0;">Billeder kommer snart…</p>`;
+          }
+        }, 500);
       });
     }
 
@@ -302,4 +311,3 @@
   <footer>© 2025 MadaCoin. Alle rettigheder forbeholdes.</footer>
 </body>
 </html>
-
