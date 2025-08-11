@@ -379,12 +379,12 @@
   async function initYouTube() {
     const { data, error } = await sb
       .from("youtube_videos")
-      .select("youtube_url,is_active,sort_order,created_at,title")
-      .eq("is_active", true)
-      .not("youtube_url", "is", null)
-      .neq("youtube_url", "")
-      .order("sort_order", { ascending: true })
-      .order("created_at", { ascending: false });
+     .select("youtube_url,is_active,created_at")
+  .eq("is_active", true)
+  .not("youtube_url", "is", null)
+  .neq("youtube_url", "")
+  .order("created_at", { ascending: false });
+
 
     if (error) { console.error(error); return; }
 
@@ -410,6 +410,7 @@
   <footer>© 2025 MadaCoin. Alle rettigheder forbeholdes.</footer>
 </body>
 </html>
+
 
 
 
