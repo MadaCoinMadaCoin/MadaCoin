@@ -361,7 +361,14 @@
       btn.style.cursor = "pointer";
       btn.style.padding = "0";
       btn.title = v.title || "Se video";
-      btn.innerHTML = `<img src="${thumbUrl(id)}" alt="${v.title || "YouTube thumbnail"}" style="display:block;width:100%;height:100%;object-fit:cover;">`;
+      btn.innerHTML = `
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <img src="${thumbUrl(id)}" alt="${v.title || "YouTube thumbnail"}"
+         style="display:block;width:100%;height:100%;object-fit:cover;">
+    ${v.title ? `<div style="font-size:12px;line-height:1.2;color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${v.title}</div>` : ``}
+  </div>
+`;
+
       btn.onclick = () => {
         renderPlayer(id);
         [...wrap.children].forEach(c => c.style.border = "2px solid #333");
@@ -405,6 +412,7 @@
   <footer>© 2025 MadaCoin. Alle rettigheder forbeholdes.</footer>
 </body>
 </html>
+
 
 
 
