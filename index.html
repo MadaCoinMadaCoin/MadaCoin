@@ -1,14 +1,30 @@
 <!DOCTYPE html>
 <html lang="da">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>MadaCoin Landing</title>
-<style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>MadaCoin — Donations for Madagascar</title>
+  <meta name="description" content="MadaCoin støtter udvikling i Madagaskar gennem donationer og gennemsigtighed. Følg projektet og vores roadmap.">
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="MadaCoin — Donations for Madagascar">
+  <meta property="og:description" content="Støt udvikling i Madagaskar gennem MadaCoin.">
+  <meta property="og:url" content="https://madacoin.pro">
+  <meta property="og:type" content="website">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="MadaCoin — Donations for Madagascar">
+  <meta name="twitter:description" content="Støt udvikling i Madagaskar gennem MadaCoin.">
+
+  <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
+      /* NOTE: Signed URL udløber senere – ok for nu */
       background: url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/sign/backgrounds/ChatGPT%20Image%2026.%20jul.%202025,%2002.39.48.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8wZTcxMmNhYy0yZjA2LTQ2Y2YtYjRlMC1lOTcyZjJiNmQwNjEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJiYWNrZ3JvdW5kcy9DaGF0R1BUIEltYWdlIDI2LiBqdWwuIDIwMjUsIDAyLjM5LjQ4LnBuZyIsImlhdCI6MTc1MzQ5MzUwMCwiZXhwIjoxMDM5MzQwNzEwMH0.MDP85P5oLRUPvjTqFpzpaHDTgHa6Kg1pY9XDHYrve8w') no-repeat center center fixed;
       background-size: cover;
       background-attachment: fixed;
@@ -49,12 +65,8 @@
       font-weight: bold;
       transition: background-color 0.3s;
     }
-    .social-menu a:hover {
-      background-color: rgba(0, 0, 0, 0.7);
-    }
-    .social-menu a img {
-      width: 25px;
-    }
+    .social-menu a:hover { background-color: rgba(0, 0, 0, 0.7); }
+    .social-menu a img { width: 25px; }
 
     .menu {
       display: flex;
@@ -70,9 +82,7 @@
       background-color: rgba(0, 0, 0, 0.5);
       border-radius: 5px;
     }
-    .menu a:hover {
-      background-color: rgba(0, 0, 0, 0.7);
-    }
+    .menu a:hover { background-color: rgba(0, 0, 0, 0.7); }
 
     .content-box {
       padding: 10px;
@@ -80,9 +90,7 @@
       border-radius: 20px;
       margin-top: 400px;
       max-width: 1000px;
-      margin-left: auto;
-      margin-right: auto;
-      margin-bottom: 10px;
+      margin: 400px auto 10px;
     }
 
     .coin-section {
@@ -108,6 +116,7 @@
       height: 300px;
       border-radius: 10px;
       margin-bottom: 10px;
+      object-fit: cover;
     }
     .coin-description {
       font-size: 0.9rem;
@@ -127,10 +136,7 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
       transition: all 0.3s ease-in-out;
     }
-    .button:hover {
-      background: linear-gradient(135deg, #FFC107, #B8860B);
-      transform: scale(1.05);
-    }
+    .button:hover { background: linear-gradient(135deg, #FFC107, #B8860B); transform: scale(1.05); }
 
     .roadmap {
       margin: 40px auto;
@@ -153,149 +159,147 @@
       width: 100%;
       max-width: 700px;
     }
-    .roadmap-box h2 {
-      margin: 0;
-      color: #444;
-      font-size: 1.2rem;
-    }
-    .description {
-      font-size: 0.8rem;
-      margin: 0;
-      color: #555;
-    }
+    .roadmap-box h2 { margin: 0; color: #444; font-size: 1.2rem; }
+    .description { font-size: 0.8rem; margin: 0; color: #555; }
     .step-images {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      max-width: 100%;
-      justify-content: flex-start;
-      margin-top: 10px;
+      display: flex; flex-wrap: wrap; gap: 10px; max-width: 100%;
+      justify-content: flex-start; margin-top: 10px;
     }
     .step-images img {
-      width: 80px;
-      height: 80px;
-      object-fit: cover;
-      cursor: pointer;
-      margin: 5px;
-      transition: transform 0.3s ease-in-out;
+      width: 80px; height: 80px; object-fit: cover; cursor: pointer;
+      margin: 5px; transition: transform 0.3s ease-in-out;
     }
-    .step-images img:hover {
-      transform: scale(8);
-      z-index: 2;
-    }
+    .step-images img:hover { transform: scale(4); z-index: 2; }
 
-    footer {
-      text-align: center;
-      padding: 20px;
-      background: #ddd;
+    footer { text-align: center; padding: 20px; background: #ddd; }
+
+    @media (max-width: 768px) {
+      .madagascar-container img { width: 92vw; max-width: 520px; }
+      .content-box { margin-top: 240px; padding: 12px; }
+      .coin-section { gap: 24px; }
     }
-</style>
+  </style>
 </head>
 <body>
 
-<!-- VENSTREMENU SOCIAL -->
-<div class="social-menu">
-  <a href="https://www.tiktok.com" target="_blank"><img src="https://img.icons8.com/ios-filled/50/ffffff/tiktok.png" alt="TikTok" /> TikTok</a>
-  <a href="https://www.facebook.com" target="_blank"><img src="https://img.icons8.com/ios-filled/50/ffffff/facebook-new.png" alt="Facebook" /> Facebook</a>
-  <a href="https://web.telegram.org" target="_blank"><img src="https://img.icons8.com/ios-filled/50/ffffff/telegram-app.png" alt="Telegram" /> Telegram</a>
-  <a href="https://www.instagram.com" target="_blank"><img src="https://img.icons8.com/ios-filled/50/ffffff/instagram-new.png" alt="Instagram" /> Instagram</a>
-  <a href="https://x.com" target="_blank"><img src="https://img.icons8.com/ios-filled/50/ffffff/twitterx.png" alt="X" /> X</a>
-</div>
+  <!-- VENSTREMENU SOCIAL -->
+  <div class="social-menu">
+    <a href="https://www.tiktok.com" target="_blank" rel="noopener noreferrer"><img src="https://img.icons8.com/ios-filled/50/ffffff/tiktok.png" alt="TikTok" /> TikTok</a>
+    <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer"><img src="https://img.icons8.com/ios-filled/50/ffffff/facebook-new.png" alt="Facebook" /> Facebook</a>
+    <a href="https://web.telegram.org" target="_blank" rel="noopener noreferrer"><img src="https://img.icons8.com/ios-filled/50/ffffff/telegram-app.png" alt="Telegram" /> Telegram</a>
+    <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer"><img src="https://img.icons8.com/ios-filled/50/ffffff/instagram-new.png" alt="Instagram" /> Instagram</a>
+    <a href="https://x.com" target="_blank" rel="noopener noreferrer"><img src="https://img.icons8.com/ios-filled/50/ffffff/twitterx.png" alt="X" /> X</a>
+  </div>
 
-<!-- ØVERSTE MENU -->
-<div class="menu">
-  <a href="#">Hjem</a>
-  <a href="#">Om MadaCoin</a>
-  <a href="#">Kontakt</a>
-</div>
+  <!-- ØVERSTE MENU -->
+  <div class="menu">
+    <a href="#">Hjem</a>
+    <a href="#">Om MadaCoin</a>
+    <a href="#">Kontakt</a>
+  </div>
 
-<!-- Ø-billedet -->
-<div class="madagascar-container">
-  <img src="https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/sign/backgrounds/ChatGPT%20Image%2026.%20jul.%202025,%2002.34.32.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8wZTcxMmNhYy0yZjA2LTQ2Y2YtYjRlMC1lOTcyZjJiNmQwNjEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJiYWNrZ3JvdW5kcy9DaGF0R1BUIEltYWdlIDI2LiBqdWwuIDIwMjUsIDAyLjM0LjMyLnBuZyIsImlhdCI6MTc1MzY0ODA0NCwiZXhwIjo4ODE1MzU2MTY0NH0.NgGHOp8k38S34w-iR6M3TCjEFJENQ1MRdjmpv4CLKRY" alt="Madagaskar Ø" />
-</div>
+  <!-- Ø-billedet -->
+  <div class="madagascar-container">
+    <!-- NOTE: Signed URL udløber senere – ok for nu -->
+    <img src="https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/sign/backgrounds/ChatGPT%20Image%2026.%20jul.%202025,%2002.34.32.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8wZTcxMmNhYy0yZjA2LTQ2Y2YtYjRlMC1lOTcyZjJiNmQwNjEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJiYWNrZ3JvdW5kcy9DaGF0R1BUIEltYWdlIDI2LiBqdWwuIDIwMjUsIDAyLjM0LjMyLnBuZyIsImlhdCI6MTc1MzY0ODA0NCwiZXhwIjo4ODE1MzU2MTY0NH0.NgGHOp8k38S34w-iR6M3TCjEFJENQ1MRdjmpv4CLKRY"
+         alt="Madagaskar Ø" />
+  </div>
 
-<!-- MØNTSEKTION -->
-<div class="content-box">
-  <section class="coin-section">
-    <div class="coin">
-      <img src="https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/images/MadaCoin%20D.png" alt="MadaCoin Donation" />
-      <p class="coin-description">Støt vores mission ved at købe MadaCoin Donation.</p>
-      <button class="button" onclick="openTransak('MCD', '0xa594586B04f1b6782EC906B49882EbD0E652a388')">Køb MadaCoin Donation</button>
-    </div>
-    <div class="coin">
-      <img src="https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/images/MadaCoin%20C.png" alt="MadaCoin" />
-      <p class="coin-description">Investér i MadaCoin – fremtidens valuta for Madagaskar.</p>
-      <button class="button" onclick="openTransak('MCN', 'DIN_MCN_KONTRAKT_ADRESSE')">Køb MadaCoin</button>
-    </div>
-  </section>
-</div>
+  <!-- MØNTSEKTION -->
+  <div class="content-box">
+    <section class="coin-section">
+      <div class="coin">
+        <img id="coinD" alt="MadaCoin Donation" />
+        <p class="coin-description">Støt vores mission ved at købe MadaCoin Donation.</p>
+        <button class="button" onclick="openTransak('MCD', '0xa594586B04f1b6782EC906B49882EbD0E652a388')">Køb MadaCoin Donation</button>
+      </div>
+      <div class="coin">
+        <img id="coinC" alt="MadaCoin" />
+        <p class="coin-description">Investér i MadaCoin – fremtidens valuta for Madagaskar.</p>
+        <button class="button" onclick="openTransak('MCN', 'DIN_MCN_KONTRAKT_ADRESSE')">Køb MadaCoin</button>
+      </div>
+    </section>
+  </div>
 
-<!-- ROADMAP -->
-<div class="roadmap" id="roadmap"></div>
+  <!-- ROADMAP -->
+  <div class="roadmap" id="roadmap"></div>
 
-<!-- YOUTUBE SEKTION -->
-<div style="display: flex; flex-direction: column; align-items: center; margin-top: 10px; margin-bottom: 60px;">
-  <iframe width="560" height="315" src="https://www.youtube.com/embed/U7VQcIjIJFw" title="YouTube video player" frameborder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen
-    style="border-radius: 12px;"></iframe>
-</div>
+  <!-- YOUTUBE SEKTION -->
+  <div style="display: flex; flex-direction: column; align-items: center; margin-top: 10px; margin-bottom: 60px;">
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/U7VQcIjIJFw" title="YouTube video player" frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen
+      style="border-radius: 12px;"></iframe>
+  </div>
 
-<script>
-  function openTransak(symbol, wallet) {
-    const transakURL = `https://global.transak.com/?apiKey=DIN_API_KEY&cryptoCurrencyCode=${symbol}&walletAddress=${wallet}&network=polygon&fiatCurrency=EUR&defaultPaymentMethod=credit_debit_card&themeColor=FFCC00`;
-    window.open(transakURL, "_blank", "width=500,height=700");
-  }
-
-  const base = "https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public";
-  const buckets = ["roadmap1", "roadmap2", "roadmap3", "roadmap4"];
-  const steps = [
-    { title: "Køb byggegrund - Opret projekt kontor", desc: "Når målet er opfyldt, køber vi byggegrund og opretter projektkontor." },
-    { title: "De første boliger bygges", desc: "Når minimum målet er opfyldt, sættes projektet i gang." },
-    { title: "Solcellepark og batterier", desc: "Når målet er opnået, installerer vi solceller og batterier." },
-    { title: "Byg en Skole", desc: "Byggeprojekt fra børnehave til gymnasium." }
-  ];
-
-  function renderRoadmap() {
-    const root = document.getElementById('roadmap');
-    root.innerHTML = '';
-
-    buckets.forEach((bucket, idx) => {
-      const stepIndex = idx + 1;
-      const s = steps[idx] || { title: `Roadmap ${stepIndex}`, desc: '' };
-
-      const box = document.createElement('div');
-      box.className = 'roadmap-box';
-      box.innerHTML = `
-        <h2>${s.title}</h2>
-        <p class="description">${s.desc}</p>
-        <div class="step-images" id="imgs-${stepIndex}"></div>
-      `;
-      root.appendChild(box);
-
-      const wrap = document.getElementById(`imgs-${stepIndex}`);
-      for (let i = 1; i <= 10; i++) {
-        const src = `${base}/${bucket}/Roadmap_${stepIndex}_pic_${i}.png`;
-        const img = document.createElement('img');
-        img.alt = `Roadmap ${stepIndex} billede ${i}`;
-        img.src = src;
-        img.onerror = () => img.remove();
-        wrap.appendChild(img);
+  <script>
+    /* Transak (placeholder indtil nøgler er på plads) */
+    const TRANSAK_KEY = "DIN_API_KEY"; // TODO
+    function openTransak(symbol, wallet) {
+      if (!TRANSAK_KEY || TRANSAK_KEY === "DIN_API_KEY" || (wallet && wallet.includes("DIN_MCN_KONTRAKT_ADRESSE"))) {
+        alert("Køb-funktionen bliver aktiveret, når nøgle og kontrakt er sat.");
+        return;
       }
-    });
-  }
+      const url = `https://global.transak.com/?apiKey=${TRANSAK_KEY}&cryptoCurrencyCode=${symbol}&walletAddress=${wallet}&network=polygon&fiatCurrency=EUR&defaultPaymentMethod=credit_debit_card&themeColor=FFCC00`;
+      window.open(url, "_blank", "width=500,height=700");
+    }
 
-  renderRoadmap();
-</script>
+    /* Supabase public base */
+    const base = "https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public";
 
-<footer>© 2025 MadaCoin. Alle rettigheder forbeholdes.</footer>
+    /* Coins: forventer public filer i bucket "images":
+       images/MadaCoin_C.png   og   images/MadaCoin_D.png  */
+    const pub = (...p) => `${base}/${p.map(encodeURIComponent).join('/')}`;
+    function setCoinImages() {
+      const c = document.getElementById('coinC');
+      const d = document.getElementById('coinD');
+      if (c) c.src = pub('images','MadaCoin_C.png'); // case-sensitivt!
+      if (d) d.src = pub('images','MadaCoin_D.png');
+    }
 
-<!-- PREVIEW BADGE (fjernes igen før live) -->
-<div style="position:fixed;bottom:10px;right:10px;background:rgba(255,215,0,.95);color:#004d73;padding:6px 10px;border-radius:8px;font-weight:bold;z-index:2000;box-shadow:0 2px 6px rgba(0,0,0,.25);">
-  PREVIEW
-</div>
+    /* Roadmap-billeder (public buckets roadmap1..4 med Roadmap_X_pic_Y.png) */
+    const buckets = ["roadmap1", "roadmap2", "roadmap3", "roadmap4"];
+    const steps = [
+      { title: "Køb byggegrund - Opret projekt kontor", desc: "Når målet er opfyldt, køber vi byggegrund og opretter projektkontor." },
+      { title: "De første boliger bygges", desc: "Når minimum målet er opfyldt, sættes projektet i gang." },
+      { title: "Solcellepark og batterier", desc: "Når målet er opnået, installerer vi solceller og batterier." },
+      { title: "Byg en Skole", desc: "Byggeprojekt fra børnehave til gymnasium." }
+    ];
 
+    function renderRoadmap() {
+      const root = document.getElementById('roadmap');
+      root.innerHTML = '';
 
+      buckets.forEach((bucket, idx) => {
+        const stepIndex = idx + 1;
+        const s = steps[idx] || { title: `Roadmap ${stepIndex}`, desc: '' };
+
+        const box = document.createElement('div');
+        box.className = 'roadmap-box';
+        box.innerHTML = `
+          <h2>${s.title}</h2>
+          <p class="description">${s.desc}</p>
+          <div class="step-images" id="imgs-${stepIndex}"></div>
+        `;
+        root.appendChild(box);
+
+        const wrap = document.getElementById(`imgs-${stepIndex}`);
+        for (let i = 1; i <= 10; i++) {
+          const src = `${base}/${bucket}/Roadmap_${stepIndex}_pic_${i}.png`;
+          const img = document.createElement('img');
+          img.alt = \`Roadmap ${stepIndex} billede ${i}\`;
+          img.src = src;
+          img.onerror = () => img.remove();
+          wrap.appendChild(img);
+        }
+      });
+    }
+
+    /* Init */
+    renderRoadmap();
+    setCoinImages();
+  </script>
+
+  <footer>© 2025 MadaCoin. Alle rettigheder forbeholdes.</footer>
 </body>
 </html>
-
 
