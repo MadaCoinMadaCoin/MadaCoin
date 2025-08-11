@@ -411,12 +411,50 @@
   initYouTube();
 </script>
 
+
+<script>
+  async function loadFooter() {
+    const el = document.getElementById('footer-text');
+    if (!el || !window.sb) return;
+
+    const lang = (navigator.language || 'en').slice(0, 2);
+
+    // Prøv først brugerens sprog
+    let { data, error } = await sb
+      .from('site_text')
+      .select('value')
+      .eq('key', 'footer_text')
+      .eq('lang', lang)
+      .eq('is_active', true)
+      .limit(1)
+      .maybeSingle();
+
+    // Fald tilbage til engelsk
+    if ((!data || !data.value) && !error) {
+      const fallback = await sb
+        .from('site_text')
+        .select('value')
+        .eq('key', 'footer_text')
+        .eq('lang', 'en')
+        .eq('is_active', true)
+        .limit(1)
+        .maybeSingle();
+      data = fallback.data;
+    }
+
+    if (data && data.value) el.textContent = data.value;
+  }
+
+  loadFooter();
+</script>
+
   
   
   <footer><span id="footer-text">© 2025 MadaCoin. All rights reserved.</span></footer>
 
 </body>
 </html>
+
 
 
 
