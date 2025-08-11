@@ -374,7 +374,7 @@
   async function initYouTube() {
     const { data, error } = await sb
       .from("youtube_videos")
-     .select("youtube_url,is_active,created_at")
+     .select("youtube_url,is_active,created_at,title")
   .eq("is_active", true)
   .not("youtube_url", "is", null)
   .neq("youtube_url", "")
@@ -405,6 +405,7 @@
   <footer>© 2025 MadaCoin. Alle rettigheder forbeholdes.</footer>
 </body>
 </html>
+
 
 
 
