@@ -318,10 +318,99 @@
 </section>
 
 
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = "https://byrlebjwknppjbtkbozt.supabase.co";
+  const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  function getYouTubeId(url) {
+    if (!url) return null;
+    try {
+      const u = new URL(url);
+      if (u.hostname.includes("youtu.be")) return u.pathname.slice(1);
+      if (u.searchParams.get("v")) return u.searchParams.get("v");
+      const m = url.match(/(?:embed|shorts)\/([a-zA-Z0-9_-]{6,})/);
+      if (m) return m[1];
+      const seg = u.pathname.split("/").pop();
+      return seg && seg.length >= 6 ? seg : null;
+    } catch { return null; }
+  }
+
+  function thumbUrl(id) {
+    return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+  }
+
+  function renderPlayer(id) {
+    const el = document.getElementById("yt-player");
+    el.innerHTML = `
+      <iframe
+        src="https://www.youtube.com/embed/${id}"
+        title="MadaCoin video"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen
+        style="position:absolute;inset:0;width:100%;height:100%;"
+      ></iframe>`;
+  }
+
+  function renderThumbs(videos, activeId) {
+    const wrap = document.getElementById("yt-thumbs");
+    wrap.innerHTML = "";
+    videos.forEach(v => {
+      const id = v._id;
+      const btn = document.createElement("button");
+      btn.style.border = id === activeId ? "3px solid #f0b90b" : "2px solid #333";
+      btn.style.borderRadius = "12px";
+      btn.style.overflow = "hidden";
+      btn.style.cursor = "pointer";
+      btn.style.padding = "0";
+      btn.title = v.title || "Se video";
+      btn.innerHTML = `<img src="${thumbUrl(id)}" alt="${v.title || "YouTube thumbnail"}" style="display:block;width:100%;height:100%;object-fit:cover;">`;
+      btn.onclick = () => {
+        renderPlayer(id);
+        [...wrap.children].forEach(c => c.style.border = "2px solid #333");
+        btn.style.border = "3px solid #f0b90b";
+      };
+      wrap.appendChild(btn);
+    });
+  }
+
+  async function initYouTube() {
+    const { data, error } = await sb
+      .from("youtube_videos")
+      .select("youtube_url,is_active,sort_order,created_at,title")
+      .eq("is_active", true)
+      .not("youtube_url", "is", null)
+      .neq("youtube_url", "")
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: false });
+
+    if (error) { console.error(error); return; }
+
+    const videos = (data || [])
+      .map(v => ({ ...v, _id: getYouTubeId(v.youtube_url) }))
+      .filter(v => v._id);
+
+    if (!videos.length) {
+      document.getElementById("yt-section").style.display = "none";
+      return;
+    }
+
+    document.getElementById("yt-section").style.display = "";
+    renderPlayer(videos[0]._id);
+    renderThumbs(videos, videos[0]._id);
+  }
+
+  initYouTube();
+</script>
+
+  
   
   <footer>© 2025 MadaCoin. Alle rettigheder forbeholdes.</footer>
 </body>
 </html>
+
 
 
 
