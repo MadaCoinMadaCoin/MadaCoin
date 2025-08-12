@@ -445,46 +445,58 @@
 
 
   <script>
-  async function loadSocial() {
+(function(){
+  function log(...args){ console.log('[social]', ...args); }
+
+  async function run() {
     const root = document.getElementById('social-menu');
-if (!root) return;
+    if (!root) { log('no root'); return; }
 
-// Vent lidt og prøv igen hvis Supabase-klienten ikke er klar endnu
-if (!window.sb) {
-  setTimeout(loadSocial, 300);
-  return;
-}
+    // Vent hvis Supabase-klienten ikke er klar endnu
+    if (!window.sb || !sb?.from) {
+      log('sb not ready → retry');
+      setTimeout(run, 300);
+      return;
+    }
 
+    try {
+      const { data, error } = await sb
+        .from('social_links')
+        .select('platform,url,sort_order,is_active,created_at')
+        .eq('is_active', true)
+        .not('url','is', null)
+        .neq('url','')
+        .order('sort_order', { ascending: true })
+        .order('created_at', { ascending: false });
 
-    const { data, error } = await sb
-      .from('social_links')
-      .select('platform,url,sort_order,is_active,created_at')
-      .eq('is_active', true)
-      .order('sort_order', { ascending: true })
-      .order('created_at', { ascending: false });
+      log('query result', { rows: data?.length || 0, error });
 
-    if (error || !data?.length) { root.style.display = 'none'; return; }
+      if (error) { log('error', error); root.style.display = 'none'; return; }
+      if (!data?.length) { log('no rows'); root.style.display = 'none'; return; }
 
-    root.style.display = '';
-    root.innerHTML = '';
+      root.style.display = '';
+      root.innerHTML = '';
 
-    (data || []).forEach(row => {
-      const a = document.createElement('a');
-      a.href = row.url;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      a.textContent = (row.platform || 'Link'); // kun tekst først
-      root.appendChild(a);
-    });
+      data.forEach(row => {
+        const a = document.createElement('a');
+        a.href = row.url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = (row.platform || 'Link');
+        root.appendChild(a);
+      });
+
+      log('appended', root.querySelectorAll('a').length);
+    } catch (e) {
+      log('caught', e);
+    }
   }
 
-  window.addEventListener('load', () =>
-  loadSocial().then(() => console.log('social loaded after LOAD'))
-);
-
-
-
+  // Kør først når hele siden er loadet (inkl. eksterne scripts) — og log
+  window.addEventListener('load', () => { console.log('[social] window load'); run(); });
+})();
 </script>
+
 
 
 
@@ -494,6 +506,7 @@ if (!window.sb) {
 
 </body>
 </html>
+
 
 
 
