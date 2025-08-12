@@ -646,7 +646,20 @@ function initRoadmapLightboxPart1() {
   });
 }
 
-window.addEventListener('load', initRoadmapLightboxPart1);
+// Mærk automatisk alle <img> hvor src indeholder "roadmap"
+function markRoadmapImages() {
+  const imgs = Array.from(document.querySelectorAll('img'));
+  const hits = imgs.filter(img => /roadmap/i.test(img.src));
+  hits.forEach(img => img.classList.add('roadmap-thumb'));
+  console.log('[roadmap] fundet billeder:', hits.map(i => i.src));
+}
+
+// Når siden er klar: mærk billederne og aktivér lightbox
+window.addEventListener('load', () => {
+  markRoadmapImages();
+  initRoadmapLightboxPart1();
+});
+
 
     
 </script>
@@ -665,6 +678,7 @@ window.addEventListener('load', initRoadmapLightboxPart1);
 
 </body>
 </html>
+
 
 
 
