@@ -46,28 +46,38 @@
     }
 
     .social-menu {
-      position: fixed;
-      top: 150px;
-      left: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      z-index: 1000;
-    }
-    .social-menu a {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
-      color: white;
-      background-color: rgba(0, 0, 0, 0.5);
-      padding: 8px 12px;
-      border-radius: 5px;
-      font-weight: bold;
-      transition: background-color 0.3s;
-    }
-    .social-menu a:hover { background-color: rgba(0, 0, 0, 0.7); }
-    .social-menu a img { width: 25px; }
+  position: fixed;
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.social-menu a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.social-menu a:hover {
+  background-color: rgba(0, 0, 0, 0.85);
+  transform: translateY(-2px);
+}
+
+.social-menu a img {
+  width: 22px;
+  height: 22px;
+}
+
 
     .menu {
       display: flex;
@@ -408,6 +418,72 @@
   }
 
   initYouTube();
+
+  // --- Social links menu ---
+  function normalizeUrl(url) {
+    if (!url) return null;
+    const u = url.trim();
+    if (/^https?:\/\//i.test(u)) return u;
+    return 'https://' + u;
+  }
+
+  function iconUrlFor(platform) {
+    const formattedName = platform.charAt(0).toUpperCase() + platform.slice(1).toLowerCase();
+    const { data } = sb
+      .storage
+      .from('social.icons')
+      .getPublicUrl(`${formattedName}.svg`);
+    return data?.publicUrl || null;
+  }
+
+  function fallbackIconUrl() {
+    const { data } = sb.storage.from('social.icons').getPublicUrl('Globe.svg');
+    return data?.publicUrl || '';
+  }
+
+  async function renderSocialLinks() {
+    const el = document.getElementById('social-menu');
+    el.innerHTML = '';
+
+    const { data, error } = await sb
+      .from('social_links')
+      .select('platform,url,is_active,sort_order')
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true });
+
+    if (error) {
+      console.error('Fejl ved hentning af social_links:', error);
+      return;
+    }
+
+    const globe = fallbackIconUrl();
+
+    (data || [])
+      .filter(r => r.url && r.url.trim() !== '')
+      .forEach(r => {
+        const platform = (r.platform || '').trim();
+        const href = normalizeUrl(r.url);
+        if (!href) return;
+
+        const a = document.createElement('a');
+        a.href = href;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.title = platform;
+        a.setAttribute('aria-label', platform);
+
+        const img = document.createElement('img');
+        img.src = iconUrlFor(platform) || globe;
+        img.onerror = () => { img.src = globe; };
+
+        a.appendChild(img);
+        el.appendChild(a);
+      });
+  }
+
+  renderSocialLinks();
+
+  
 </script>
 
 
@@ -510,6 +586,7 @@
 
 </body>
 </html>
+
 
 
 
