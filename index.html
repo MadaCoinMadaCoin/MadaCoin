@@ -189,6 +189,40 @@
       .content-box { margin-top: 240px; padding: 12px; }
       .coin-section { gap: 24px; }
     }
+
+/* --- Roadmap Lightbox --- */
+#rm-lightbox {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+#rm-lightbox.active { display: flex; }
+
+#rm-lightbox .rm-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.85);
+}
+
+/* Selve billedet i lightbox */
+#rm-image {
+  position: relative;
+  max-width: 100vw;
+  max-height: 100vh;
+  transform-origin: center center;
+  touch-action: none;       /* nødvendig for pinch/drag på mobil */
+  user-select: none;
+  -webkit-user-drag: none;
+  cursor: zoom-out;         /* klik/tap = luk ved 1× */
+}
+
+/* Markér dine roadmap-thumbnails med denne klasse */
+.roadmap-thumb { cursor: zoom-in; }
+
+    
   </style>
 </head>
 <body>
@@ -580,10 +614,50 @@ window.addEventListener('load', () => {
   // Kør først når hele siden er loadet (inkl. eksterne scripts) — og log
   window.addEventListener('load', () => { console.log('[social] window load'); run(); });
 })();
+
+
+// --- Roadmap Lightbox (del 1: åbne/lukke) ---
+const rmBox = document.getElementById('rm-lightbox');
+const rmImg = document.getElementById('rm-image');
+
+function openLightbox(src) {
+  rmImg.src = src;
+  rmBox.classList.add('active');
+  rmBox.setAttribute('aria-hidden', 'false');
+}
+
+function closeLightbox() {
+  rmBox.classList.remove('active');
+  rmBox.setAttribute('aria-hidden', 'true');
+  rmImg.src = '';
+}
+
+function initRoadmapLightboxPart1() {
+  document.querySelectorAll('.roadmap-thumb').forEach(img => {
+    const full = img.dataset.fullsrc || img.src;
+    img.addEventListener('click', () => openLightbox(full));
+    img.addEventListener('touchend', () => openLightbox(full), { passive: true });
+  });
+
+  rmBox.addEventListener('click', (e) => {
+    if (e.target === rmBox || e.target.classList.contains('rm-backdrop') || e.target === rmImg) {
+      closeLightbox();
+    }
+  });
+}
+
+window.addEventListener('load', initRoadmapLightboxPart1);
+
+    
 </script>
 
 
 
+<!-- Lightbox til roadmap -->
+<div id="rm-lightbox" aria-hidden="true">
+  <div class="rm-backdrop"></div>
+  <img id="rm-image" alt="Roadmap" />
+</div>
 
   
   
@@ -591,6 +665,7 @@ window.addEventListener('load', () => {
 
 </body>
 </html>
+
 
 
 
