@@ -309,11 +309,15 @@
 
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  
 <script>
   const SUPABASE_URL = "https://byrlebjwknppjbtbkozt.supabase.co";
   const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-
+  
+  // 👉 Tilføj DENNE linje:
+  window.sb = sb;
+  
   function getYouTubeId(url) {
     if (!url) return null;
     try {
@@ -506,6 +510,7 @@
 
 </body>
 </html>
+
 
 
 
