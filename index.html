@@ -449,41 +449,24 @@
     const root = document.getElementById('social-menu');
     if (!root || !window.sb) return;
 
-    const ICONS = {
-      tiktok:    "https://img.icons8.com/ios-filled/50/ffffff/tiktok.png",
-      facebook:  "https://img.icons8.com/ios-filled/50/ffffff/facebook-new.png",
-      telegram:  "https://img.icons8.com/ios-filled/50/ffffff/telegram-app.png",
-      instagram: "https://img.icons8.com/ios-filled/50/ffffff/instagram-new.png",
-      x:         "https://img.icons8.com/ios-filled/50/ffffff/twitterx.png",
-      youtube:   "https://img.icons8.com/ios-filled/50/ffffff/youtube-play.png"
-    };
-
     const { data, error } = await sb
       .from('social_links')
       .select('platform,url,sort_order,is_active,created_at')
       .eq('is_active', true)
-      .not('url', 'is', null)
-      .neq('url', '')
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: false });
 
-    if (error) { console.error(error); return; }
+    if (error || !data?.length) { root.style.display = 'none'; return; }
 
-    const links = data || [];
-    if (!links.length) { root.style.display = 'none'; return; } // skjul helt når der ingenting er
     root.style.display = '';
-
     root.innerHTML = '';
-    links.forEach(row => {
-      const key = (row.platform || '').toLowerCase();
-      const icon = ICONS[key] || "https://img.icons8.com/ios-filled/50/ffffff/link.png";
-      const label = key ? key[0].toUpperCase() + key.slice(1) : 'Link';
 
+    (data || []).forEach(row => {
       const a = document.createElement('a');
       a.href = row.url;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-      a.innerHTML = `<img src="${icon}" alt="${label}" /> ${label}`;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.textContent = (row.platform || 'Link'); // kun tekst først
       root.appendChild(a);
     });
   }
@@ -492,12 +475,14 @@
 </script>
 
 
+
   
   
   <footer><span id="footer-text">© 2025 MadaCoin. All rights reserved.</span></footer>
 
 </body>
 </html>
+
 
 
 
