@@ -481,11 +481,11 @@
       });
   }
 
-  renderSocialLinks();
-
 window.addEventListener('load', () => {
   renderSocialLinks();
+  setTimeout(renderSocialLinks, 500); // ekstra sikkerhed
 });
+
 
 
   
@@ -591,6 +591,7 @@ window.addEventListener('load', () => {
 
 </body>
 </html>
+
 
 
 
