@@ -447,7 +447,14 @@
   <script>
   async function loadSocial() {
     const root = document.getElementById('social-menu');
-    if (!root || !window.sb) return;
+if (!root) return;
+
+// Vent lidt og prøv igen hvis Supabase-klienten ikke er klar endnu
+if (!window.sb) {
+  setTimeout(loadSocial, 300);
+  return;
+}
+
 
     const { data, error } = await sb
       .from('social_links')
@@ -471,7 +478,11 @@
     });
   }
 
-  window.addEventListener('DOMContentLoaded', () => loadSocial().then(() => console.log('social loaded')));
+  window.addEventListener('load', () =>
+  loadSocial().then(() => console.log('social loaded after LOAD'))
+);
+
+
 
 </script>
 
@@ -483,6 +494,7 @@
 
 </body>
 </html>
+
 
 
 
