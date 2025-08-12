@@ -617,8 +617,7 @@ window.addEventListener('load', () => {
 
 
 // --- Roadmap Lightbox (del 1: åbne/lukke) ---
-const rmBox = document.getElementById('rm-lightbox');
-const rmImg = document.getElementById('rm-image');
+let rmBox, rmImg; // sættes først når siden er loadet
 
 function openLightbox(src) {
   rmImg.src = src;
@@ -654,14 +653,15 @@ function markRoadmapImages() {
   console.log('[roadmap] fundet billeder:', hits.map(i => i.src));
 }
 
-// Når siden er klar: mærk billederne og aktivér lightbox
+// Kun én init – når siden er klar
 window.addEventListener('load', () => {
+  rmBox = document.getElementById('rm-lightbox');
+  rmImg = document.getElementById('rm-image');
+
   markRoadmapImages();
   initRoadmapLightboxPart1();
 });
-
-
-    
+  
 </script>
 
 
@@ -678,6 +678,7 @@ window.addEventListener('load', () => {
 
 </body>
 </html>
+
 
 
 
