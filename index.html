@@ -721,32 +721,34 @@ function rmTouchEnd() {
     
 
   /* --- ROADMAP LIGHTBOX — INIT ON LOAD --- */
-  window.addEventListener('load', () => {
-  // Hent referencer EFTER at DOM er klar
+window.addEventListener('load', () => {
+  // 1) Hent referencer EFTER at DOM er klar
   rmBox = document.getElementById('rm-lightbox');
   rmImg = document.getElementById('rm-image');
 
-  // 1) Mærk roadmap-billeder (giver dem .roadmap-thumb)
+  // 2) Mærk roadmap-billeder + bind åbne/lukke på thumbnails
   markRoadmapImages();
-
-  // 2) Bind klik/tap på thumbnails + klik på backdrop
   initRoadmapLightboxPart1();
 
-  // 3) Først nu findes rmImg → tilmeld wheel-zoom og klik-logik
-  if (rmImg) {
-    // musehjul = zoom om cursor
-    rmImg.addEventListener('wheel', rmWheelHandler, { passive: false });
-
-    // klik på billedet: hvis zoomet → reset; ellers → luk
-    rmImg.addEventListener('click', () => {
-      if (scale > 1) centerReset();
-      else closeLightbox();
-    });
+  // 3) Når billedet findes i lightbox → tilmeld handlers
+  if (!rmImg) {
+    console.warn('[lightbox] rmImg mangler');
+    return;
   }
+
+  /* PC: musehjul-zoom + klik (reset → luk) */
+  rmImg.addEventListener('wheel', rmWheelHandler, { passive: false });
+  rmImg.addEventListener('click', () => {
+    if (scale > 1) centerReset();
+    else closeLightbox();
+  });
+
+  /* Mobil: pinch-zoom + pan + tap (reset → luk) */
+  rmImg.addEventListener('touchstart', rmTouchStart, { passive: true });
+  rmImg.addEventListener('touchmove',  rmTouchMove,  { passive: false });
+  rmImg.addEventListener('touchend',   rmTouchEnd,   { passive: true });
 });
-
-
-
+/* --- /ROADMAP LIGHTBOX — INIT ON LOAD --- */
 
     
 /* === ROADMAP LIGHTBOX — SLUT === */
@@ -767,6 +769,7 @@ function rmTouchEnd() {
 
 </body>
 </html>
+
 
 
 
