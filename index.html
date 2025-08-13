@@ -592,6 +592,14 @@ function centerReset() {
 }
 function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
 
+    
+/* --- ROADMAP LIGHTBOX — TOUCH STATE --- */
+let touchMoved = false;
+let pinchStartDist = 0;
+let pinchStartScale = 1;
+let panStartX = 0, panStartY = 0;
+let panning = false;
+
 
 /* --- ROADMAP LIGHTBOX — OPEN/CLOSE --- */
 function openLightbox(src) {
@@ -658,7 +666,59 @@ function rmWheelHandler(e) {
   applyTransform();
 }
 
+/* --- ROADMAP LIGHTBOX — TOUCH HANDLERS (PINCH + PAN + TAP) --- */
+let touchMoved = false;
+let pinchStartDist = 0;
+let pinchStartScale = 1;
+let panStartX = 0, panStartY = 0;
+let panning = false;
 
+function rmTouchStart(e) {
+  touchMoved = false;
+
+  if (e.touches.length === 2) {
+    const [a,b] = e.touches;
+    pinchStartDist = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+    pinchStartScale = scale;
+  } else if (e.touches.length === 1) {
+    if (scale > 1) {
+      const t = e.touches[0];
+      panning = true;
+      panStartX = t.clientX - tx;
+      panStartY = t.clientY - ty;
+    }
+  }
+}
+
+function rmTouchMove(e) {
+  if (e.touches.length === 2) {
+    e.preventDefault(); // undgå sidescroll/sidezoom
+    const [a,b] = e.touches;
+    const dist = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+    scale = clamp(pinchStartScale * (dist / pinchStartDist), MIN_SCALE, MAX_SCALE);
+    applyTransform();
+    touchMoved = true;
+  } else if (e.touches.length === 1 && panning) {
+    e.preventDefault(); // undgå sidescroll
+    const t = e.touches[0];
+    tx = t.clientX - panStartX;
+    ty = t.clientY - panStartY;
+    applyTransform();
+    touchMoved = true;
+  }
+}
+
+function rmTouchEnd() {
+  panning = false;
+  // Tap: hvis ingen bevægelse → reset eller luk
+  if (!touchMoved) {
+    if (scale > 1) centerReset();
+    else closeLightbox();
+  }
+}
+
+
+    
 
   /* --- ROADMAP LIGHTBOX — INIT ON LOAD --- */
   window.addEventListener('load', () => {
@@ -707,6 +767,7 @@ function rmWheelHandler(e) {
 
 </body>
 </html>
+
 
 
 
