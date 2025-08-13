@@ -634,35 +634,7 @@ function markRoadmapImages() {
   hits.forEach(img => img.classList.add('roadmap-thumb'));
   console.log('[roadmap] fundet billeder:', hits.map(i => i.src));
 }
-
-/* --- ROADMAP LIGHTBOX — PC: WHEEL ZOOM --- */
-// Zoom omkring cursorens position (føles naturligt)
-rmImg.addEventListener('wheel', (e) => {
-  e.preventDefault();
-  const rect = rmImg.getBoundingClientRect();
-  // cursor relativt til billedets center (inkl. nuværende pan)
-  const cx = e.clientX - (rect.left + rect.width/2) - tx;
-  const cy = e.clientY - (rect.top  + rect.height/2) - ty;
-
-  const old = scale;
-  // blød zoom: negativ delta = zoom ind, positiv = zoom ud
-  const factor = Math.exp(-e.deltaY * 0.0015);
-  scale = clamp(scale * factor, MIN_SCALE, MAX_SCALE);
-
-  const k = scale / old;
-  // hold cursorpunktet “fast” under musen
-  tx -= cx * (k - 1);
-  ty -= cy * (k - 1);
-
-  applyTransform();
-}, { passive: false });
-
-/* --- ROADMAP LIGHTBOX — CLICK LOGIC (RESET → CLOSE) --- */
-// Klik på selve billedet: hvis zoomet → reset; ellers → luk
-rmImg.addEventListener('click', () => {
-  if (scale > 1) centerReset();
-  else closeLightbox();
-});
+    
 
 
 /* --- ROADMAP LIGHTBOX — PC: WHEEL HANDLER (ZOOM OM CURSOR) --- */
@@ -687,10 +659,36 @@ function rmWheelHandler(e) {
 }
 
 
-    
-    
-/* --- ROADMAP LIGHTBOX — INIT ON LOAD --- */
 
+  /* --- ROADMAP LIGHTBOX — INIT ON LOAD --- */
+  window.addEventListener('load', () => {
+  // Hent referencer EFTER at DOM er klar
+  rmBox = document.getElementById('rm-lightbox');
+  rmImg = document.getElementById('rm-image');
+
+  // 1) Mærk roadmap-billeder (giver dem .roadmap-thumb)
+  markRoadmapImages();
+
+  // 2) Bind klik/tap på thumbnails + klik på backdrop
+  initRoadmapLightboxPart1();
+
+  // 3) Først nu findes rmImg → tilmeld wheel-zoom og klik-logik
+  if (rmImg) {
+    // musehjul = zoom om cursor
+    rmImg.addEventListener('wheel', rmWheelHandler, { passive: false });
+
+    // klik på billedet: hvis zoomet → reset; ellers → luk
+    rmImg.addEventListener('click', () => {
+      if (scale > 1) centerReset();
+      else closeLightbox();
+    });
+  }
+});
+
+
+
+
+    
 /* === ROADMAP LIGHTBOX — SLUT === */
 </script>
 
@@ -709,6 +707,7 @@ function rmWheelHandler(e) {
 
 </body>
 </html>
+
 
 
 
