@@ -762,6 +762,11 @@ window.addEventListener('load', () => {
   rmImg.addEventListener('touchstart', rmTouchStart, { passive: true });
   rmImg.addEventListener('touchmove',  rmTouchMove,  { passive: false });
   rmImg.addEventListener('touchend',   rmTouchEnd,   { passive: true });
+
+    // Blokér scrolling på selve overlayet (Android/iOS)
+  rmBox.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+
+  
 });
 /* --- /ROADMAP LIGHTBOX — INIT ON LOAD --- */
 
@@ -784,6 +789,7 @@ window.addEventListener('load', () => {
 
 </body>
 </html>
+
 
 
 
