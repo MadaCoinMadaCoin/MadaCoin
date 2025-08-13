@@ -27,10 +27,11 @@
 <body>
   <header class="wrap">
     <nav>
-      <a href="/">Forside</a>
-      <a href="/madacoin.html">Om MadaCoin</a>
-      <a aria-current="page" class="pill" href="/rapporter.html">Rapporter</a>
-    </nav>
+  <button id="nav-home" type="button" class="pill">Forside</button>
+  <button id="nav-om" type="button" class="pill">Om MadaCoin</button>
+  <button id="nav-rapporter" type="button" class="pill">Rapporter</button>
+</nav>
+
   </header>
 
   <main class="wrap">
@@ -108,5 +109,23 @@
       });
     }
   </script>
+
+  <script>
+  const go = (id, href) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('click', () => { window.location.href = href; });
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.location.href = href; }
+    });
+  };
+  go('nav-home','/');
+  go('nav-om','/madacoin.html');
+  go('nav-rapporter','/rapporter.html');
+</script>
+
+
+  
 </body>
+
 </html>
