@@ -252,9 +252,12 @@ body.modal-open {
 
   <!-- ØVERSTE MENU -->
   <div class="menu">
-    <a href="#">Hjem</a>
-    <a href="/madacoin.html">Om MadaCoin</a>
-    <a href="/rapporter.html">Rapporter</a>
+    <nav>
+  <button id="nav-home" class="pill">Forside</button>
+  <button id="nav-om" class="pill">Om MadaCoin</button>
+  <button id="nav-rapporter" class="pill">Rapporter</button>
+</nav>
+
   </div>
 
   <!-- Ø-billedet -->
@@ -787,12 +790,28 @@ window.addEventListener('load', () => {
   <img id="rm-image" alt="Roadmap" />
 </div>
 
-  
+
+
+
+  <script>
+  // Brug optional chaining (?.) så der ikke kommer fejl hvis en knap mangler på en side
+  document.getElementById('nav-home')?.addEventListener('click', () => {
+    window.location.assign('/');
+  });
+  document.getElementById('nav-om')?.addEventListener('click', () => {
+    window.location.assign('/madacoin.html');
+  });
+  document.getElementById('nav-rapporter')?.addEventListener('click', () => {
+    window.location.assign('/rapporter.html');
+  });
+</script>
+
   
   <footer><span id="footer-text">© 2025 MadaCoin. All rights reserved.</span></footer>
 
 </body>
 </html>
+
 
 
 
