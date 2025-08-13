@@ -594,52 +594,43 @@ window.addEventListener('load', () => {
   <script>
 /* === ROADMAP LIGHTBOX — START (GENINDSAT) === */
 
-/* --- ROADMAP LIGHTBOX — STATE & REF --- */
-let rmBox, rmImg; // sættes når siden er loadet
-    
- /* --- ROADMAP LIGHTBOX — TRANSFORM STATE & HELPERS --- */
-let scale = 1, tx = 0, ty = 0;        // zoom (scale) + pan (translate)
-const MIN_SCALE = 1, MAX_SCALE = 4;   // zoom-grænser
+/* --- STATE & REF --- */
+let rmBox, rmImg;
+let scale = 1, tx = 0, ty = 0;
+const MIN_SCALE = 1, MAX_SCALE = 4;
 
 function applyTransform() {
+  if (!rmImg) return;
   rmImg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
 }
-function centerReset() {
-  scale = 1; tx = 0; ty = 0;
-  applyTransform();
-}
-function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+function centerReset() { scale = 1; tx = 0; ty = 0; applyTransform(); }
+function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
 
-    
-/* --- ROADMAP LIGHTBOX — TOUCH STATE --- */
+/* --- TOUCH STATE --- */
 let touchMoved = false;
 let pinchStartDist = 0;
 let pinchStartScale = 1;
 let panStartX = 0, panStartY = 0;
 let panning = false;
 
-
-/* --- ROADMAP LIGHTBOX — OPEN/CLOSE --- */
+/* --- OPEN/CLOSE --- */
 function openLightbox(src) {
   rmImg.src = src;
-  centerReset(); // start altid centreret i 1x
+  centerReset();                          // start centreret
   document.body.classList.add('modal-open'); // lås baggrundsscroll
   rmBox.classList.add('active');
   rmBox.setAttribute('aria-hidden', 'false');
 }
 function closeLightbox() {
-  document.body.classList.remove('modal-open'); // lås op igen
+  document.body.classList.remove('modal-open');
   rmBox.classList.remove('active');
   rmBox.setAttribute('aria-hidden', 'true');
   rmImg.src = '';
 }
 
-
-/* --- ROADMAP LIGHTBOX — BIND THUMBNAILS (DEL 1: ÅBNE/LUKKE) --- */
+/* --- BIND THUMBNAILS (klik/tap åbner) --- */
 function initRoadmapLightboxPart1() {
-  console.log('[lightbox] init thumbnails');
-
-  const thumbs = Array.from(document.querySelectorAll('.roadmap-thumb'));
+  const thumbs = [...document.querySelectorAll('.roadmap-thumb')];
   console.log('[lightbox] thumbs found:', thumbs.length);
 
   thumbs.forEach(img => {
@@ -647,14 +638,12 @@ function initRoadmapLightboxPart1() {
 
     // PC: klik åbner
     img.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      console.log('[lightbox] click thumb -> open', full);
+      ev.preventDefault(); ev.stopPropagation();
       openLightbox(full);
     }, { passive: false });
 
-    // MOBIL: robust tap
-    let sx = 0, sy = 0, st = 0, moved = false;
+    // MOBIL: robust tap (kort tid, næsten ingen bevægelse)
+    let sx=0, sy=0, st=0, moved=false;
     img.addEventListener('touchstart', (ev) => {
       if (ev.touches.length !== 1) return;
       const t = ev.touches[0];
@@ -669,76 +658,60 @@ function initRoadmapLightboxPart1() {
 
     img.addEventListener('touchend', () => {
       const dt = Date.now() - st;
-      if (!moved && dt < 300) {
-        console.log('[lightbox] tap thumb -> open', full);
-        openLightbox(full);
-      }
+      if (!moved && dt < 300) openLightbox(full);
     }, { passive: true });
   });
 }
 
-
-/* --- ROADMAP LIGHTBOX — AUTO-MARK THUMBS --- */
+/* --- AUTO-MARK THUMBS (img hvor src indeholder "roadmap") --- */
 function markRoadmapImages() {
-  // Mærk automatisk alle <img> hvor src indeholder "roadmap"
-  const imgs = Array.from(document.querySelectorAll('img'));
+  const imgs = [...document.querySelectorAll('img')];
   const hits = imgs.filter(img => /roadmap/i.test(img.src));
   hits.forEach(img => img.classList.add('roadmap-thumb'));
-  console.log('[roadmap] fundet billeder:', hits.map(i => i.src));
 }
-    
 
-
-/* --- ROADMAP LIGHTBOX — PC: WHEEL HANDLER (ZOOM OM CURSOR) --- */
+/* --- PC: WHEEL ZOOM (zoom om cursor) --- */
 function rmWheelHandler(e) {
   e.preventDefault();
   const rect = rmImg.getBoundingClientRect();
-
-  // cursor relativt til billedets center (inkl. nuværende pan)
   const cx = e.clientX - (rect.left + rect.width/2) - tx;
   const cy = e.clientY - (rect.top  + rect.height/2) - ty;
 
   const old = scale;
-  const factor = Math.exp(-e.deltaY * 0.0015); // blød zoom
-  scale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * factor));
+  const factor = Math.exp(-e.deltaY * 0.0015);   // blød zoom
+  scale = clamp(scale * factor, MIN_SCALE, MAX_SCALE);
 
   const k = scale / old;
-  // hold cursorpunktet “fast” under musen
   tx -= cx * (k - 1);
   ty -= cy * (k - 1);
 
   applyTransform();
 }
 
-/* --- ROADMAP LIGHTBOX — TOUCH HANDLERS (PINCH + PAN + TAP) --- */
-
+/* --- MOBIL: PINCH + PAN + TAP --- */
 function rmTouchStart(e) {
   touchMoved = false;
-
   if (e.touches.length === 2) {
     const [a,b] = e.touches;
-    pinchStartDist = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+    pinchStartDist  = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
     pinchStartScale = scale;
-  } else if (e.touches.length === 1) {
-    if (scale > 1) {
-      const t = e.touches[0];
-      panning = true;
-      panStartX = t.clientX - tx;
-      panStartY = t.clientY - ty;
-    }
+  } else if (e.touches.length === 1 && scale > 1) {
+    const t = e.touches[0];
+    panning = true;
+    panStartX = t.clientX - tx;
+    panStartY = t.clientY - ty;
   }
 }
-
 function rmTouchMove(e) {
   if (e.touches.length === 2) {
-    e.preventDefault(); // undgå sidescroll/sidezoom
+    e.preventDefault();
     const [a,b] = e.touches;
     const dist = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
     scale = clamp(pinchStartScale * (dist / pinchStartDist), MIN_SCALE, MAX_SCALE);
     applyTransform();
     touchMoved = true;
   } else if (e.touches.length === 1 && panning) {
-    e.preventDefault(); // undgå sidescroll
+    e.preventDefault();
     const t = e.touches[0];
     tx = t.clientX - panStartX;
     ty = t.clientY - panStartY;
@@ -746,64 +719,44 @@ function rmTouchMove(e) {
     touchMoved = true;
   }
 }
-
 function rmTouchEnd() {
   panning = false;
-  // Tap: hvis ingen bevægelse → reset eller luk
   if (!touchMoved) {
     if (scale > 1) centerReset();
     else closeLightbox();
   }
 }
 
-
-    
-
-  /* --- ROADMAP LIGHTBOX — INIT ON LOAD --- */
+/* --- INIT ON LOAD --- */
 window.addEventListener('load', () => {
-  // 1) Hent referencer EFTER at DOM er klar
   rmBox = document.getElementById('rm-lightbox');
   rmImg = document.getElementById('rm-image');
+  if (!rmBox || !rmImg) { console.warn('[lightbox] elements missing'); return; }
 
-  // 2) Mærk roadmap-billeder + bind åbne/lukke på thumbnails
+  // 1) thumbnails
   markRoadmapImages();
   initRoadmapLightboxPart1();
 
-  // 3) Overlay-klik (nu hvor rmBox findes)
-  if (rmBox) {
-    rmBox.addEventListener('click', (e) => {
-      const clickedBackdrop = e.target === rmBox || e.target.classList.contains('rm-backdrop');
-      const clickedImage    = e.target === rmImg;
-      if (clickedBackdrop || clickedImage) closeLightbox();
-    }, { passive: true });
+  // 2) overlay (klik lukker, blokér scroll på mobil)
+  rmBox.addEventListener('click', (e) => {
+    const clickedBackdrop = e.target === rmBox || e.target.classList.contains('rm-backdrop');
+    const clickedImage    = e.target === rmImg;
+    if (clickedBackdrop || clickedImage) closeLightbox();
+  }, { passive: true });
+  rmBox.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
 
-    // Blokér scroll på overlay (mobil)
-    rmBox.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
-  }
-
-  // 4) Billed-handlers (PC + mobil)
-  if (rmImg) {
-    // PC: wheel-zoom + klik (reset → luk)
-    rmImg.addEventListener('wheel', rmWheelHandler, { passive: false });
-    rmImg.addEventListener('click', () => {
-      if (scale > 1) centerReset();
-      else closeLightbox();
-    });
-
-    // Mobil: pinch-zoom + pan + tap (reset → luk)
-    rmImg.addEventListener('touchstart', rmTouchStart, { passive: true });
-    rmImg.addEventListener('touchmove',  rmTouchMove,  { passive: false });
-    rmImg.addEventListener('touchend',   rmTouchEnd,   { passive: true });
-  }
+  // 3) billed-handlers
+  rmImg.addEventListener('wheel', rmWheelHandler, { passive: false });
+  rmImg.addEventListener('click', () => { if (scale > 1) centerReset(); else closeLightbox(); });
+  rmImg.addEventListener('touchstart', rmTouchStart, { passive: true });
+  rmImg.addEventListener('touchmove',  rmTouchMove,  { passive: false });
+  rmImg.addEventListener('touchend',   rmTouchEnd,   { passive: true });
 
   console.log('[lightbox] init done');
 });
-/* --- /ROADMAP LIGHTBOX — INIT ON LOAD --- */
-
-
-    
 /* === ROADMAP LIGHTBOX — SLUT === */
 </script>
+
 
 
 
@@ -820,6 +773,7 @@ window.addEventListener('load', () => {
 
 </body>
 </html>
+
 
 
 
