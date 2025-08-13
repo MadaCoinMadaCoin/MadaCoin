@@ -21,15 +21,25 @@
 
   <style>
     /* Base layout */
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      /* NOTE: Signed URL udløber senere – ok for nu */
-      background: url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/sign/backgrounds/ChatGPT%20Image%2026.%20jul.%202025,%2002.39.48.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8wZTcxMmNhYy0yZjA2LTQ2Y2YtYjRlMC1lOTcyZjJiNmQwNjEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJiYWNrZ3JvdW5kcy9DaGF0R1BUIEltYWdlIDI2LiBqdWwuIDIwMjUsIDAyLjM5LjQ4LnBuZyIsImlhdCI6MTc1MzQ5MzUwMCwiZXhwIjoxMDM5MzQwNzEwMH0.MDP85P5oLRUPvjTqFpzpaHDTgHa6Kg1pY9XDHYrve8w') no-repeat center center fixed;
-      background-size: cover;
-      background-attachment: fixed;
-    }
+    body{
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+
+  background-color: #061a2b; /* fallback */
+  background-image: url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png'); /* ← brug din public URL, .png eller .jpg */
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  background-attachment: fixed; /* ser godt ud på desktop */
+}
+
+/* Slå 'fixed' fra på mobil for glattere scroll */
+@media (max-width: 800px){
+  body{ background-attachment: scroll; }
+}
+
+
 
     .madagascar-container {
       position: absolute;
@@ -832,6 +842,7 @@ window.addEventListener('load', () => {
 
 </body>
 </html>
+
 
 
 
