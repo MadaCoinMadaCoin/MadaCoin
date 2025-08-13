@@ -109,24 +109,13 @@
       });
     }
 
-<script>
-  const go = (id, href) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.addEventListener('click', () => { window.location.href = href; });
-    el.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.location.href = href; }
-    });
-  };
-  go('nav-home','/');
-  go('nav-om','/madacoin.html');
-  go('nav-rapporter','/rapporter.html');
-</script>
-
 
     
   </script>
+
+  
 </body>
 
 </html>
+
 
