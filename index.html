@@ -325,6 +325,9 @@
           const img = document.createElement('img');
           img.alt = `Roadmap ${stepIndex} billede ${i}`;
           img.src = url;
+          
+          // --- ROADMAP LIGHTBOX: gør thumbnail klikbar ---
+          img.classList.add('roadmap-thumb');
           img.onerror = () => img.remove();
           wrap.appendChild(img);
         }
@@ -706,6 +709,7 @@ function rmWheelHandler(e) {
 
 </body>
 </html>
+
 
 
 
