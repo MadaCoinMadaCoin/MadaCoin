@@ -599,9 +599,10 @@ let rmBox, rmImg;
 let scale = 1, tx = 0, ty = 0;
 const MIN_SCALE = 1, MAX_SCALE = 4;
 
-    /* --- ROADMAP LIGHTBOX — OPEN GUARD --- */
+/* --- ROADMAP LIGHTBOX — OPEN GUARD --- */
 let justOpenedAt = 0;
-const OPEN_GUARD_MS = 350; // ignorér klik/tap i ~0,35s efter åbning
+const OPEN_GUARD_MS = 350; // ignorer klik/tap ~0,35s efter åbning
+
 
 
 function applyTransform() {
@@ -625,7 +626,7 @@ function openLightbox(src) {
   document.body.classList.add('modal-open'); // lås baggrundsscroll
   rmBox.classList.add('active');
   rmBox.setAttribute('aria-hidden', 'false');
-  justOpenedAt = Date.now(); // <-- tilføj denne linje
+  justOpenedAt = Date.now(); // sæt tidsstempel når vi åbner
 }
 function closeLightbox() {
   document.body.classList.remove('modal-open');
@@ -662,11 +663,15 @@ function initRoadmapLightboxPart1() {
       if (Math.abs(t.clientX - sx) > 10 || Math.abs(t.clientY - sy) > 10) moved = true;
     }, { passive: true });
 
-    img.addEventListener('touchend', () => {
-      const dt = Date.now() - st;
-      if (!moved && dt < 300) openLightbox(full);
-    }, { passive: false });      // <— ændret fra true
-  });
+    img.addEventListener('touchend', (ev) => {
+  const dt = Date.now() - st;
+  if (!moved && dt < 300) {
+    ev.preventDefault();       // ← stop “syntetisk klik” efter touchend
+    ev.stopPropagation();
+    openLightbox(full);
+  }
+}, { passive: false });
+
 }
 
 /* --- AUTO-MARK THUMBS (img hvor src indeholder "roadmap") --- */
@@ -761,6 +766,7 @@ window.addEventListener('load', () => {
   rmImg.addEventListener('touchstart', rmTouchStart, { passive: true });
   rmImg.addEventListener('touchmove',  rmTouchMove,  { passive: false });
   rmImg.addEventListener('touchend',   rmTouchEnd,   { passive: true });
+  rmImg.addEventListener('contextmenu', (e) => e.preventDefault());
 
   console.log('[lightbox] init done');
 });
@@ -783,6 +789,7 @@ window.addEventListener('load', () => {
 
 </body>
 </html>
+
 
 
 
