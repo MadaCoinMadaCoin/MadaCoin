@@ -686,16 +686,6 @@ function rmWheelHandler(e) {
     
     
 /* --- ROADMAP LIGHTBOX — INIT ON LOAD --- */
-window.addEventListener('load', () => {
-  // Hent referencer EFTER DOM er klar
-  rmBox = document.getElementById('rm-lightbox');
-  rmImg = document.getElementById('rm-image');
-
-  // 1) Mærk roadmap-billeder
-  markRoadmapImages();
-  // 2) Tilknyt åbne/lukke-hændelser
-  initRoadmapLightboxPart1();
-});
 
 /* === ROADMAP LIGHTBOX — SLUT === */
 </script>
@@ -715,6 +705,7 @@ window.addEventListener('load', () => {
 
 </body>
 </html>
+
 
 
 
