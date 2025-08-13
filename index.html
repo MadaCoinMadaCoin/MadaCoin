@@ -253,11 +253,10 @@ body.modal-open {
   <!-- ØVERSTE MENU -->
   <div class="menu">
     <nav>
-  <button id="nav-home" type="button" class="pill">Forside</button>
-  <button id="nav-om" type="button" class="pill">Om MadaCoin</button>
-  <button id="nav-rapporter" type="button" class="pill">Rapporter</button>
-
-</nav>
+      <a href="/index.html">Home</a>
+      <a href="/madacoin.html">Om MadaCoin</a>
+      <a href="/rapporter.html">Rapporter</a>
+    </nav>
 
   </div>
 
@@ -794,27 +793,12 @@ window.addEventListener('load', () => {
 
 
 
-  <script>
-  const go = (id, href) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.type = 'button';
-    el.addEventListener('click', () => window.location.assign(href));
-    el.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.location.assign(href); }
-    });
-  };
-  go('nav-home','/');
-  go('nav-om','/madacoin.html');
-  go('nav-rapporter','/rapporter.html');
-</script>
-
-
   
   <footer><span id="footer-text">© 2025 MadaCoin. All rights reserved.</span></footer>
 
 </body>
 </html>
+
 
 
 
