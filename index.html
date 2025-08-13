@@ -794,23 +794,27 @@ window.addEventListener('load', () => {
 
 
   <script>
-  // Brug optional chaining (?.) så der ikke kommer fejl hvis en knap mangler på en side
-  document.getElementById('nav-home')?.addEventListener('click', () => {
-    window.location.assign('/');
-  });
-  document.getElementById('nav-om')?.addEventListener('click', () => {
-    window.location.assign('/madacoin.html');
-  });
-  document.getElementById('nav-rapporter')?.addEventListener('click', () => {
-    window.location.assign('/rapporter.html');
-  });
+  const go = (id, href) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.type = 'button';
+    el.addEventListener('click', () => window.location.assign(href));
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.location.assign(href); }
+    });
+  };
+  go('nav-home','/');
+  go('nav-om','/madacoin.html');
+  go('nav-rapporter','/rapporter.html');
 </script>
+
 
   
   <footer><span id="footer-text">© 2025 MadaCoin. All rights reserved.</span></footer>
 
 </body>
 </html>
+
 
 
 
