@@ -208,6 +208,24 @@
   background: rgba(0,0,0,.85);
 }
 
+
+ /* --- LIGHTBOX: blokér baggrundsscroll på mobil --- */
+body.modal-open { 
+  overflow: hidden;             /* ingen scroll i baggrunden */
+  height: 100vh;
+}
+
+/* Undgå at swipe/overscroll bobler ud af overlayet */
+#rm-lightbox { 
+  overscroll-behavior: contain; 
+}
+
+/* Sørg for at berøringer ikke triggere side-gestus */
+#rm-lightbox, #rm-lightbox * {
+  touch-action: none;
+}
+    
+
 /* Selve billedet i lightbox */
 #rm-image {
   position: relative;
@@ -605,10 +623,12 @@ let panning = false;
 function openLightbox(src) {
   rmImg.src = src;
   centerReset(); // start altid centreret i 1x
+  document.body.classList.add('modal-open'); // lås baggrundsscroll
   rmBox.classList.add('active');
   rmBox.setAttribute('aria-hidden', 'false');
 }
 function closeLightbox() {
+  document.body.classList.remove('modal-open'); // lås op igen
   rmBox.classList.remove('active');
   rmBox.setAttribute('aria-hidden', 'true');
   rmImg.src = '';
@@ -764,6 +784,7 @@ window.addEventListener('load', () => {
 
 </body>
 </html>
+
 
 
 
