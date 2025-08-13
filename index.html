@@ -660,6 +660,30 @@ rmImg.addEventListener('click', () => {
   else closeLightbox();
 });
 
+
+/* --- ROADMAP LIGHTBOX — PC: WHEEL HANDLER (ZOOM OM CURSOR) --- */
+function rmWheelHandler(e) {
+  e.preventDefault();
+  const rect = rmImg.getBoundingClientRect();
+
+  // cursor relativt til billedets center (inkl. nuværende pan)
+  const cx = e.clientX - (rect.left + rect.width/2) - tx;
+  const cy = e.clientY - (rect.top  + rect.height/2) - ty;
+
+  const old = scale;
+  const factor = Math.exp(-e.deltaY * 0.0015); // blød zoom
+  scale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * factor));
+
+  const k = scale / old;
+  // hold cursorpunktet “fast” under musen
+  tx -= cx * (k - 1);
+  ty -= cy * (k - 1);
+
+  applyTransform();
+}
+
+
+    
     
 /* --- ROADMAP LIGHTBOX — INIT ON LOAD --- */
 window.addEventListener('load', () => {
@@ -691,6 +715,7 @@ window.addEventListener('load', () => {
 
 </body>
 </html>
+
 
 
 
