@@ -637,42 +637,46 @@ function closeLightbox() {
 
 /* --- ROADMAP LIGHTBOX — BIND THUMBNAILS (DEL 1: ÅBNE/LUKKE) --- */
 function initRoadmapLightboxPart1() {
-  // Finder alle thumbnails (vi tilføjer klassen automatisk i markRoadmapImages)
-  document.querySelectorAll('.roadmap-thumb').forEach(img => {
+  console.log('[lightbox] init thumbnails');
+
+  const thumbs = Array.from(document.querySelectorAll('.roadmap-thumb'));
+  console.log('[lightbox] thumbs found:', thumbs.length);
+
+  thumbs.forEach(img => {
     const full = img.dataset.fullsrc || img.src;
-      // PC: klik åbner
-  img.addEventListener('click', () => openLightbox(full));
 
-  // MOBIL: robust tap-detektion (hurtig tap uden bevægelse)
-  let sx = 0, sy = 0, st = 0, moved = false;
+    // PC: klik åbner
+    img.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      console.log('[lightbox] click thumb -> open', full);
+      openLightbox(full);
+    }, { passive: false });
 
-  img.addEventListener('touchstart', (ev) => {
-    if (ev.touches.length !== 1) return;
-    const t = ev.touches[0];
-    sx = t.clientX; sy = t.clientY; st = Date.now(); moved = false;
-  }, { passive: true });
+    // MOBIL: robust tap
+    let sx = 0, sy = 0, st = 0, moved = false;
+    img.addEventListener('touchstart', (ev) => {
+      if (ev.touches.length !== 1) return;
+      const t = ev.touches[0];
+      sx = t.clientX; sy = t.clientY; st = Date.now(); moved = false;
+    }, { passive: true });
 
-  img.addEventListener('touchmove', (ev) => {
-    if (ev.touches.length !== 1) return;
-    const t = ev.touches[0];
-    if (Math.abs(t.clientX - sx) > 10 || Math.abs(t.clientY - sy) > 10) moved = true;
-  }, { passive: true });
+    img.addEventListener('touchmove', (ev) => {
+      if (ev.touches.length !== 1) return;
+      const t = ev.touches[0];
+      if (Math.abs(t.clientX - sx) > 10 || Math.abs(t.clientY - sy) > 10) moved = true;
+    }, { passive: true });
 
-  img.addEventListener('touchend', () => {
-    const dt = Date.now() - st;
-    // betingelser for “tap”: kort tid, næsten ingen bevægelse
-    if (!moved && dt < 300) openLightbox(full);
-  }, { passive: true 
-     });
-
-
-  // Klik på baggrunden eller billedet selv → luk
-  rmBox.addEventListener('click', (e) => {
-    const clickedBackdrop = e.target === rmBox || e.target.classList.contains('rm-backdrop');
-    const clickedImage    = e.target === rmImg;
-    if (clickedBackdrop || clickedImage) closeLightbox();
+    img.addEventListener('touchend', () => {
+      const dt = Date.now() - st;
+      if (!moved && dt < 300) {
+        console.log('[lightbox] tap thumb -> open', full);
+        openLightbox(full);
+      }
+    }, { passive: true });
   });
 }
+
 
 /* --- ROADMAP LIGHTBOX — AUTO-MARK THUMBS --- */
 function markRoadmapImages() {
@@ -765,30 +769,37 @@ window.addEventListener('load', () => {
   markRoadmapImages();
   initRoadmapLightboxPart1();
 
-  // 3) Når billedet findes i lightbox → tilmeld handlers
-  if (!rmImg) {
-    console.warn('[lightbox] rmImg mangler');
-    return;
+  // 3) Overlay-klik (nu hvor rmBox findes)
+  if (rmBox) {
+    rmBox.addEventListener('click', (e) => {
+      const clickedBackdrop = e.target === rmBox || e.target.classList.contains('rm-backdrop');
+      const clickedImage    = e.target === rmImg;
+      if (clickedBackdrop || clickedImage) closeLightbox();
+    }, { passive: true });
+
+    // Blokér scroll på overlay (mobil)
+    rmBox.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
   }
 
-  /* PC: musehjul-zoom + klik (reset → luk) */
-  rmImg.addEventListener('wheel', rmWheelHandler, { passive: false });
-  rmImg.addEventListener('click', () => {
-    if (scale > 1) centerReset();
-    else closeLightbox();
-  });
+  // 4) Billed-handlers (PC + mobil)
+  if (rmImg) {
+    // PC: wheel-zoom + klik (reset → luk)
+    rmImg.addEventListener('wheel', rmWheelHandler, { passive: false });
+    rmImg.addEventListener('click', () => {
+      if (scale > 1) centerReset();
+      else closeLightbox();
+    });
 
-  /* Mobil: pinch-zoom + pan + tap (reset → luk) */
-  rmImg.addEventListener('touchstart', rmTouchStart, { passive: true });
-  rmImg.addEventListener('touchmove',  rmTouchMove,  { passive: false });
-  rmImg.addEventListener('touchend',   rmTouchEnd,   { passive: true });
+    // Mobil: pinch-zoom + pan + tap (reset → luk)
+    rmImg.addEventListener('touchstart', rmTouchStart, { passive: true });
+    rmImg.addEventListener('touchmove',  rmTouchMove,  { passive: false });
+    rmImg.addEventListener('touchend',   rmTouchEnd,   { passive: true });
+  }
 
-    // Blokér scrolling på selve overlayet (Android/iOS)
-  rmBox.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
-
-  
+  console.log('[lightbox] init done');
 });
 /* --- /ROADMAP LIGHTBOX — INIT ON LOAD --- */
+
 
     
 /* === ROADMAP LIGHTBOX — SLUT === */
@@ -809,6 +820,7 @@ window.addEventListener('load', () => {
 
 </body>
 </html>
+
 
 
 
