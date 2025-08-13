@@ -515,10 +515,16 @@
       });
   }
 
+/* --- SOCIAL MENU (IKONER) — INIT ON LOAD --- */
 window.addEventListener('load', () => {
+  // Tegn ikonmenuen, når siden er klar
   renderSocialLinks();
-  setTimeout(renderSocialLinks, 500); // ekstra sikkerhed
+
+  // Ekstra sikring: tegn igen kort efter i tilfælde af overskrivninger
+  setTimeout(renderSocialLinks, 500);
 });
+/* --- /SOCIAL MENU (IKONER) --- */
+
 
 
 
@@ -564,105 +570,66 @@ window.addEventListener('load', () => {
 
 
   <script>
-(function(){
-  function log(...args){ console.log('[social]', ...args); }
+/* === ROADMAP LIGHTBOX — START (GENINDSAT) === */
 
-  async function run() {
-    const root = document.getElementById('social-menu');
-    if (!root) { log('no root'); return; }
+/* --- ROADMAP LIGHTBOX — STATE & REF --- */
+let rmBox, rmImg; // sættes når siden er loadet
 
-    // Vent hvis Supabase-klienten ikke er klar endnu
-    if (!window.sb || !sb?.from) {
-      log('sb not ready → retry');
-      setTimeout(run, 300);
-      return;
-    }
-
-    try {
-      const { data, error } = await sb
-        .from('social_links')
-        .select('platform,url,sort_order,is_active,created_at')
-        .eq('is_active', true)
-        .not('url','is', null)
-        .neq('url','')
-        .order('sort_order', { ascending: true })
-        .order('created_at', { ascending: false });
-
-      log('query result', { rows: data?.length || 0, error });
-
-      if (error) { log('error', error); root.style.display = 'none'; return; }
-      if (!data?.length) { log('no rows'); root.style.display = 'none'; return; }
-
-      root.style.display = '';
-      root.innerHTML = '';
-
-      data.forEach(row => {
-        const a = document.createElement('a');
-        a.href = row.url;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        a.textContent = (row.platform || 'Link');
-        root.appendChild(a);
-      });
-
-      log('appended', root.querySelectorAll('a').length);
-    } catch (e) {
-      log('caught', e);
-    }
-  }
-
-  // Kør først når hele siden er loadet (inkl. eksterne scripts) — og log
-  window.addEventListener('load', () => { console.log('[social] window load'); run(); });
-})();
-
-
-// --- Roadmap Lightbox (del 1: åbne/lukke) ---
-let rmBox, rmImg; // sættes først når siden er loadet
-
+/* --- ROADMAP LIGHTBOX — OPEN/CLOSE --- */
 function openLightbox(src) {
   rmImg.src = src;
   rmBox.classList.add('active');
   rmBox.setAttribute('aria-hidden', 'false');
 }
-
 function closeLightbox() {
   rmBox.classList.remove('active');
   rmBox.setAttribute('aria-hidden', 'true');
   rmImg.src = '';
 }
 
+/* --- ROADMAP LIGHTBOX — BIND THUMBNAILS (DEL 1: ÅBNE/LUKKE) --- */
 function initRoadmapLightboxPart1() {
+  // Finder alle thumbnails (vi tilføjer klassen automatisk i markRoadmapImages)
   document.querySelectorAll('.roadmap-thumb').forEach(img => {
     const full = img.dataset.fullsrc || img.src;
+    // PC: klik åbner
     img.addEventListener('click', () => openLightbox(full));
+    // Mobil: tap åbner
     img.addEventListener('touchend', () => openLightbox(full), { passive: true });
   });
 
+  // Klik på baggrunden eller billedet selv → luk
   rmBox.addEventListener('click', (e) => {
-    if (e.target === rmBox || e.target.classList.contains('rm-backdrop') || e.target === rmImg) {
-      closeLightbox();
-    }
+    const clickedBackdrop = e.target === rmBox || e.target.classList.contains('rm-backdrop');
+    const clickedImage    = e.target === rmImg;
+    if (clickedBackdrop || clickedImage) closeLightbox();
   });
 }
 
-// Mærk automatisk alle <img> hvor src indeholder "roadmap"
+/* --- ROADMAP LIGHTBOX — AUTO-MARK THUMBS --- */
 function markRoadmapImages() {
+  // Mærk automatisk alle <img> hvor src indeholder "roadmap"
   const imgs = Array.from(document.querySelectorAll('img'));
   const hits = imgs.filter(img => /roadmap/i.test(img.src));
   hits.forEach(img => img.classList.add('roadmap-thumb'));
   console.log('[roadmap] fundet billeder:', hits.map(i => i.src));
 }
 
-// Kun én init – når siden er klar
+/* --- ROADMAP LIGHTBOX — INIT ON LOAD --- */
 window.addEventListener('load', () => {
+  // Hent referencer EFTER DOM er klar
   rmBox = document.getElementById('rm-lightbox');
   rmImg = document.getElementById('rm-image');
 
+  // 1) Mærk roadmap-billeder
   markRoadmapImages();
+  // 2) Tilknyt åbne/lukke-hændelser
   initRoadmapLightboxPart1();
 });
-  
+
+/* === ROADMAP LIGHTBOX — SLUT === */
 </script>
+
 
 
 
@@ -678,6 +645,7 @@ window.addEventListener('load', () => {
 
 </body>
 </html>
+
 
 
 
