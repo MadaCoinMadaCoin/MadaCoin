@@ -227,7 +227,7 @@ body.modal-open {
     
 
 /* Selve billedet i lightbox */
-#rm-image {
+  #rm-image { -webkit-touch-callout: none; }
   position: relative;
   max-width: 100vw;
   max-height: 100vh;
@@ -599,6 +599,11 @@ let rmBox, rmImg;
 let scale = 1, tx = 0, ty = 0;
 const MIN_SCALE = 1, MAX_SCALE = 4;
 
+    /* --- ROADMAP LIGHTBOX — OPEN GUARD --- */
+let justOpenedAt = 0;
+const OPEN_GUARD_MS = 350; // ignorér klik/tap i ~0,35s efter åbning
+
+
 function applyTransform() {
   if (!rmImg) return;
   rmImg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
@@ -620,6 +625,7 @@ function openLightbox(src) {
   document.body.classList.add('modal-open'); // lås baggrundsscroll
   rmBox.classList.add('active');
   rmBox.setAttribute('aria-hidden', 'false');
+  justOpenedAt = Date.now(); // <-- tilføj denne linje
 }
 function closeLightbox() {
   document.body.classList.remove('modal-open');
@@ -659,7 +665,7 @@ function initRoadmapLightboxPart1() {
     img.addEventListener('touchend', () => {
       const dt = Date.now() - st;
       if (!moved && dt < 300) openLightbox(full);
-    }, { passive: true });
+    }, { passive: false });      // <— ændret fra true
   });
 }
 
@@ -739,6 +745,7 @@ window.addEventListener('load', () => {
 
   // 2) overlay (klik lukker, blokér scroll på mobil)
   rmBox.addEventListener('click', (e) => {
+     if (Date.now() - justOpenedAt < OPEN_GUARD_MS) return; // <— NY
     const clickedBackdrop = e.target === rmBox || e.target.classList.contains('rm-backdrop');
     const clickedImage    = e.target === rmImg;
     if (clickedBackdrop || clickedImage) closeLightbox();
@@ -747,7 +754,10 @@ window.addEventListener('load', () => {
 
   // 3) billed-handlers
   rmImg.addEventListener('wheel', rmWheelHandler, { passive: false });
-  rmImg.addEventListener('click', () => { if (scale > 1) centerReset(); else closeLightbox(); });
+  rmImg.addEventListener('click', () => { 
+    if (Date.now() - justOpenedAt < OPEN_GUARD_MS) return; // <— NY
+    if (scale > 1) centerReset(); 
+    else closeLightbox(); });
   rmImg.addEventListener('touchstart', rmTouchStart, { passive: true });
   rmImg.addEventListener('touchmove',  rmTouchMove,  { passive: false });
   rmImg.addEventListener('touchend',   rmTouchEnd,   { passive: true });
@@ -773,6 +783,7 @@ window.addEventListener('load', () => {
 
 </body>
 </html>
+
 
 
 
