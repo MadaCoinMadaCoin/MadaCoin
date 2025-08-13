@@ -637,42 +637,46 @@ function closeLightbox() {
 
 /* --- BIND THUMBNAILS (klik/tap åbner) --- */
 function initRoadmapLightboxPart1() {
-  const thumbs = [...document.querySelectorAll('.roadmap-thumb')];
+  const thumbs = Array.from(document.querySelectorAll('.roadmap-thumb'));
   console.log('[lightbox] thumbs found:', thumbs.length);
 
-  thumbs.forEach(img => {
+  thumbs.forEach((img) => {
     const full = img.dataset.fullsrc || img.src;
 
     // PC: klik åbner
-    img.addEventListener('click', (ev) => {
-      ev.preventDefault(); ev.stopPropagation();
+    img.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       openLightbox(full);
     }, { passive: false });
 
-    // MOBIL: robust tap (kort tid, næsten ingen bevægelse)
-    let sx=0, sy=0, st=0, moved=false;
-    img.addEventListener('touchstart', (ev) => {
-      if (ev.touches.length !== 1) return;
-      const t = ev.touches[0];
+    // MOBIL: robust tap (kort tid + næsten ingen bevægelse)
+    let sx = 0, sy = 0, st = 0, moved = false;
+
+    img.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) return;
+      const t = e.touches[0];
       sx = t.clientX; sy = t.clientY; st = Date.now(); moved = false;
     }, { passive: true });
 
-    img.addEventListener('touchmove', (ev) => {
-      if (ev.touches.length !== 1) return;
-      const t = ev.touches[0];
-      if (Math.abs(t.clientX - sx) > 10 || Math.abs(t.clientY - sy) > 10) moved = true;
+    img.addEventListener('touchmove', (e) => {
+      if (e.touches.length !== 1) return;
+      const t = e.touches[0];
+      if (Math.abs(t.clientX - sx) > 15 || Math.abs(t.clientY - sy) > 15) moved = true; // lidt mere tolerance
     }, { passive: true });
 
-    img.addEventListener('touchend', (ev) => {
-  const dt = Date.now() - st;
-  if (!moved && dt < 300) {
-    ev.preventDefault();       // ← stop “syntetisk klik” efter touchend
-    ev.stopPropagation();
-    openLightbox(full);
-  }
-}, { passive: false });
-
+    // MOBIL: touchend = kort TAP → åbn (og stop syntetisk klik)
+    img.addEventListener('touchend', (e) => {
+      const dt = Date.now() - st;
+      if (!moved && dt < 350) {          // lidt længere tap-vindue
+        e.preventDefault();
+        e.stopPropagation();
+        openLightbox(full);
+      }
+    }, { passive: false });
+  });
 }
+
 
 /* --- AUTO-MARK THUMBS (img hvor src indeholder "roadmap") --- */
 function markRoadmapImages() {
@@ -789,6 +793,7 @@ window.addEventListener('load', () => {
 
 </body>
 </html>
+
 
 
 
