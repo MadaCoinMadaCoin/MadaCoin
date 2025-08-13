@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MadaCoin – Rapporter</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:#0b0b0c;color:#eaeaea}
+    header,footer{padding:14px 18px;border-bottom:1px solid #222}
+    a{color:#9ad4ff;text-decoration:none}
+    nav a{margin-right:14px;opacity:.9}
+    .wrap{max-width:1100px;margin:0 auto;padding:24px}
+    .card{background:#111;border:1px solid #252525;border-radius:16px;padding:18px;margin:14px 0}
+    h1,h2{margin:12px 0}
+    table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+    th,td{border-bottom:1px solid #262626;padding:10px;text-align:left}
+    .muted{opacity:.8}
+    .pill{display:inline-block;padding:3px 10px;border:1px solid #2a2a2a;border-radius:999px;font-size:12px;opacity:.9}
+    .right{text-align:right}
+    .empty{opacity:.7;border:1px dashed #2a2a2a;padding:16px;border-radius:14px}
+    details{background:#0f0f10;border:1px solid #212121;border-radius:12px;padding:10px}
+    summary{cursor:pointer}
+    ul{margin:6px 0 0 18px}
+  </style>
+</head>
+<body>
+  <header class="wrap">
+    <nav>
+      <a href="/">Forside</a>
+      <a href="/madacoin.html">Om MadaCoin</a>
+      <a aria-current="page" class="pill" href="/rapporter.html">Rapporter</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <h1>Månedlige rapporter</h1>
+    <p class="muted">Transparens over donationer (MCD), forbrug og drift (MCN). Tabellen opsummerer per måned; klik for detaljer.</p>
+
+    <div id="summary" class="card">
+      <h2>Opsummering</h2>
+      <table>
+        <tbody>
+          <tr><th>Perioder</th><td id="sum-periods" class="right">–</td></tr>
+          <tr><th>MCD modtaget</th><td id="sum-in" class="right">–</td></tr>
+          <tr><th>MCD brugt</th><td id="sum-out" class="right">–</td></tr>
+          <tr><th>Slutbalance (MCD)</th><td id="sum-bal" class="right">–</td></tr>
+          <tr><th>MCN indtægter</th><td id="sum-mcn" class="right">–</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="list"></div>
+    <div id="empty" class="empty" style="display:none">Ingen rapporter endnu.</div>
+  </main>
+
+  <footer class="wrap muted">© MadaCoin</footer>
+
+  <script>
+    function fmt(n){
+      if (n === null || n === undefined) return '–';
+      return new Intl.NumberFormat('da-DK',{maximumFractionDigits:2}).format(n);
+    }
+
+    if (typeof SUPABASE_URL === 'undefined') {
+      console.warn('[reports] SUPABASE config mangler – viser kun tom visning.');
+      document.getElementById('empty').style.display='block';
+    } else {
+      const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+      // Forventet tabel `reports`:
+      // id (uuid), period (text '2025-07'), mcd_in (numeric), mcd_out (numeric), mcd_balance (numeric), mcn_revenue (numeric), notes_md (text), links (json[])
+      sb.from('reports').select('*').order('period',{ascending:false}).then(({ data, error }) => {
+        if (error) { console.error(error); document.getElementById('empty').style.display='block'; return; }
+        if (!data || !data.length) { document.getElementById('empty').style.display='block'; return; }
+
+        // Opsummering
+        const sum = data.reduce((a,r)=>({
+          periods:a.periods+1,
+          in:a.in + (Number(r.mcd_in)||0),
+          out:a.out + (Number(r.mcd_out)||0),
+          bal: Number(r.mcd_balance)||a.bal,
+          mcn:a.mcn + (Number(r.mcn_revenue)||0)
+        }),{periods:0,in:0,out:0,bal:0,mcn:0});
+        document.getElementById('sum-periods').textContent = fmt(sum.periods);
+        document.getElementById('sum-in').textContent = fmt(sum.in);
+        document.getElementById('sum-out').textContent = fmt(sum.out);
+        document.getElementById('sum-bal').textContent = fmt(sum.bal);
+        document.getElementById('sum-mcn').textContent = fmt(sum.mcn);
+
+        // Liste
+        const host = document.getElementById('list');
+        data.forEach(r => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <h2>${r.title || 'Rapport'} – ${r.period}</h2>
+            <table><tbody>
+              <tr><th>MCD modtaget</th><td class="right">${fmt(r.mcd_in)}</td></tr>
+              <tr><th>MCD brugt</th><td class="right">${fmt(r.mcd_out)}</td></tr>
+              <tr><th>Slutbalance (MCD)</th><td class="right">${fmt(r.mcd_balance)}</td></tr>
+              <tr><th>MCN indtægter</th><td class="right">${fmt(r.mcn_revenue)}</td></tr>
+            </tbody></table>
+            ${r.notes_md ? `<details><summary>Noter</summary><div class="muted">${r.notes_md}</div></details>` : ''}
+            ${Array.isArray(r.links) && r.links.length ? `<details><summary>Bilag/kvitteringer</summary><ul>${r.links.map(x=>`<li><a target="_blank" rel="noopener" href="${x.url}">${x.label||x.url}</a></li>`).join('')}</ul></details>` : ''}
+          `;
+          host.appendChild(card);
+        });
+      });
+    }
+  </script>
+</body>
+</html>

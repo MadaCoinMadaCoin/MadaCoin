@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MadaCoin – Om projektet</title>
+  <link rel="preconnect" href="https://unpkg.com" />
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:#0b0b0c;color:#eaeaea}
+    header,footer{padding:14px 18px;border-bottom:1px solid #222}
+    a{color:#9ad4ff;text-decoration:none}
+    nav a{margin-right:14px;opacity:.9}
+    .wrap{max-width:1100px;margin:0 auto;padding:24px}
+    .hero{padding:24px 0}
+    .grid{display:grid;gap:16px}
+    .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    @media (max-width:900px){.grid-2{grid-template-columns:1fr}}
+    .card{background:#111;border:1px solid #252525;border-radius:16px;padding:18px;box-shadow:0 1px 0 rgba(255,255,255,.04) inset}
+    h1,h2,h3{margin:12px 0 8px}
+    .muted{opacity:.8}
+    .list{line-height:1.6}
+    .pill{display:inline-block;padding:3px 10px;border:1px solid #2a2a2a;border-radius:999px;font-size:12px;opacity:.9}
+    .kbd{font-family:ui-monospace,Menlo,Monaco,monospace;background:#0e0e0f;border:1px solid #2b2b2b;border-bottom-color:#1c1c1c;padding:2px 6px;border-radius:6px}
+  </style>
+</head>
+<body>
+  <header class="wrap">
+    <nav>
+      <a href="/">Forside</a>
+      <a aria-current="page" class="pill" href="/madacoin.html">Om MadaCoin</a>
+      <a href="/rapporter.html">Rapporter</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <h1>MadaCoin – Mål & vejen</h1>
+      <p class="muted" data-text="about:intro">
+        MadaCoin støtter udvikling i Madagaskar via to tokens: MCD (donation) og MCN (krypto).
+      </p>
+    </section>
+
+    <section class="grid grid-2">
+      <div class="card">
+        <h2>Tokens</h2>
+        <div class="list">
+          <p><strong>MCD – MadaCoin Donation</strong><br/><span class="muted" data-text="about:mcd">Donations-token. Midlerne går til projekter og rapporteres åbent.</span></p>
+          <p><strong>MCN – MadaCoin Crypto</strong><br/><span class="muted" data-text="about:mcn">Indtjenings-/driftstoken. Bruges ikke til byggeri i projektet.</span></p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Vejen (Roadmap – kort)</h2>
+        <div class="list">
+          <p class="muted" data-text="about:roadmap">Plan 1: Teknisk struktur (site, wallets, Supabase). Plan 2: Overdragelse/ejerskab og roller.</p>
+          <p class="muted">Detaljeret roadmap findes på forsiden.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Ejerskab & roller</h2>
+        <div class="list">
+          <ul>
+            <li><strong>Julienne</strong> (Madagaskar): juridisk ejer/leder af NGO/virksomhed, fuld kontrol over wallets og rettigheder.</li>
+            <li><strong>Thomas</strong>: teknisk ansvarlig & direktør <em>uden økonomisk råderet</em>. Fokus: udvikling, drift, sikkerhed.</li>
+            <li>Begge beskytter midler og forhindrer unødige udgifter (også ved mistet/stjålet mobil).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Firmastruktur</h2>
+        <div class="list">
+          <ul>
+            <li>NGO/forening i Madagaskar (ejerskab hos Julienne).</li>
+            <li>Evt. holdingselskab til kontrakter/partnere (senere).</li>
+            <li>Adskilte wallets/bankkonti: <span class="muted">MCD (donation) adskilt fra drift/MCN</span>.</li>
+            <li>Offentlig rapportering: månedlige rapporter (se <a href="/rapporter.html">Rapporter</a>).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Teknisk</h2>
+        <p class="muted">Supabase bruges som backend (alt indhold hentes dynamisk til landingssiden). Roadmap-billeder navngives <span class="kbd">Roadmap_X_pic_Y</span> og skjules automatisk, hvis de mangler.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap muted">© MadaCoin</footer>
+
+  <script>
+    // Forvent at SUPABASE_URL og SUPABASE_ANON allerede findes globalt (fra din index).
+    // Hvis ikke, kan du importere samme config her.
+    if (typeof SUPABASE_URL === 'undefined') {
+      console.warn('[about] SUPABASE config mangler – indhold bliver statisk.');
+    } else {
+      const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+      // Enkel CMS: tabel `site_text` med kolonner: page (text), key (text), value (text)
+      // Eksempel-rækker: ("about","intro", "…"), ("about","mcd","…"), ("about","mcn","…"), ("about","roadmap","…")
+      sb.from('site_text').select('key,value').eq('page','about').then(({ data, error }) => {
+        if (error) return console.warn('[about] site_text fejl:', error);
+        const map = Object.fromEntries(data.map(x => [x.key, x.value]));
+        document.querySelectorAll('[data-text^="about:"]').forEach(el => {
+          const key = el.getAttribute('data-text').split(':')[1];
+          if (map[key]) el.innerHTML = map[key];
+        });
+      });
+    }
+  </script>
+</body>
+</html>
