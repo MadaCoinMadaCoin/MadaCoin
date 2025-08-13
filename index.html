@@ -640,11 +640,31 @@ function initRoadmapLightboxPart1() {
   // Finder alle thumbnails (vi tilføjer klassen automatisk i markRoadmapImages)
   document.querySelectorAll('.roadmap-thumb').forEach(img => {
     const full = img.dataset.fullsrc || img.src;
-    // PC: klik åbner
-    img.addEventListener('click', () => openLightbox(full));
-    // Mobil: tap åbner
-    img.addEventListener('touchend', () => openLightbox(full), { passive: true });
-  });
+      // PC: klik åbner
+  img.addEventListener('click', () => openLightbox(full));
+
+  // MOBIL: robust tap-detektion (hurtig tap uden bevægelse)
+  let sx = 0, sy = 0, st = 0, moved = false;
+
+  img.addEventListener('touchstart', (ev) => {
+    if (ev.touches.length !== 1) return;
+    const t = ev.touches[0];
+    sx = t.clientX; sy = t.clientY; st = Date.now(); moved = false;
+  }, { passive: true });
+
+  img.addEventListener('touchmove', (ev) => {
+    if (ev.touches.length !== 1) return;
+    const t = ev.touches[0];
+    if (Math.abs(t.clientX - sx) > 10 || Math.abs(t.clientY - sy) > 10) moved = true;
+  }, { passive: true });
+
+  img.addEventListener('touchend', () => {
+    const dt = Date.now() - st;
+    // betingelser for “tap”: kort tid, næsten ingen bevægelse
+    if (!moved && dt < 300) openLightbox(full);
+  }, { passive: true 
+     });
+
 
   // Klik på baggrunden eller billedet selv → luk
   rmBox.addEventListener('click', (e) => {
@@ -789,6 +809,7 @@ window.addEventListener('load', () => {
 
 </body>
 </html>
+
 
 
 
