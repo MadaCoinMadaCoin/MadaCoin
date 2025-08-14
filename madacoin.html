@@ -8,184 +8,266 @@
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
   <style>
-    /* --- Base --- */
+    /* ====== Tema / design ====== */
+    :root{
+      --bg: #061a2b;
+      --bg-image: url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
+      --text: #ffffff;
+      --muted:#cfd3d7;
+      --primary:#9ad4ff;
+
+      --card:#0b0b0c;
+      --card-border:#2a2a2a;
+      --shadow: 0 12px 26px rgba(0,0,0,.5);
+      --radius: 16px;
+
+      --orange:#ff8a00;
+
+      --wrap: 1200px;
+      --gap: 24px;
+      --left-col: 480px;    /* venstre org-kolonne */
+      --right-col: 420px;   /* højre kort-kolonne */
+    }
+
+    *{box-sizing:border-box}
     body{
       margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
-
-      /* Baggrund */
-      background-color:#061a2b;
-      background-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
-      background-repeat:no-repeat;
-      background-position:center center;
-      background-size:cover;
-      background-attachment:fixed;
-
-      color:#eaeaea;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+      color:var(--text);
+      background: var(--bg) no-repeat center/cover fixed;
+      background-image: var(--bg-image);
     }
-    @media (max-width:800px){
-      body{ background-attachment:scroll; }
+    @media (max-width:900px){ body{ background-attachment:scroll } }
+
+    a{ color:var(--primary); text-decoration:none }
+    a:hover{ text-decoration:underline }
+
+    header{ border-bottom:1px solid rgba(255,255,255,.06); background: rgba(0,0,0,.35); backdrop-filter: blur(6px) }
+    .wrap{ max-width: var(--wrap); margin:0 auto; padding: 18px 24px }
+
+    nav{ display:flex; gap:14px; align-items:center; flex-wrap:wrap }
+    nav a{
+      color:#fff; opacity:.92; padding:8px 12px; border-radius:10px; border:1px solid transparent;
+    }
+    nav a.active{
+      background:#0d0d0f; border-color:#333; text-decoration:none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
     }
 
-    header,footer{padding:14px 18px;border-bottom:1px solid #222}
-    a{color:#9ad4ff;text-decoration:none}
-    nav a{margin-right:14px;opacity:.9}
-    .wrap{max-width:1100px;margin:0 auto;padding:24px}
-    .hero{padding:24px 0}
-    .grid{display:grid;gap:16px}
-    .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
-    @media (max-width:900px){.grid-2{grid-template-columns:1fr}}
-    .card{background:#111;border:1px solid #252525;border-radius:16px;padding:18px;box-shadow:0 1px 0 rgba(255,255,255,.04) inset}
-    h1,h2,h3{margin:12px 0 8px}
-    .muted{opacity:.8}
-    .list{line-height:1.6}
-    .pill{display:inline-block;padding:3px 10px;border:1px solid #2a2a2a;border-radius:999px;font-size:12px;opacity:.9}
-    .kbd{font-family:ui-monospace,Menlo,Monaco,monospace;background:#0e0e0f;border:1px solid #2b2b2b;border-bottom-color:#1c1c1c;padding:2px 6px;border-radius:6px}
-
-    /* Social menu (vandret) */
-    .social-menu{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+    /* Social menu (i header, skjules hvis tom) */
+    .social-menu{ display:flex; gap:12px; flex-wrap:wrap; margin-top:8px }
     .social-menu a{
       display:inline-flex;align-items:center;justify-content:center;
-      width:36px;height:36px;border-radius:999px;background:#0e2236;border:1px solid #1c2f45
+      width:36px;height:36px;border-radius:999px;background:#121214;border:1px solid #2a2a2a
     }
-    .social-menu a:hover{filter:brightness(1.1)}
+    .social-menu a:hover{ filter:brightness(1.1) }
 
-    footer {
-      text-align: center;
-      padding: 20px;
-      background: #e4e6c5;
-      color: #000000; /* tekstfarve */
+    /* ====== Layout-grid (3 kolonner) ====== */
+    .layout{
+      max-width: var(--wrap);
+      margin: 0 auto;
+      padding: 24px;
+      display:grid;
+      grid-template-columns: var(--left-col) 1fr var(--right-col);
+      gap: var(--gap);
     }
-    footer a {
-      color: #fff; /* links hvide */
-      text-decoration: none;
+    @media (max-width:1100px){
+      :root{ --left-col: 430px; --right-col: 360px }
     }
-    footer a:hover { text-decoration: underline; }
-    footer.muted { opacity: 1; }
+    @media (max-width:980px){
+      .layout{ grid-template-columns: 1fr }
+    }
+
+    /* ====== Kort ====== */
+    .card{
+      background:var(--card);
+      border:1px solid var(--card-border);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .card.pad{ padding:18px }
+    h1{ margin: 10px 0 12px; font-size: clamp(22px, 3.2vw, 34px) }
+    h2{ margin: 0 0 10px; font-size: clamp(18px, 2.2vw, 22px) }
+    .muted{ color: var(--muted) }
+    .mb24{ margin-bottom:24px }
+
+    /* ====== Org-venstre kolonne (uden pile) ====== */
+    .org-left{ position:relative }
+    .person{
+      display:flex; flex-direction:column; align-items:center; gap:8px;
+      margin-bottom: 18px;
+    }
+    .photo{
+      width: 170px; height: 170px; border-radius: 8px; background:#fff; /* hvid blok som i skitse */
+      box-shadow: inset 0 0 0 1px #dcdcdc;
+      background-position:center; background-size:cover; background-repeat:no-repeat;
+    }
+    .label{
+      min-width: 220px; text-align:center; padding:8px 14px; border-radius: 999px;
+      background:#0d0d0f; border:1px solid #333; box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+      line-height:1.2
+    }
+    .label .title{ opacity:.9; font-size: 13px }
+
+    /* Orange forbindelseslinjer */
+    .vlink{
+      width:6px; height:38px; background:var(--orange); border-radius:3px; margin: 6px auto 16px;
+    }
+    .vlink.long{ height:58px }
+
+    .branch{ position:relative; padding-top: 26px; display:flex; gap: 36px; justify-content: space-between }
+    .branch .hbar{
+      position:absolute; top:0; left:6%; right:6%;
+      height:6px; background:var(--orange); border-radius:3px;
+    }
+    .sub{ display:flex; flex-direction:column; align-items:center; gap:10px }
+    .sub .photo{ width:120px; height:120px }
+    .sub::before{
+      content:""; width:6px; height:26px; background:var(--orange); border-radius:3px;
+      margin-bottom:4px;
+    }
+
+    /* ====== Info-kolonnen (midten) ====== */
+    .info-col{ display:flex; flex-direction:column; gap:24px }
+    .info-card{ min-height: 170px }
+
+    /* ====== Sidekolonne (højre) ====== */
+    .side-col{ display:flex; flex-direction:column; gap:24px }
+    .side-card{ min-height: 180px }
+
+    /* ====== Footer (fælles til side 2 og 3) ====== */
+    .site-footer{
+      margin-top: 28px;
+      border-top:1px solid rgba(255,255,255,.06);
+      background:#000;
+      color:#fff;
+      text-align:center;
+      padding:20px;
+    }
+    .site-footer a{ color:#fff; text-decoration: underline }
   </style>
 </head>
 <body>
   <header class="wrap">
     <nav>
       <a href="/index.html" data-text="common:nav_home">Home</a>
-      <a href="/madacoin.html" data-text="common:nav_about">Om MadaCoin</a>
+      <a href="/madacoin.html" class="active" data-text="common:nav_about">Om</a>
       <a href="/rapporter.html" data-text="common:nav_reports">Rapporter</a>
     </nav>
-    <!-- Valgfri social menu i header (skjules automatisk hvis tom) -->
     <div class="social-menu" id="social-menu"></div>
   </header>
 
-  <main class="wrap">
-    <section class="hero">
-      <h1 data-text="about:heading">MadaCoin – Mål &amp; vejen</h1>
-      <p class="muted" data-text="about:intro">
-        MadaCoin støtter udvikling i Madagaskar via to tokens: MCD (donation) og MCN (krypto).
-      </p>
+  <div class="layout">
+    <!-- Venstre: Org-diagram (uden pile) -->
+    <section class="org-left">
+      <!-- Øverste (CEO) -->
+      <div class="person" id="person-top">
+        <div class="photo" id="photo-top" aria-label="Profilbillede"></div>
+        <div class="label">
+          <div class="name" id="name-top">Julienne</div>
+          <div class="title" id="title-top">Ejer og Direktør</div>
+        </div>
+      </div>
+
+      <div class="vlink"></div>
+
+      <!-- Midt (Adm. dir / teknisk) -->
+      <div class="person" id="person-mid">
+        <div class="photo" id="photo-mid" aria-label="Profilbillede"></div>
+        <div class="label">
+          <div class="name" id="name-mid">Thomas</div>
+          <div class="title" id="title-mid">Administrerende Direktør · Udvikler</div>
+        </div>
+      </div>
+
+      <div class="vlink long"></div>
+
+      <!-- Bund: tre underliggende bokse -->
+      <div class="branch">
+        <div class="hbar"></div>
+
+        <div class="sub" id="sub-1">
+          <div class="photo" id="photo-sub-1"></div>
+          <div class="label">
+            <div class="name" id="name-sub-1">Navn</div>
+            <div class="title" id="title-sub-1">Rolle</div>
+          </div>
+        </div>
+
+        <div class="sub" id="sub-2">
+          <div class="photo" id="photo-sub-2"></div>
+          <div class="label">
+            <div class="name" id="name-sub-2">Navn</div>
+            <div class="title" id="title-sub-2">Rolle</div>
+          </div>
+        </div>
+
+        <div class="sub" id="sub-3">
+          <div class="photo" id="photo-sub-3"></div>
+          <div class="label">
+            <div class="name" id="name-sub-3">Navn</div>
+            <div class="title" id="title-sub-3">Rolle</div>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section class="grid grid-2">
-      <div class="card">
-        <h2 data-text="about:sec_tokens_title">Tokens</h2>
-        <div class="list">
-          <p>
-            <strong data-text="about:mcd_title">MCD – MadaCoin Donation</strong><br/>
-            <span class="muted" data-text="about:mcd">
-              Donations-token. Midlerne går til projekter og rapporteres åbent.
-            </span>
-          </p>
-          <p>
-            <strong data-text="about:mcn_title">MCN – MadaCoin Crypto</strong><br/>
-            <span class="muted" data-text="about:mcn">
-              Indtjenings-/driftstoken. Bruges ikke til byggeri i projektet.
-            </span>
-          </p>
-        </div>
-      </div>
+    <!-- Midt: beskrivelser til top+midt -->
+    <section class="info-col">
+      <article class="card pad info-card" id="bio-top" data-text="about:bio_top">
+        <h2 data-text="about:bio_top_title">Profil beskrivelse</h2>
+        <p class="muted">Erfaringer fra tidligere …</p>
+      </article>
 
-      <div class="card">
-        <h2 data-text="about:sec_roadmap_title">Vejen (Roadmap – kort)</h2>
-        <div class="list">
-          <p class="muted" data-text="about:roadmap">
-            Plan 1: Teknisk struktur (site, wallets, Supabase). Plan 2: Overdragelse/ejerskab og roller.
-          </p>
-          <p class="muted" data-text="about:roadmap_hint">
-            Detaljeret roadmap findes på forsiden.
-          </p>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2 data-text="about:sec_roles_title">Ejerskab &amp; roller</h2>
-        <div class="list">
-          <ul>
-            <li>
-              <span data-text="about:role_julienne">
-                <strong>Julienne</strong> (Madagaskar): juridisk ejer/leder af NGO/virksomhed, fuld kontrol over wallets og rettigheder.
-              </span>
-            </li>
-            <li>
-              <span data-text="about:role_thomas">
-                <strong>Thomas</strong>: teknisk ansvarlig &amp; direktør <em>uden økonomisk råderet</em>. Fokus: udvikling, drift, sikkerhed.
-              </span>
-            </li>
-            <li>
-              <span data-text="about:role_both">
-                Begge beskytter midler og forhindrer unødige udgifter (også ved mistet/stjålet mobil).
-              </span>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2 data-text="about:sec_structure_title">Firmastruktur</h2>
-        <div class="list">
-          <ul>
-            <li data-text="about:str_org">NGO/forening i Madagaskar (ejerskab hos Julienne).</li>
-            <li data-text="about:str_holdco">Evt. holdingselskab til kontrakter/partnere (senere).</li>
-            <li data-text="about:str_wallets">Adskilte wallets/bankkonti: <span class="muted">MCD (donation) adskilt fra drift/MCN</span>.</li>
-            <li data-text="about:str_reports">Offentlig rapportering: månedlige rapporter (se <a href="/rapporter.html">Rapporter</a>).</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2 data-text="about:sec_tech_title">Teknisk</h2>
-        <p class="muted" data-text="about:tech">
-          Supabase bruges som backend (alt indhold hentes dynamisk til landingssiden). Roadmap-billeder navngives
-          <span class="kbd">Roadmap_X_pic_Y</span> og skjules automatisk, hvis de mangler.
-        </p>
-      </div>
+      <article class="card pad info-card mb24" id="bio-mid" data-text="about:bio_mid">
+        <h2 data-text="about:bio_mid_title">Profil beskrivelse</h2>
+        <p class="muted">Erfaringer fra tidligere …</p>
+      </article>
     </section>
-  </main>
 
-  <footer>
-    <span id="footer-text" data-text="common:footer">© 2025 MadaCoin. All rights reserved.</span>
+    <!-- Højre: tre kort -->
+    <aside class="side-col">
+      <div class="card pad side-card" id="side-1">
+        <h2 data-text="about:right_1_title">Vores version</h2>
+        <div class="muted" data-text="about:right_1">…</div>
+      </div>
+      <div class="card pad side-card" id="side-2">
+        <h2 data-text="about:right_2_title">opdelt</h2>
+        <div class="muted" data-text="about:right_2">…</div>
+      </div>
+      <div class="card pad side-card" id="side-3">
+        <h2 data-text="about:right_3_title">flere gange</h2>
+        <div class="muted" data-text="about:right_3">…</div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Fælles footer (brug samme på side 3) -->
+  <footer class="site-footer">
+    <span data-text="common:footer">© 2025 MadaCoin. All rights reserved.</span>
   </footer>
 
   <script>
-    // ===================== SUPABASE CLIENT =====================
+    // ============= Supabase client =============
     (function initSupabase(){
       if (!window.supabase || !window.supabase.createClient) {
-        console.warn('[about] Supabase lib mangler');
-        return;
+        console.warn('[about] Supabase lib mangler'); return;
       }
       if (!window.SUPABASE_URL || !window.SUPABASE_ANON) {
-        console.warn('[about] SUPABASE_URL/ANON mangler – indhold bliver statisk.');
-        return;
+        console.warn('[about] SUPABASE_URL/ANON mangler – kører fallback.'); return;
       }
       window.sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON);
     })();
 
     (async () => {
-      if (!window.sb) return;
       const sb = window.sb;
+      if (!sb) return;
 
-      // ========== 1) SETTINGS → title & favicons ==========
+      // 1) Settings → titel, (valgfrit) theme + favicons
       try {
         const { data, error } = await sb
           .from('settings')
-          .select('site_title,favicon_svg_url,favicon_png_url,apple_touch_icon_url')
+          .select('site_title,favicon_svg_url,favicon_png_url,apple_touch_icon_url,theme_primary,bg_image_url,bg_color')
           .eq('id', 1)
           .single();
 
@@ -195,73 +277,106 @@
           const ensureLink = (id, rel, extra = {}) => {
             let el = document.getElementById(id);
             if (!el) { el = document.createElement('link'); el.id = id; el.rel = rel; document.head.appendChild(el); }
-            Object.assign(el, extra);
-            return el;
+            Object.assign(el, extra); return el;
           };
-
           if (data.favicon_svg_url) ensureLink('fav-svg', 'icon', { type: 'image/svg+xml', href: data.favicon_svg_url });
           if (data.favicon_png_url) ensureLink('fav-png', 'icon', { href: data.favicon_png_url, sizes: 'any' });
           if (data.apple_touch_icon_url) ensureLink('apple-icon', 'apple-touch-icon', { href: data.apple_touch_icon_url });
-        } else if (error) {
-          console.warn('[about] settings fejl:', error);
-        }
-      } catch (e) {
-        console.warn('[about] settings exception:', e);
-      }
 
-      // ========== 2) SITE TEXT → udfyld alle data-text ==========
+          const root = document.documentElement;
+          if (data.theme_primary) root.style.setProperty('--primary', data.theme_primary);
+          if (data.bg_color) root.style.setProperty('--bg', data.bg_color);
+          if (data.bg_image_url) root.style.setProperty('--bg-image', `url('${data.bg_image_url}')`);
+        }
+      } catch(e){ console.warn('[about] settings:', e); }
+
+      // 2) Tekst (common + about)
       try {
-        // Hent både fælles tekster (nav/footer) og side-tekster
         const { data, error } = await sb
           .from('site_text')
           .select('page,key,value')
           .in('page', ['common','about']);
-
-        if (!error && Array.isArray(data)) {
-          // Map: "page:key" → value
-          const dict = {};
-          for (const row of data) {
-            dict[`${row.page}:${row.key}`] = row.value;
-          }
+        if (!error && data) {
+          const dict = Object.fromEntries(data.map(r => [`${r.page}:${r.key}`, r.value]));
           document.querySelectorAll('[data-text]').forEach(el => {
-            const k = el.getAttribute('data-text');
-            if (dict[k]) el.innerHTML = dict[k];
+            const key = el.getAttribute('data-text');
+            if (dict[key]) el.innerHTML = dict[key];
           });
         } else if (error) {
           console.warn('[about] site_text fejl:', error);
         }
-      } catch (e) {
-        console.warn('[about] site_text exception:', e);
-      }
+      } catch(e){ console.warn('[about] site_text:', e); }
 
-      // ========== 3) SOCIAL LINKS → render hvis der er nogen ==========
+      // 3) Org-people (slots matcher layoutet)
+      try {
+        const { data, error } = await sb
+          .from('org_people')
+          .select('slot,name,title,photo_url,bio')
+          .in('slot', ['top','mid','sub1','sub2','sub3']);
+        if (!error && data?.length) {
+          const bySlot = Object.fromEntries(data.map(x => [x.slot, x]));
+
+          const fill = (slot, ids) => {
+            const p = bySlot[slot]; if (!p) return;
+            if (ids.photo && p.photo_url) {
+              const ph = document.getElementById(ids.photo);
+              if (ph) ph.style.backgroundImage = `url('${p.photo_url}')`;
+            }
+            if (ids.name && p.name)  document.getElementById(ids.name).textContent = p.name;
+            if (ids.title && p.title) document.getElementById(ids.title).textContent = p.title;
+            if (ids.bio && p.bio)    document.getElementById(ids.bio).innerHTML = p.bio;
+          };
+
+          fill('top',  { photo:'photo-top',  name:'name-top',  title:'title-top',  bio:'bio-top' });
+          fill('mid',  { photo:'photo-mid',  name:'name-mid',  title:'title-mid',  bio:'bio-mid' });
+          fill('sub1', { photo:'photo-sub-1',name:'name-sub-1',title:'title-sub-1' });
+          fill('sub2', { photo:'photo-sub-2',name:'name-sub-2',title:'title-sub-2' });
+          fill('sub3', { photo:'photo-sub-3',name:'name-sub-3',title:'title-sub-3' });
+        } else if (error) {
+          console.warn('[about] org_people fejl:', error);
+        }
+      } catch(e){ console.warn('[about] org_people:', e); }
+
+      // 4) Højre kolonne bokse
+      try {
+        const { data, error } = await sb
+          .from('about_boxes')
+          .select('title,content,sort')
+          .order('sort',{ascending:true});
+        if (!error && data?.length) {
+          const slots = [ 'side-1', 'side-2', 'side-3' ];
+          data.slice(0,3).forEach((row, i) => {
+            const root = document.getElementById(slots[i]); if (!root) return;
+            const h2 = root.querySelector('h2'); const body = root.querySelector('.muted');
+            if (row.title)   h2.innerHTML = row.title;
+            if (row.content) body.innerHTML = row.content;
+          });
+        } else if (error) {
+          console.warn('[about] about_boxes fejl:', error);
+        }
+      } catch(e){ console.warn('[about] about_boxes:', e); }
+
+      // 5) Social links (skjul hele menuen hvis ingen)
       try {
         const root = document.getElementById('social-menu');
         if (root) {
           const { data, error } = await sb
             .from('social_links')
             .select('name,url,icon,sort')
-            .order('sort', { ascending: true });
-
-          if (error) {
-            console.warn('[about] social_links fejl:', error);
-          } else {
-            const items = (data || []).filter(x => x?.url && String(x.url).trim().length > 0);
-            if (!items.length) {
-              root.style.display = 'none';
-            } else {
+            .order('sort',{ascending:true});
+          if (!error && data) {
+            const items = data.filter(x => x?.url && String(x.url).trim().length > 0);
+            if (!items.length) root.style.display = 'none';
+            else {
               root.innerHTML = items.map(x => `
                 <a href="${x.url}" target="_blank" rel="noopener" title="${x.name}">
-                  <!-- Du kan senere bytte span ud med flotte SVG-ikoner fra Supabase -->
                   <span class="sr-only">${x.name}</span>
                 </a>
               `).join('');
             }
           }
         }
-      } catch (e) {
-        console.warn('[about] social_links exception:', e);
-      }
+      } catch(e){ console.warn('[about] social_links:', e); }
     })();
   </script>
 </body>
