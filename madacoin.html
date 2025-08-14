@@ -6,26 +6,26 @@
   <title>Om MadaCoin</title>
   <link rel="preconnect" href="https://unpkg.com" />
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
   <style>
-  body{
+    /* --- Base --- */
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+
+      /* Baggrund */
+      background-color:#061a2b;
+      background-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
+      background-repeat:no-repeat;
+      background-position:center center;
+      background-size:cover;
+      background-attachment:fixed;
+
+      color:#eaeaea;
+    }
     @media (max-width:800px){
-  body{ background-attachment:scroll; }
-
-}
-
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
-
-  /* KUN det her er ændret: */
-  background-color:#061a2b;
-  background-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
-  background-repeat:no-repeat;
-  background-position:center center;
-  background-size:cover;
-  background-attachment:fixed;
-
-  color:#eaeaea;
-}
+      body{ background-attachment:scroll; }
+    }
 
     header,footer{padding:14px 18px;border-bottom:1px solid #222}
     a{color:#9ad4ff;text-decoration:none}
@@ -42,35 +42,42 @@
     .pill{display:inline-block;padding:3px 10px;border:1px solid #2a2a2a;border-radius:999px;font-size:12px;opacity:.9}
     .kbd{font-family:ui-monospace,Menlo,Monaco,monospace;background:#0e0e0f;border:1px solid #2b2b2b;border-bottom-color:#1c1c1c;padding:2px 6px;border-radius:6px}
 
-        footer {
-  text-align: center;
-  padding: 20px;
-  background: #e4e6c5;
-  color: #000000;            /* ← tekstfarve hvid */
-}
-footer a {
-  color: #fff;            /* ← links også hvide */
-  text-decoration: none;
-}
-footer a:hover { text-decoration: underline; }
+    /* Social menu (vandret) */
+    .social-menu{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+    .social-menu a{
+      display:inline-flex;align-items:center;justify-content:center;
+      width:36px;height:36px;border-radius:999px;background:#0e2236;border:1px solid #1c2f45
+    }
+    .social-menu a:hover{filter:brightness(1.1)}
 
-/* Hvis din footer har class="muted", så fjern dæmpning */
-footer.muted { opacity: 1; }
-    
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: #e4e6c5;
+      color: #000000; /* tekstfarve */
+    }
+    footer a {
+      color: #fff; /* links hvide */
+      text-decoration: none;
+    }
+    footer a:hover { text-decoration: underline; }
+    footer.muted { opacity: 1; }
   </style>
 </head>
 <body>
   <header class="wrap">
     <nav>
-      <a href="/index.html">Home</a>
-      <a href="/madacoin.html">Om MadaCoin</a>
-      <a href="/rapporter.html">Rapporter</a>
+      <a href="/index.html" data-text="common:nav_home">Home</a>
+      <a href="/madacoin.html" data-text="common:nav_about">Om MadaCoin</a>
+      <a href="/rapporter.html" data-text="common:nav_reports">Rapporter</a>
     </nav>
+    <!-- Valgfri social menu i header (skjules automatisk hvis tom) -->
+    <div class="social-menu" id="social-menu"></div>
   </header>
 
   <main class="wrap">
     <section class="hero">
-      <h1>MadaCoin – Mål & vejen</h1>
+      <h1 data-text="about:heading">MadaCoin – Mål &amp; vejen</h1>
       <p class="muted" data-text="about:intro">
         MadaCoin støtter udvikling i Madagaskar via to tokens: MCD (donation) og MCN (krypto).
       </p>
@@ -78,96 +85,184 @@ footer.muted { opacity: 1; }
 
     <section class="grid grid-2">
       <div class="card">
-        <h2>Tokens</h2>
+        <h2 data-text="about:sec_tokens_title">Tokens</h2>
         <div class="list">
-          <p><strong>MCD – MadaCoin Donation</strong><br/><span class="muted" data-text="about:mcd">Donations-token. Midlerne går til projekter og rapporteres åbent.</span></p>
-          <p><strong>MCN – MadaCoin Crypto</strong><br/><span class="muted" data-text="about:mcn">Indtjenings-/driftstoken. Bruges ikke til byggeri i projektet.</span></p>
+          <p>
+            <strong data-text="about:mcd_title">MCD – MadaCoin Donation</strong><br/>
+            <span class="muted" data-text="about:mcd">
+              Donations-token. Midlerne går til projekter og rapporteres åbent.
+            </span>
+          </p>
+          <p>
+            <strong data-text="about:mcn_title">MCN – MadaCoin Crypto</strong><br/>
+            <span class="muted" data-text="about:mcn">
+              Indtjenings-/driftstoken. Bruges ikke til byggeri i projektet.
+            </span>
+          </p>
         </div>
       </div>
 
       <div class="card">
-        <h2>Vejen (Roadmap – kort)</h2>
+        <h2 data-text="about:sec_roadmap_title">Vejen (Roadmap – kort)</h2>
         <div class="list">
-          <p class="muted" data-text="about:roadmap">Plan 1: Teknisk struktur (site, wallets, Supabase). Plan 2: Overdragelse/ejerskab og roller.</p>
-          <p class="muted">Detaljeret roadmap findes på forsiden.</p>
+          <p class="muted" data-text="about:roadmap">
+            Plan 1: Teknisk struktur (site, wallets, Supabase). Plan 2: Overdragelse/ejerskab og roller.
+          </p>
+          <p class="muted" data-text="about:roadmap_hint">
+            Detaljeret roadmap findes på forsiden.
+          </p>
         </div>
       </div>
 
       <div class="card">
-        <h2>Ejerskab & roller</h2>
+        <h2 data-text="about:sec_roles_title">Ejerskab &amp; roller</h2>
         <div class="list">
           <ul>
-            <li><strong>Julienne</strong> (Madagaskar): juridisk ejer/leder af NGO/virksomhed, fuld kontrol over wallets og rettigheder.</li>
-            <li><strong>Thomas</strong>: teknisk ansvarlig & direktør <em>uden økonomisk råderet</em>. Fokus: udvikling, drift, sikkerhed.</li>
-            <li>Begge beskytter midler og forhindrer unødige udgifter (også ved mistet/stjålet mobil).</li>
+            <li>
+              <span data-text="about:role_julienne">
+                <strong>Julienne</strong> (Madagaskar): juridisk ejer/leder af NGO/virksomhed, fuld kontrol over wallets og rettigheder.
+              </span>
+            </li>
+            <li>
+              <span data-text="about:role_thomas">
+                <strong>Thomas</strong>: teknisk ansvarlig &amp; direktør <em>uden økonomisk råderet</em>. Fokus: udvikling, drift, sikkerhed.
+              </span>
+            </li>
+            <li>
+              <span data-text="about:role_both">
+                Begge beskytter midler og forhindrer unødige udgifter (også ved mistet/stjålet mobil).
+              </span>
+            </li>
           </ul>
         </div>
       </div>
 
       <div class="card">
-        <h2>Firmastruktur</h2>
+        <h2 data-text="about:sec_structure_title">Firmastruktur</h2>
         <div class="list">
           <ul>
-            <li>NGO/forening i Madagaskar (ejerskab hos Julienne).</li>
-            <li>Evt. holdingselskab til kontrakter/partnere (senere).</li>
-            <li>Adskilte wallets/bankkonti: <span class="muted">MCD (donation) adskilt fra drift/MCN</span>.</li>
-            <li>Offentlig rapportering: månedlige rapporter (se <a href="/rapporter.html">Rapporter</a>).</li>
+            <li data-text="about:str_org">NGO/forening i Madagaskar (ejerskab hos Julienne).</li>
+            <li data-text="about:str_holdco">Evt. holdingselskab til kontrakter/partnere (senere).</li>
+            <li data-text="about:str_wallets">Adskilte wallets/bankkonti: <span class="muted">MCD (donation) adskilt fra drift/MCN</span>.</li>
+            <li data-text="about:str_reports">Offentlig rapportering: månedlige rapporter (se <a href="/rapporter.html">Rapporter</a>).</li>
           </ul>
         </div>
       </div>
 
       <div class="card">
-        <h2>Teknisk</h2>
-        <p class="muted">Supabase bruges som backend (alt indhold hentes dynamisk til landingssiden). Roadmap-billeder navngives <span class="kbd">Roadmap_X_pic_Y</span> og skjules automatisk, hvis de mangler.</p>
+        <h2 data-text="about:sec_tech_title">Teknisk</h2>
+        <p class="muted" data-text="about:tech">
+          Supabase bruges som backend (alt indhold hentes dynamisk til landingssiden). Roadmap-billeder navngives
+          <span class="kbd">Roadmap_X_pic_Y</span> og skjules automatisk, hvis de mangler.
+        </p>
       </div>
     </section>
   </main>
 
+  <footer>
+    <span id="footer-text" data-text="common:footer">© 2025 MadaCoin. All rights reserved.</span>
+  </footer>
 
   <script>
-    // Forvent at SUPABASE_URL og SUPABASE_ANON allerede findes globalt (fra din index).
-    // Hvis ikke, kan du importere samme config her.
-    if (typeof SUPABASE_URL === 'undefined') {
-      console.warn('[about] SUPABASE config mangler – indhold bliver statisk.');
-    } else {
-      const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-      // Enkel CMS: tabel `site_text` med kolonner: page (text), key (text), value (text)
-      // Eksempel-rækker: ("about","intro", "…"), ("about","mcd","…"), ("about","mcn","…"), ("about","roadmap","…")
-      sb.from('site_text').select('key,value').eq('page','about').then(({ data, error }) => {
-        if (error) return console.warn('[about] site_text fejl:', error);
-        const map = Object.fromEntries(data.map(x => [x.key, x.value]));
-        document.querySelectorAll('[data-text^="about:"]').forEach(el => {
-          const key = el.getAttribute('data-text').split(':')[1];
-          if (map[key]) el.innerHTML = map[key];
-        });
-      });
-    }
+    // ===================== SUPABASE CLIENT =====================
+    (function initSupabase(){
+      if (!window.supabase || !window.supabase.createClient) {
+        console.warn('[about] Supabase lib mangler');
+        return;
+      }
+      if (!window.SUPABASE_URL || !window.SUPABASE_ANON) {
+        console.warn('[about] SUPABASE_URL/ANON mangler – indhold bliver statisk.');
+        return;
+      }
+      window.sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON);
+    })();
 
+    (async () => {
+      if (!window.sb) return;
+      const sb = window.sb;
 
-    
+      // ========== 1) SETTINGS → title & favicons ==========
+      try {
+        const { data, error } = await sb
+          .from('settings')
+          .select('site_title,favicon_svg_url,favicon_png_url,apple_touch_icon_url')
+          .eq('id', 1)
+          .single();
+
+        if (!error && data) {
+          if (data.site_title) document.title = data.site_title;
+
+          const ensureLink = (id, rel, extra = {}) => {
+            let el = document.getElementById(id);
+            if (!el) { el = document.createElement('link'); el.id = id; el.rel = rel; document.head.appendChild(el); }
+            Object.assign(el, extra);
+            return el;
+          };
+
+          if (data.favicon_svg_url) ensureLink('fav-svg', 'icon', { type: 'image/svg+xml', href: data.favicon_svg_url });
+          if (data.favicon_png_url) ensureLink('fav-png', 'icon', { href: data.favicon_png_url, sizes: 'any' });
+          if (data.apple_touch_icon_url) ensureLink('apple-icon', 'apple-touch-icon', { href: data.apple_touch_icon_url });
+        } else if (error) {
+          console.warn('[about] settings fejl:', error);
+        }
+      } catch (e) {
+        console.warn('[about] settings exception:', e);
+      }
+
+      // ========== 2) SITE TEXT → udfyld alle data-text ==========
+      try {
+        // Hent både fælles tekster (nav/footer) og side-tekster
+        const { data, error } = await sb
+          .from('site_text')
+          .select('page,key,value')
+          .in('page', ['common','about']);
+
+        if (!error && Array.isArray(data)) {
+          // Map: "page:key" → value
+          const dict = {};
+          for (const row of data) {
+            dict[`${row.page}:${row.key}`] = row.value;
+          }
+          document.querySelectorAll('[data-text]').forEach(el => {
+            const k = el.getAttribute('data-text');
+            if (dict[k]) el.innerHTML = dict[k];
+          });
+        } else if (error) {
+          console.warn('[about] site_text fejl:', error);
+        }
+      } catch (e) {
+        console.warn('[about] site_text exception:', e);
+      }
+
+      // ========== 3) SOCIAL LINKS → render hvis der er nogen ==========
+      try {
+        const root = document.getElementById('social-menu');
+        if (root) {
+          const { data, error } = await sb
+            .from('social_links')
+            .select('name,url,icon,sort')
+            .order('sort', { ascending: true });
+
+          if (error) {
+            console.warn('[about] social_links fejl:', error);
+          } else {
+            const items = (data || []).filter(x => x?.url && String(x.url).trim().length > 0);
+            if (!items.length) {
+              root.style.display = 'none';
+            } else {
+              root.innerHTML = items.map(x => `
+                <a href="${x.url}" target="_blank" rel="noopener" title="${x.name}">
+                  <!-- Du kan senere bytte span ud med flotte SVG-ikoner fra Supabase -->
+                  <span class="sr-only">${x.name}</span>
+                </a>
+              `).join('');
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('[about] social_links exception:', e);
+      }
+    })();
   </script>
-
-  
-<footer><span id="footer-text">© 2025 MadaCoin. All rights reserved.</span></footer>
-
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
