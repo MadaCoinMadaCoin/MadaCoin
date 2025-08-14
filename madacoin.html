@@ -141,6 +141,34 @@
     .right-col .card{ width:100% }
     .right-col #right-main .muted{ min-height: 8rem; } /* valgfri min-højde */
 
+    /* Partner-stribe (gulvplads under roller) */
+    .partners{ margin: 8px auto 0; padding: 18px 0 8px; }
+    .partners-title{
+      margin: 0 0 10px;
+      font-size: clamp(16px, 1.8vw, 18px);
+      color: #cfd3d7; opacity: .95;
+    }
+    .partners-list{
+      display:flex; flex-wrap:wrap; gap:18px; align-items:center;
+      border-top:1px solid rgba(255,255,255,.06);
+      padding-top:14px;
+    }
+    .partner{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:120px; height:54px; padding:8px 10px;
+      background:#0d0d0f; border:1px solid #2a2a2a; border-radius:12px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      transition: transform .15s ease, filter .15s ease, background .15s ease;
+    }
+    .partner:hover{ transform: translateY(-1px); filter: brightness(1.08); }
+    .partner img{
+      max-width:100%; max-height:100%; display:block; object-fit:contain;
+      filter: saturate(.9) contrast(1.05);
+    }
+    @media (max-width: 1100px){
+      .partner{ width:104px; height:50px; }
+    }
+
     /* Footer */
     .site-footer{
       margin-top:auto; padding:12px 16px; color:#fff; text-align:center;
@@ -242,6 +270,12 @@
     </aside>
   </div>
 
+  <!-- GULVPLADS: Samarbejdspartnere -->
+  <section class="partners wrap" id="partners">
+    <h3 class="partners-title">Samarbejdspartnere</h3>
+    <div class="partners-list" id="partners-list" aria-label="Samarbejdspartnere"></div>
+  </section>
+
   <footer class="site-footer">
     <span data-text="common:footer">© 2025 MadaCoin. All rights reserved.</span>
   </footer>
@@ -304,7 +338,7 @@
         }catch(e){ console.warn('[about] site_text:',e); }
       }
 
-      /* Personer/partnere */
+      /* Personer/partnere (pyramiden) */
       if(window.sb){
         try{
           var pplRes=await window.sb.from('org_people')
@@ -376,7 +410,59 @@
         showPhoto('photo-sub-3','sub','');
       }
     })();
+
+    /* --- Partners strip (gulvplads) --- */
+    (async function(){
+      const elSection = document.getElementById('partners');
+      const elList = document.getElementById('partners-list');
+      if(!elSection || !elList) return;
+
+      // Brug samme projekt/fallback som ovenfor
+      var STATIC_PROJECT = 'byrlebjwknppjbtbkozt';
+      var STATIC_STORAGE_BASE = 'https://' + STATIC_PROJECT + '.supabase.co/storage/v1/object/public';
+      var STORAGE_BASE = (window.SUPABASE_URL && window.SUPABASE_URL.indexOf('supabase.co')>-1)
+        ? window.SUPABASE_URL.replace(/\/+$/,'') + '/storage/v1/object/public'
+        : STATIC_STORAGE_BASE;
+
+      // Brug mønten som fallback-logo
+      var COIN_PLACEHOLDER = STORAGE_BASE + '/people/Revision.jpg';
+
+      async function getPartners(){
+        if(!window.sb) return [];
+        try{
+          const { data, error } = await window.sb
+            .from('partners')
+            .select('id,name,website,logo_url,logo_alt,active')
+            .eq('active', true)
+            .order('name', { ascending: true })
+            .limit(12);
+          if(error){ console.warn('[partners] error:', error); return []; }
+          return data || [];
+        }catch(e){ console.warn('[partners] exception:', e); return []; }
+      }
+
+      const rows = await getPartners();
+      if(!rows.length){
+        elSection.style.display = 'none'; // skjul hele sektionen
+        return;
+      }
+
+      rows.forEach(p=>{
+        const a = document.createElement('a');
+        a.className = 'partner';
+        a.href = p.website || '#';
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.title = p.name || 'Partner';
+
+        const img = document.createElement('img');
+        img.alt = p.logo_alt || p.name || 'Partner logo';
+        img.src = (p.logo_url && p.logo_url.trim()) ? p.logo_url : COIN_PLACEHOLDER;
+
+        a.appendChild(img);
+        elList.appendChild(a);
+      });
+    })();
   </script>
 </body>
 </html>
-
