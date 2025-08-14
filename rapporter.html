@@ -34,17 +34,20 @@
     /* GENERELT LAYOUT */
     header{ padding:14px 18px; border-bottom:1px solid #222; position:relative; z-index:5; }
     a{ color:#9ad4ff; text-decoration:none; }
-    .wrap{ max-width:1100px; margin:0 auto; padding:24px; }
+    
+    /* .wrap centrerer indholdet til max 1100px */
+.wrap{ max-width:1100px; margin:0 auto; padding:24px; }
 
-    /* TOPMENU: venstrejusteret og jævn afstand */
-    header.wrap{ text-align:left; }
-    header.wrap nav{
-      display:flex;
-      gap:14px;
-      justify-content:flex-start;
-      align-items:flex;
-      margin:0;
-    }
+/* header + nav som på side 2 */
+header.wrap{ text-align: left; }
+header.wrap nav{
+  display: flex;
+  gap: 14px;
+  justify-content: flex-start;  /* links står til venstre i containeren */
+  margin: 0;
+}
+
+    
     header.wrap nav a{ opacity:.9; }
     header.wrap nav a:hover{ opacity:1; text-decoration:underline; }
 
@@ -162,6 +165,7 @@
   </script>
 </body>
 </html>
+
 
 
 
