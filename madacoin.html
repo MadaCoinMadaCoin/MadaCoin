@@ -210,44 +210,57 @@
   </footer>
 
   <script>
-    // Init Supabase
-    (function(){
-      if (!window.supabase?.createClient) { console.warn('[about] Supabase lib mangler'); return; }
-      if (!window.SUPABASE_URL || !window.SUPABASE_ANON) { console.warn('[about] SUPABASE_URL/ANON mangler'); return; }
-      window.sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON);
+    (function init(){
+      // Supabase client (valgfri – siden virker også uden)
+      if (window.supabase?.createClient && window.SUPABASE_URL && window.SUPABASE_ANON) {
+        window.sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON);
+      } else {
+        window.sb = null; // kør med statiske fallbacks
+      }
     })();
 
     (async () => {
-      const sb = window.sb; if (!sb) return;
+      "use strict";
 
-      // SETTINGS (titel, favicons/tema) + placeholder fra favicon hvis muligt
+      const sb = window.sb || null; // fortsæt også uden supabase
+
+      // ---------- STATIC STORAGE BASE (fungerer altid) ----------
+      // Brug dit projekt-id (samme som i baggrundsbilledet)
+      const STATIC_PROJECT = 'byrlebjwknppjbtbkozt';
+      const STATIC_STORAGE_BASE = `https://${STATIC_PROJECT}.supabase.co/storage/v1/object/public`;
+
+      // Hvis SUPABASE_URL findes, brug den; ellers brug statisk base
+      const STORAGE_BASE =
+        (window.SUPABASE_URL && window.SUPABASE_URL.includes('supabase.co')
+          ? window.SUPABASE_URL.replace(/\/+$/,'') + '/storage/v1/object/public'
+          : STATIC_STORAGE_BASE);
+
+      // ---------- PLACEHOLDER ----------
       let PLACEHOLDER = '';
-      let STORAGE_BASE = '';
-      try{
-        const { data } = await sb.from('settings')
-          .select('site_title,favicon_svg_url,favicon_png_url,apple_touch_icon_url,theme_primary,bg_image_url,bg_color')
-          .eq('id',1).single();
+      if (sb) {
+        try{
+          const { data } = await sb.from('settings')
+            .select('site_title,favicon_svg_url,favicon_png_url,apple_touch_icon_url,theme_primary,bg_image_url,bg_color')
+            .eq('id',1).maybeSingle();
 
-        if (data){
-          if (data.site_title) document.title = data.site_title;
-          const ensure=(id,rel,extra={})=>{let el=document.getElementById(id);
-            if(!el){el=document.createElement('link'); el.id=id; el.rel=rel; document.head.appendChild(el)}
-            Object.assign(el,extra) };
-          if (data.favicon_svg_url) ensure('fav-svg','icon',{type:'image/svg+xml',href:data.favicon_svg_url});
-          if (data.favicon_png_url) ensure('fav-png','icon',{href:data.favicon_png_url,sizes:'any'});
-          if (data.apple_touch_icon_url) ensure('apple-icon','apple-touch-icon',{href:data.apple_touch_icon_url});
+          if (data){
+            if (data.site_title) document.title = data.site_title;
+            const ensure=(id,rel,extra={})=>{let el=document.getElementById(id);
+              if(!el){el=document.createElement('link'); el.id=id; el.rel=rel; document.head.appendChild(el)}
+              Object.assign(el,extra) };
+            if (data.favicon_svg_url) ensure('fav-svg','icon',{type:'image/svg+xml',href:data.favicon_svg_url});
+            if (data.favicon_png_url) ensure('fav-png','icon',{href:data.favicon_png_url,sizes:'any'});
+            if (data.apple_touch_icon_url) ensure('apple-icon','apple-touch-icon',{href=data.apple_touch_icon_url});
 
-          const root=document.documentElement;
-          if (data.theme_primary) root.style.setProperty('--primary', data.theme_primary);
-          if (data.bg_color) root.style.setProperty('--bg', data.bg_color);
-          if (data.bg_image_url) root.style.setProperty('--bg-image', `url('${data.bg_image_url}')`);
+            const root=document.documentElement;
+            if (data.theme_primary) root.style.setProperty('--primary', data.theme_primary);
+            if (data.bg_color) root.style.setProperty('--bg', data.bg_color);
+            if (data.bg_image_url) root.style.setProperty('--bg-image', `url('${data.bg_image_url}')`);
 
-          PLACEHOLDER = data.favicon_png_url || data.favicon_svg_url || data.apple_touch_icon_url || '';
-        }
-
-        // base til public storage ud fra SUPABASE_URL
-        STORAGE_BASE = (window.SUPABASE_URL || '').replace(/\/+$/,'') + '/storage/v1/object/public';
-      }catch(e){ console.warn('[about] settings:', e); }
+            PLACEHOLDER = data.favicon_png_url || data.favicon_svg_url || data.apple_touch_icon_url || '';
+          }
+        }catch(e){ console.warn('[about] settings:', e); }
+      }
 
       // Fallback placeholder (MC-mønt i SVG) hvis intet favicon
       if (!PLACEHOLDER){
@@ -262,18 +275,14 @@
         );
       }
 
-      // Hjælpere
+      // ---------- Hjælpere ----------
       const fallbackBySlot = (slot) => {
-        if (!STORAGE_BASE) return '';
         if (slot === 'top')        return `${STORAGE_BASE}/people/Owner.jpg`;
         if (slot === 'mid')        return `${STORAGE_BASE}/people/ADM.jpg`;
         if (slot === 'accounting') return `${STORAGE_BASE}/people/Revision.jpg`;
         return '';
       };
 
-      // showPhoto: brug photo_url || fallbackBySlot(slot) || PLACEHOLDER
-      // Ramme kun ved "rigtige" fotos: top/mid falder tilbage til deres jpg → med ramme.
-      // Accounting: fallback Revision.jpg behandles som PLADSHOLDER (ingen ramme) indtil I sætter et rigtigt logo.
       const showPhoto = (elId, slot, url) => {
         const el = document.getElementById(elId);
         if (!el) return;
@@ -292,131 +301,146 @@
         };
         img.src = chosen;
 
-        // Rammelogik
+        // Rammelogik: kun ramme ved rigtigt billede
         let addFrame = hasReal;
-        if (!hasReal && slot === 'accounting' && fallback) addFrame = false; // Revision.jpg = behandles som placeholder
-        if (!hasReal && !fallback) addFrame = false;                         // MC-coin placeholder
+        if (!hasReal && slot === 'accounting' && fallback) addFrame = false; // Revision.jpg = placeholder
+        if (!hasReal && !fallback) addFrame = false;                         // MC coin placeholder
 
         el.classList.toggle('has-photo', addFrame);
       };
 
       const setText = (id, val) => { const el=document.getElementById(id); if (el && val) el.textContent = val; };
 
-      // Tekster (common + about)
-      try{
-        const { data } = await sb.from('site_text').select('page,key,value').in('page',['common','about']);
-        if (data){
-          const dict=Object.fromEntries(data.map(r=>[`${r.page}:${r.key}`,r.value]));
-          document.querySelectorAll('[data-text]').forEach(el=>{
-            const k=el.getAttribute('data-text'); if (dict[k]) el.innerHTML = dict[k];
-          });
-        }
-      }catch(e){ console.warn('[about] site_text:', e); }
-
-      // Personer/partnere
-      let partnersById = {};
-      try{
-        const { data: people } = await sb.from('org_people')
-          .select('slot,name,title,photo_url,bio,partner_id')
-          .in('slot',['top','mid','accounting','sub1','sub2','sub3']);
-
-        const partnerIds = [...new Set((people||[]).map(p=>p.partner_id).filter(Boolean))];
-        if (partnerIds.length){
-          const { data: partners } = await sb.from('partners')
-            .select('id,name,website,logo_url,logo_alt,category,active')
-            .in('id', partnerIds);
-          partnersById = Object.fromEntries((partners||[]).map(x=>[x.id,x]));
-        }
-
-        const bySlot = Object.fromEntries((people||[]).map(x=>[x.slot,x]));
-
-        // Julienne
-        (function(){
-          const p = bySlot.top || {};
-          showPhoto('photo-top', 'top', p.photo_url);
-          setText('name-top',  p.name  || document.getElementById('name-top').textContent);
-          setText('title-top', p.title || document.getElementById('title-top').textContent);
-          if (p.bio){
-            const el = document.querySelector('#bio-top [data-text="about:bio_top"]');
-            if (el) el.innerHTML = p.bio;
+      // ---------- Tekster (common + about) ----------
+      if (sb) {
+        try{
+          const { data } = await sb.from('site_text').select('page,key,value').in('page',['common','about']);
+          if (data){
+            const dict=Object.fromEntries(data.map(r=>[`${r.page}:${r.key}`,r.value]));
+            document.querySelectorAll('[data-text]').forEach(el=>{
+              const k=el.getAttribute('data-text'); if (dict[k]) el.innerHTML = dict[k];
+            });
           }
-        })();
+        }catch(e){ console.warn('[about] site_text:', e); }
+      }
 
-        // Thomas
-        (function(){
-          const p = bySlot.mid || {};
-          showPhoto('photo-mid', 'mid', p.photo_url);
-          setText('name-mid',  p.name  || document.getElementById('name-mid').textContent);
-          setText('title-mid', p.title || document.getElementById('title-mid').textContent);
-          if (p.bio){
-            const el = document.querySelector('#bio-thomas [data-text="about:thomas_bio"]');
-            if (el) el.innerHTML = p.bio;
+      // ---------- Personer/partnere ----------
+      if (sb) {
+        try{
+          const { data: people } = await sb.from('org_people')
+            .select('slot,name,title,photo_url,bio,partner_id')
+            .in('slot',['top','mid','accounting','sub1','sub2','sub3']);
+
+          const partnerIds = [...new Set((people||[]).map(p=>p.partner_id).filter(Boolean))];
+          let partnersById = {};
+          if (partnerIds.length){
+            const { data: partners } = await sb.from('partners')
+              .select('id,name,website,logo_url,logo_alt,category,active')
+              .in('id', partnerIds);
+            partnersById = Object.fromEntries((partners||[]).map(x=>[x.id,x]));
           }
-        })();
 
-        // Accounting (partner eller person)
-        (function(){
-          const p = bySlot.accounting || {};
-          const partner = p.partner_id ? partnersById[p.partner_id] : null;
-          const name  = partner?.name || p.name  || document.getElementById('name-accounting').textContent;
-          const title = partner ? (partner.category || 'Partner') : (p.title || document.getElementById('title-accounting').textContent);
-          const logo  = partner?.logo_url || p.photo_url || '';
-          showPhoto('photo-accounting', 'accounting', logo);
-          setText('name-accounting', name);
-          setText('title-accounting', title);
-        })();
+          const bySlot = Object.fromEntries((people||[]).map(x=>[x.slot,x]));
 
-        // Underroller – vis altid (med pladsholder hvis tomt)
-        (function(){
-          const rows = [
-            { slot:'sub1', photo:'photo-sub-1', name:'name-sub-1', title:'title-sub-1' },
-            { slot:'sub2', photo:'photo-sub-2', name:'name-sub-2', title:'title-sub-2' },
-            { slot:'sub3', photo:'photo-sub-3', name:'name-sub-3', title:'title-sub-3' },
-          ];
-          rows.forEach(m => {
-            const p = bySlot[m.slot] || {};
+          // Julienne
+          (function(){
+            const p = bySlot.top || {};
+            showPhoto('photo-top', 'top', p.photo_url);
+            setText('name-top',  p.name  || document.getElementById('name-top').textContent);
+            setText('title-top', p.title || document.getElementById('title-top').textContent);
+            if (p.bio){
+              const el = document.querySelector('#bio-top [data-text="about:bio_top"]');
+              if (el) el.innerHTML = p.bio;
+            }
+          })();
+
+          // Thomas
+          (function(){
+            const p = bySlot.mid || {};
+            showPhoto('photo-mid', 'mid', p.photo_url);
+            setText('name-mid',  p.name  || document.getElementById('name-mid').textContent);
+            setText('title-mid', p.title || document.getElementById('title-mid').textContent);
+            if (p.bio){
+              const el = document.querySelector('#bio-thomas [data-text="about:thomas_bio"]');
+              if (el) el.innerHTML = p.bio;
+            }
+          })();
+
+          // Accounting
+          (function(){
+            const p = bySlot.accounting || {};
             const partner = p.partner_id ? partnersById[p.partner_id] : null;
-            const name  = partner?.name || p.name  || document.getElementById(m.name).textContent;
-            const title = partner ? (partner.category || 'Partner') : (p.title || document.getElementById(m.title).textContent);
+            const name  = partner?.name || p.name  || document.getElementById('name-accounting').textContent;
+            const title = partner ? (partner.category || 'Partner') : (p.title || document.getElementById('title-accounting').textContent);
             const logo  = partner?.logo_url || p.photo_url || '';
-            // sub-roller bruger ikke special fallback – coin/placeholder hvis tomt
-            showPhoto(m.photo, 'sub', logo);
-            setText(m.name,  name);
-            setText(m.title, title);
-          });
-        })();
-      }catch(e){ console.warn('[about] org_people:', e); }
+            showPhoto('photo-accounting', 'accounting', logo);
+            setText('name-accounting', name);
+            setText('title-accounting', title);
+          })();
 
-      // Højre kolonne bokse
-      try{
-        const { data } = await sb.from('about_boxes').select('title,content,sort').order('sort',{ascending:true});
-        if (data?.length){
-          const ids=['side-1','side-2','side-3'];
-          data.slice(0,3).forEach((row,i)=>{
-            const root=document.getElementById(ids[i]); if (!root) return;
-            const h2=root.querySelector('h2'); const body=root.querySelector('.muted');
-            if (row.title)   h2.innerHTML = row.title;
-            if (row.content) body.innerHTML = row.content;
-          });
-        }
-      }catch(e){ console.warn('[about] about_boxes:', e); }
+          // Sub-roller (vises altid – med placeholder hvis tomt)
+          (function(){
+            const rows = [
+              { slot:'sub1', photo:'photo-sub-1', name:'name-sub-1', title:'title-sub-1' },
+              { slot:'sub2', photo:'photo-sub-2', name:'name-sub-2', title:'title-sub-2' },
+              { slot:'sub3', photo:'photo-sub-3', name:'name-sub-3', title:'title-sub-3' },
+            ];
+            rows.forEach(m => {
+              const p = bySlot[m.slot] || {};
+              const partner = p.partner_id ? partnersById[p.partner_id] : null;
+              const name  = partner?.name || p.name  || document.getElementById(m.name).textContent;
+              const title = partner ? (partner.category || 'Partner') : (p.title || document.getElementById(m.title).textContent);
+              const logo  = partner?.logo_url || p.photo_url || '';
+              showPhoto(m.photo, 'sub', logo);
+              setText(m.name,  name);
+              setText(m.title, title);
+            });
+          })();
+        }catch(e){ console.warn('[about] org_people:', e); }
+      } else {
+        // Ingen Supabase? Brug kun fallbacks + eksisterende tekster i HTML
+        showPhoto('photo-top', 'top', '');
+        showPhoto('photo-mid', 'mid', '');
+        showPhoto('photo-accounting', 'accounting', '');
+        showPhoto('photo-sub-1', 'sub', '');
+        showPhoto('photo-sub-2', 'sub', '');
+        showPhoto('photo-sub-3', 'sub', '');
+      }
 
-      // Social links
-      try{
-        const root=document.getElementById('social-menu');
-        if (root){
-          const { data } = await sb.from('social_links')
-            .select('name,url,icon,sort').order('sort',{ascending:true});
-          const items=(data||[]).filter(x=>x?.url && String(x.url).trim().length>0);
-          if (!items.length) root.style.display='none';
-          else{
-            root.innerHTML = items.map(x=>`
-              <a href="${x.url}" target="_blank" rel="noopener" title="${x.name}">
-                <span class="sr-only">${x.name}</span>
-              </a>`).join('');
+      // ---------- Højre kolonne bokse ----------
+      if (sb) {
+        try{
+          const { data } = await sb.from('about_boxes').select('title,content,sort').order('sort',{ascending:true});
+          if (data?.length){
+            const ids=['side-1','side-2','side-3'];
+            data.slice(0,3).forEach((row,i)=>{
+              const root=document.getElementById(ids[i]); if (!root) return;
+              const h2=root.querySelector('h2'); const body=root.querySelector('.muted');
+              if (row.title)   h2.innerHTML = row.title;
+              if (row.content) body.innerHTML = row.content;
+            });
           }
-        }
-      }catch(e){ console.warn('[about] social_links:', e); }
+        }catch(e){ console.warn('[about] about_boxes:', e); }
+      }
+
+      // ---------- Social links ----------
+      if (sb) {
+        try{
+          const root=document.getElementById('social-menu');
+          if (root){
+            const { data } = await sb.from('social_links')
+              .select('name,url,icon,sort').order('sort',{ascending:true});
+            const items=(data||[]).filter(x=>x?.url && String(x.url).trim().length>0);
+            if (!items.length) root.style.display='none';
+            else{
+              root.innerHTML = items.map(x=>`
+                <a href="${x.url}" target="_blank" rel="noopener" title="${x.name}">
+                  <span class="sr-only">${x.name}</span>
+                </a>`).join('');
+            }
+          }
+        }catch(e){ console.warn('[about] social_links:', e); }
+      }
     })();
   </script>
 </body>
