@@ -3,77 +3,60 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MadaCoin – Rapporter</title>
+  <title>Rapporter</title>
+  <link rel="preconnect" href="https://unpkg.com" />
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
-    /* BAGGRUND + LAYOUT */
-    body{
-      margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
-      color:#eaeaea;
-
-      /* baggrund */
-      background-color:#061a2b;
-      /* skift evt. .png til .jpg hvis dit billede er .jpg */
-      background-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
-      background-repeat:no-repeat;
-      background-position:center center;
-      background-size:cover;
-      background-attachment:fixed;
-
-      /* sticky footer */
-      display:flex;
-      flex-direction:column;
-      min-height:100vh;
-    }
-    /* mobil: slå fixed fra for glidere scroll */
+  body{
     @media (max-width:800px){
-      body{ background-attachment:scroll; }
-    }
+  body{ background-attachment:scroll; }
 
-    /* GENERELT LAYOUT */
-    header{ padding:14px 18px; border-bottom:1px solid #222; position:relative; z-index:5; }
-    a{ color:#9ad4ff; text-decoration:none; }
-    
-    /* .wrap centrerer indholdet til max 1100px */
-.wrap{ max-width:1100px; margin:0 auto; padding:24px; }
-
-/* header + nav som på side 2 */
-header.wrap{ text-align: left; }
-header.wrap nav{
-  display: flex;
-  gap: 14px;
-  justify-content: flex-start;  /* links står til venstre i containeren */
-  margin: 0;
 }
 
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+
+  /* KUN det her er ændret: */
+  background-color:#061a2b;
+  background-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
+  background-repeat:no-repeat;
+  background-position:center center;
+  background-size:cover;
+  background-attachment:fixed;
+
+  color:#eaeaea;
+}
+
+    header,footer{padding:14px 18px;border-bottom:1px solid #222}
+    a{color:#9ad4ff;text-decoration:none}
+    nav a{margin-right:14px;opacity:.9}
+    .wrap{max-width:1100px;margin:0 auto;padding:24px}
+    .hero{padding:24px 0}
+    .grid{display:grid;gap:16px}
+    .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    @media (max-width:900px){.grid-2{grid-template-columns:1fr}}
+    .card{background:#111;border:1px solid #252525;border-radius:16px;padding:18px;box-shadow:0 1px 0 rgba(255,255,255,.04) inset}
+    h1,h2,h3{margin:12px 0 8px}
+    .muted{opacity:.8}
+    .list{line-height:1.6}
+    .pill{display:inline-block;padding:3px 10px;border:1px solid #2a2a2a;border-radius:999px;font-size:12px;opacity:.9}
+    .kbd{font-family:ui-monospace,Menlo,Monaco,monospace;background:#0e0e0f;border:1px solid #2b2b2b;border-bottom-color:#1c1c1c;padding:2px 6px;border-radius:6px}
+
+        footer {
+  text-align: center;
+  padding: 20px;
+  background: #e4e6c5;
+  color: #000000;            /* ← tekstfarve hvid */
+}
+footer a {
+  color: #fff;            /* ← links også hvide */
+  text-decoration: none;
+}
+footer a:hover { text-decoration: underline; }
+
+/* Hvis din footer har class="muted", så fjern dæmpning */
+footer.muted { opacity: 1; }
     
-    header.wrap nav a{ opacity:.9; }
-    header.wrap nav a:hover{ opacity:1; text-decoration:underline; }
-
-  
-
-    
-    /* KORT UI-STIL TIL INDHOLD */
-    .card{ background:#111; border:1px solid #252525; border-radius:16px; padding:18px; margin:14px 0; }
-    h1,h2{ margin:12px 0; }
-    table{ width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
-    th,td{ border-bottom:1px solid #262626; padding:10px; text-align:left; }
-    .muted{ opacity:.8; }
-    .right{ text-align:right; }
-    .empty{ opacity:.7; border:1px dashed #2a2a2a; padding:16px; border-radius:14px; }
-
-    /* FOOTER: creme + sort tekst + sticky */
-    main{ flex:1; }
-    footer{
-      margin-top:auto;
-      text-align:center;
-      padding:20px;
-      background:#e4e6c5; /* creme */
-      color:#000;         /* sort tekst */
-    }
-    footer a{ color:#000; text-decoration:none; }
-    footer a:hover{ text-decoration:underline; }
   </style>
 </head>
 <body>
@@ -81,90 +64,103 @@ header.wrap nav{
     <nav>
       <a href="/index.html">Home</a>
       <a href="/madacoin.html">Om MadaCoin</a>
-      <a href="/rapporter.html" aria-current="page">Rapporter</a>
+      <a href="/rapporter.html">Rapporter</a>
     </nav>
   </header>
 
   <main class="wrap">
-    <h1>Månedlige rapporter</h1>
-    <p class="muted">Transparens over donationer (MCD), forbrug og drift (MCN). Tabellen opsummerer per måned; klik for detaljer.</p>
+    <section class="hero">
+      <h1>MadaCoin – Mål & vejen</h1>
+      <p class="muted" data-text="about:intro">
+        MadaCoin støtter udvikling i Madagaskar via to tokens: MCD (donation) og MCN (krypto).
+      </p>
+    </section>
 
-    <div id="summary" class="card">
-      <h2>Opsummering</h2>
-      <table>
-        <tbody>
-          <tr><th>Perioder</th><td id="sum-periods" class="right">–</td></tr>
-          <tr><th>MCD modtaget</th><td id="sum-in" class="right">–</td></tr>
-          <tr><th>MCD brugt</th><td id="sum-out" class="right">–</td></tr>
-          <tr><th>Slutbalance (MCD)</th><td id="sum-bal" class="right">–</td></tr>
-          <tr><th>MCN indtægter</th><td id="sum-mcn" class="right">–</td></tr>
-        </tbody>
-      </table>
-    </div>
+    <section class="grid grid-2">
+      <div class="card">
+        <h2>Tokens</h2>
+        <div class="list">
+          <p><strong>MCD – MadaCoin Donation</strong><br/><span class="muted" data-text="about:mcd">Donations-token. Midlerne går til projekter og rapporteres åbent.</span></p>
+          <p><strong>MCN – MadaCoin Crypto</strong><br/><span class="muted" data-text="about:mcn">Indtjenings-/driftstoken. Bruges ikke til byggeri i projektet.</span></p>
+        </div>
+      </div>
 
-    <div id="list"></div>
-    <div id="empty" class="empty" style="display:none">Ingen rapporter endnu.</div>
+      <div class="card">
+        <h2>Vejen (Roadmap – kort)</h2>
+        <div class="list">
+          <p class="muted" data-text="about:roadmap">Plan 1: Teknisk struktur (site, wallets, Supabase). Plan 2: Overdragelse/ejerskab og roller.</p>
+          <p class="muted">Detaljeret roadmap findes på forsiden.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Ejerskab & roller</h2>
+        <div class="list">
+          <ul>
+            <li><strong>Julienne</strong> (Madagaskar): juridisk ejer/leder af NGO/virksomhed, fuld kontrol over wallets og rettigheder.</li>
+            <li><strong>Thomas</strong>: teknisk ansvarlig & direktør <em>uden økonomisk råderet</em>. Fokus: udvikling, drift, sikkerhed.</li>
+            <li>Begge beskytter midler og forhindrer unødige udgifter (også ved mistet/stjålet mobil).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Firmastruktur</h2>
+        <div class="list">
+          <ul>
+            <li>NGO/forening i Madagaskar (ejerskab hos Julienne).</li>
+            <li>Evt. holdingselskab til kontrakter/partnere (senere).</li>
+            <li>Adskilte wallets/bankkonti: <span class="muted">MCD (donation) adskilt fra drift/MCN</span>.</li>
+            <li>Offentlig rapportering: månedlige rapporter (se <a href="/rapporter.html">Rapporter</a>).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Teknisk</h2>
+        <p class="muted">Supabase bruges som backend (alt indhold hentes dynamisk til landingssiden). Roadmap-billeder navngives <span class="kbd">Roadmap_X_pic_Y</span> og skjules automatisk, hvis de mangler.</p>
+      </div>
+    </section>
   </main>
 
-  <footer>
-    <span id="footer-text">© 2025 MadaCoin. All rights reserved.</span>
-  </footer>
 
   <script>
-    function fmt(n){
-      if (n === null || n === undefined) return '–';
-      return new Intl.NumberFormat('da-DK',{maximumFractionDigits:2}).format(n);
-    }
-
+    // Forvent at SUPABASE_URL og SUPABASE_ANON allerede findes globalt (fra din index).
+    // Hvis ikke, kan du importere samme config her.
     if (typeof SUPABASE_URL === 'undefined') {
-      console.warn('[reports] SUPABASE config mangler – viser kun tom visning.');
-      document.getElementById('empty').style.display='block';
+      console.warn('[about] SUPABASE config mangler – indhold bliver statisk.');
     } else {
       const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-      // Forventet tabel `reports`:
-      // id (uuid), period (text '2025-07'), mcd_in (numeric), mcd_out (numeric),
-      // mcd_balance (numeric), mcn_revenue (numeric), notes_md (text), links (json[])
-      sb.from('reports').select('*').order('period',{ascending:false}).then(({ data, error }) => {
-        if (error) { console.error(error); document.getElementById('empty').style.display='block'; return; }
-        if (!data || !data.length) { document.getElementById('empty').style.display='block'; return; }
-
-        // Opsummering
-        const sum = data.reduce((a,r)=>({
-          periods:a.periods+1,
-          in:a.in + (Number(r.mcd_in)||0),
-          out:a.out + (Number(r.mcd_out)||0),
-          bal: Number(r.mcd_balance)||a.bal,
-          mcn:a.mcn + (Number(r.mcn_revenue)||0)
-        }),{periods:0,in:0,out:0,bal:0,mcn:0});
-        document.getElementById('sum-periods').textContent = fmt(sum.periods);
-        document.getElementById('sum-in').textContent = fmt(sum.in);
-        document.getElementById('sum-out').textContent = fmt(sum.out);
-        document.getElementById('sum-bal').textContent = fmt(sum.bal);
-        document.getElementById('sum-mcn').textContent = fmt(sum.mcn);
-
-        // Liste af rapporter
-        const host = document.getElementById('list');
-        data.forEach(r => {
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = `
-            <h2>${r.title || 'Rapport'} – ${r.period}</h2>
-            <table><tbody>
-              <tr><th>MCD modtaget</th><td class="right">${fmt(r.mcd_in)}</td></tr>
-              <tr><th>MCD brugt</th><td class="right">${fmt(r.mcd_out)}</td></tr>
-              <tr><th>Slutbalance (MCD)</th><td class="right">${fmt(r.mcd_balance)}</td></tr>
-              <tr><th>MCN indtægter</th><td class="right">${fmt(r.mcn_revenue)}</td></tr>
-            </tbody></table>
-            ${r.notes_md ? `<details><summary>Noter</summary><div class="muted">${r.notes_md}</div></details>` : ''}
-            ${Array.isArray(r.links) && r.links.length ? `<details><summary>Bilag/kvitteringer</summary><ul>${r.links.map(x=>`<li><a target="_blank" rel="noopener" href="${x.url}">${x.label||x.url}</a></li>`).join('')}</ul></details>` : ''}
-          `;
-          host.appendChild(card);
+      // Enkel CMS: tabel `site_text` med kolonner: page (text), key (text), value (text)
+      // Eksempel-rækker: ("about","intro", "…"), ("about","mcd","…"), ("about","mcn","…"), ("about","roadmap","…")
+      sb.from('site_text').select('key,value').eq('page','about').then(({ data, error }) => {
+        if (error) return console.warn('[about] site_text fejl:', error);
+        const map = Object.fromEntries(data.map(x => [x.key, x.value]));
+        document.querySelectorAll('[data-text^="about:"]').forEach(el => {
+          const key = el.getAttribute('data-text').split(':')[1];
+          if (map[key]) el.innerHTML = map[key];
         });
       });
     }
+
+
+    
   </script>
+
+  
+<footer><span id="footer-text">© 2025 MadaCoin. All rights reserved.</span></footer>
+
 </body>
 </html>
+
+
+
+
+
+
+
+
+
 
 
 
