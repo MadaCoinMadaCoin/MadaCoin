@@ -32,7 +32,7 @@
     .wrap{ max-width:var(--wrap); margin:0 auto; padding:18px 24px }
     header{ border-bottom:1px solid rgba(255,255,255,.06); background:transparent }
 
-    /* Nav-knapper som pills */
+    /* Nav = individuelle pills */
     nav{ display:flex; gap:12px; align-items:center; flex-wrap:wrap }
     nav a{
       color:#fff; padding:8px 14px; border-radius:12px;
@@ -222,6 +222,7 @@
 
       // SETTINGS (titel, favicons/tema) + placeholder fra favicon hvis muligt
       let PLACEHOLDER = '';
+      let STORAGE_BASE = '';
       try{
         const { data } = await sb.from('settings')
           .select('site_title,favicon_svg_url,favicon_png_url,apple_touch_icon_url,theme_primary,bg_image_url,bg_color')
@@ -243,6 +244,9 @@
 
           PLACEHOLDER = data.favicon_png_url || data.favicon_svg_url || data.apple_touch_icon_url || '';
         }
+
+        // base til public storage ud fra SUPABASE_URL
+        STORAGE_BASE = (window.SUPABASE_URL || '').replace(/\/+$/,'') + '/storage/v1/object/public';
       }catch(e){ console.warn('[about] settings:', e); }
 
       // Fallback placeholder (MC-mønt i SVG) hvis intet favicon
@@ -258,24 +262,44 @@
         );
       }
 
-      // Helper: vis foto/logo (med portrait-detektion)
-      const showPhoto = (elId, url) => {
+      // Hjælpere
+      const fallbackBySlot = (slot) => {
+        if (!STORAGE_BASE) return '';
+        if (slot === 'top')        return `${STORAGE_BASE}/people/Owner.jpg`;
+        if (slot === 'mid')        return `${STORAGE_BASE}/people/ADM.jpg`;
+        if (slot === 'accounting') return `${STORAGE_BASE}/people/Revision.jpg`;
+        return '';
+      };
+
+      // showPhoto: brug photo_url || fallbackBySlot(slot) || PLACEHOLDER
+      // Ramme kun ved "rigtige" fotos: top/mid falder tilbage til deres jpg → med ramme.
+      // Accounting: fallback Revision.jpg behandles som PLADSHOLDER (ingen ramme) indtil I sætter et rigtigt logo.
+      const showPhoto = (elId, slot, url) => {
         const el = document.getElementById(elId);
         if (!el) return;
 
-        const hasReal = url && String(url).trim();
-        const src = hasReal ? url : PLACEHOLDER;
+        const fallback = fallbackBySlot(slot);
+        const hasReal = !!(url && String(url).trim());
+        const chosen = hasReal ? url : (fallback || PLACEHOLDER);
 
-        el.style.backgroundImage = `url('${src}')`;
-        if (hasReal) el.classList.add('has-photo'); else el.classList.remove('has-photo');
+        el.style.backgroundImage = `url('${chosen}')`;
 
+        // Portræt-detektion
         const img = new Image();
         img.onload = () => {
           if (img.naturalHeight > img.naturalWidth * 1.15) el.classList.add('portrait');
           else el.classList.remove('portrait');
         };
-        img.src = src;
+        img.src = chosen;
+
+        // Rammelogik
+        let addFrame = hasReal;
+        if (!hasReal && slot === 'accounting' && fallback) addFrame = false; // Revision.jpg = behandles som placeholder
+        if (!hasReal && !fallback) addFrame = false;                         // MC-coin placeholder
+
+        el.classList.toggle('has-photo', addFrame);
       };
+
       const setText = (id, val) => { const el=document.getElementById(id); if (el && val) el.textContent = val; };
 
       // Tekster (common + about)
@@ -284,7 +308,7 @@
         if (data){
           const dict=Object.fromEntries(data.map(r=>[`${r.page}:${r.key}`,r.value]));
           document.querySelectorAll('[data-text]').forEach(el=>{
-            const k=el.getAttribute('data-text'); if (dict[k]) el.innerHTML=dict[k];
+            const k=el.getAttribute('data-text'); if (dict[k]) el.innerHTML = dict[k];
           });
         }
       }catch(e){ console.warn('[about] site_text:', e); }
@@ -309,7 +333,7 @@
         // Julienne
         (function(){
           const p = bySlot.top || {};
-          showPhoto('photo-top', p.photo_url);
+          showPhoto('photo-top', 'top', p.photo_url);
           setText('name-top',  p.name  || document.getElementById('name-top').textContent);
           setText('title-top', p.title || document.getElementById('title-top').textContent);
           if (p.bio){
@@ -321,7 +345,7 @@
         // Thomas
         (function(){
           const p = bySlot.mid || {};
-          showPhoto('photo-mid', p.photo_url);
+          showPhoto('photo-mid', 'mid', p.photo_url);
           setText('name-mid',  p.name  || document.getElementById('name-mid').textContent);
           setText('title-mid', p.title || document.getElementById('title-mid').textContent);
           if (p.bio){
@@ -334,10 +358,10 @@
         (function(){
           const p = bySlot.accounting || {};
           const partner = p.partner_id ? partnersById[p.partner_id] : null;
-          const name = partner?.name || p.name || document.getElementById('name-accounting').textContent;
+          const name  = partner?.name || p.name  || document.getElementById('name-accounting').textContent;
           const title = partner ? (partner.category || 'Partner') : (p.title || document.getElementById('title-accounting').textContent);
-          const logo = partner?.logo_url || p.photo_url || '';
-          showPhoto('photo-accounting', logo);
+          const logo  = partner?.logo_url || p.photo_url || '';
+          showPhoto('photo-accounting', 'accounting', logo);
           setText('name-accounting', name);
           setText('title-accounting', title);
         })();
@@ -352,10 +376,11 @@
           rows.forEach(m => {
             const p = bySlot[m.slot] || {};
             const partner = p.partner_id ? partnersById[p.partner_id] : null;
-            const name = partner?.name || p.name || document.getElementById(m.name).textContent;
+            const name  = partner?.name || p.name  || document.getElementById(m.name).textContent;
             const title = partner ? (partner.category || 'Partner') : (p.title || document.getElementById(m.title).textContent);
-            const logo = partner?.logo_url || p.photo_url || '';
-            showPhoto(m.photo, logo);
+            const logo  = partner?.logo_url || p.photo_url || '';
+            // sub-roller bruger ikke special fallback – coin/placeholder hvis tomt
+            showPhoto(m.photo, 'sub', logo);
             setText(m.name,  name);
             setText(m.title, title);
           });
