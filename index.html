@@ -297,40 +297,41 @@ body.modal-open {
     border-radius: 999px; 
     font-size: 12px; 
   }
-</style>
-<style id="mobile-nav-fix">
-  /* Nav skal altid være klikbar øverst */
+
+/* Nav skal altid være klikbar øverst */
+.site-nav{
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,.75);
+}
+
+/* Undgå at indhold lægger sig over nav */
+.layout, .center-col, .right-col{
+  position: relative;
+  z-index: 0;
+}
+
+/* Bedre tap-adfærd på iOS/Android */
+.site-nav nav a{
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: rgba(255,255,255,.15);
+}
+
+/* Mobil: gør højre indryk mindre (desktop bevarer 240px i .wrap) */
+@media (max-width: 900px){
+  .site-nav .wrap,
   .site-nav{
-    position: sticky;
-    top: 0;
-    z-index: 9999;
-    background: rgba(0,0,0,.75);
+    padding-left: 16px;
+    padding-right: 24px;
   }
+}
 
-  /* Undgå at indhold lægger sig over nav */
-  .layout, .center-col, .right-col{
-    position: relative;
-    z-index: 0;
-  }
-
-  /* Bedre tap-adfærd på iOS/Android */
-  .site-nav nav a{
-    position: relative;
-    z-index: 1;
-    pointer-events: auto;
-    -webkit-tap-highlight-color: rgba(255,255,255,.15);
-  }
-
-  /* Mobil: gør højre indryk mindre så knapperne er lette at ramme */
-  @media (max-width: 900px){
-    .site-nav .wrap,
-    /* fallback hvis side 1 ikke har .wrap inde i .site-nav */
-    .site-nav{
-      padding-left: 16px;
-      padding-right: 24px;
-    }
-  }
+    
 </style>
+
 
 </head>
 <body>
@@ -889,6 +890,7 @@ window.addEventListener('load', () => {
 
 </body>
 </html>
+
 
 
 
