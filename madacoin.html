@@ -8,7 +8,7 @@
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
     :root{
-      /* lærred og kolonner (Preset C) */
+      /* Lærred og kolonner (Preset C) */
       --wrap: 1680px;
       --gap: 84px;
       --left-col: 520px;     /* venstre bio-kolonne */
@@ -16,12 +16,15 @@
       --right-col: 720px;    /* stor tekstkolonne */
       --right-offset: 56px;  /* skub “Vores version” lidt ned */
 
-      /* foto-størrelser (Preset C) */
+      /* Offset for at skubbe pyramiden mod venstre (negativ værdi) */
+      --center-offset: -36px;
+
+      /* Foto-størrelser (Preset C) */
       --photo-top: 144px;    /* Julienne */
       --photo-peer: 108px;   /* Thomas + Revision */
       --photo-sub: 102px;    /* underroller */
 
-      /* farver/stil */
+      /* Farver/stil */
       --bg:#061a2b;
       --bg-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
       --text:#fff; --muted:#cfd3d7; --primary:#9ad4ff;
@@ -38,9 +41,12 @@
     }
     @media (max-width:900px){ body{ background-attachment:scroll } }
 
-    /* NAV – venstre justeret */
-    .site-nav{ padding:14px 18px; border-bottom:1px solid rgba(255,255,255,.06) }
-    .site-nav nav{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; justify-content:flex-start }
+    /* NAV – venstre som side 1/3 */
+    .site-nav{ padding:14px 0; border-bottom:1px solid rgba(255,255,255,.06) }
+    .site-nav nav{
+      display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+      justify-content:flex-start; margin-left:24px;
+    }
     .site-nav nav a{
       color:#fff; padding:8px 14px; border-radius:12px;
       background:#0d0d0f; border:1px solid #333; text-decoration:none; opacity:.96;
@@ -49,7 +55,7 @@
     .site-nav nav a:hover{ filter:brightness(1.08) }
     .site-nav nav a.active{ border-color:#555; box-shadow: inset 0 1px 0 rgba(255,255,255,.12) }
 
-    /* tre kolonner + rækker der binder bio til billeder */
+    /* Tre kolonner + rækker der binder bio til billeder */
     .layout{
       max-width:var(--wrap); margin:0 auto; padding:24px;
       display:grid;
@@ -60,7 +66,7 @@
       flex:1;
     }
 
-    /* kort */
+    /* Kort */
     .card{
       background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius);
       box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,.06)
@@ -69,22 +75,25 @@
     h2{ margin:0 0 10px; font-size:clamp(18px,2.2vw,22px) }
     .muted{ color:var(--muted) }
 
-    /* venstre kolonne – bio-kort forankret til samme rækker som billederne */
+    /* Venstre kolonne – bio-kort forankret til samme rækker som billederne */
     .bio-card{ width:360px; min-height:190px; max-width:100% }
     #bio-top{ grid-column:1; grid-row:1; }
     #bio-thomas{ grid-column:1; grid-row:2; }
 
-    /* midterkolonne (pyramiden) */
-    .center-col{ grid-column:2; display:flex; flex-direction:column; align-items:center; gap:32px }
+    /* Midterkolonne (pyramiden) */
+    .center-col{
+      grid-column:2; display:flex; flex-direction:column; align-items:center; gap:32px;
+      transform: translateX(var(--center-offset)); /* skub pyramiden mod venstre */
+    }
     #pyr-top{ grid-row:1; }
     #pyr-mid{ grid-row:2; }
     #pyr-sub{ grid-row:3; }
 
-    .people-mid{ display:flex; gap:36px; align-items:flex-start; justify-content:center } /* lidt tættere */
+    .people-mid{ display:flex; gap:36px; align-items:flex-start; justify-content:center }
 
     .person,.peer,.sub{ display:flex; flex-direction:column; align-items:center; gap:10px }
 
-    /* fotos */
+    /* Fotos */
     .photo-top{
       width:var(--photo-top); height:var(--photo-top);
       border-radius:8px; background-position:50% 50%; background-size:cover; background-repeat:no-repeat;
@@ -99,24 +108,31 @@
     .has-photo{ border-color:#2a2a2a; box-shadow:0 8px 22px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.04) }
     .portrait{ background-position:50% 35% }
 
-    /* labels (guards for lange navne) */
+    /* Labels (guards for lange navne) */
     .label{
-      min-width:192px; max-width:220px;      /* guard: hold os fra at brede os horisontalt */
+      min-width:192px; max-width:220px;
       text-align:center; padding:8px 14px; border-radius:999px;
       background:#0d0d0f; border:1px solid #333; box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
       line-height:1.2
     }
-    .label .name, .label .title{ overflow-wrap:anywhere; white-space:normal } /* guard: bryd lange navne */
+    .label .name, .label .title{ overflow-wrap:anywhere; white-space:normal }
     .label .title{ opacity:.9; font-size:13px }
 
-    /* underroller række */
+    /* Underroller række */
     .sub-row{ display:flex; justify-content:center; gap:36px; }
 
-    /* højre kolonne – stor permanent tekst, lidt lavere end Julienne */
-    .right-col{ grid-column:3; grid-row:1 / span 3; margin-top:var(--right-offset); }
+    /* Højre kolonne – stor permanent tekst, lidt lavere end Julienne */
+    .right-col{
+      grid-column:3; grid-row:1 / span 3;
+      margin-top:var(--right-offset);
+      margin-left:8px; /* lidt ekstra luft mod pyramiden */
+    }
     .right-col .card{ width:100% }
+    /* Lidt minimumshøjde så kortet ikke “klapper sammen”, selv før data er hentet */
+    .right-col #right-main .muted{ min-height: 8rem; }
+    /* (kan justeres op/ned efter smag) */
 
-    /* footer */
+    /* Footer */
     .site-footer{
       margin-top:auto; padding:12px 16px; color:#fff; text-align:center;
       background:rgba(0,0,0,.75); border-top:1px solid rgba(255,255,255,.06);
@@ -209,7 +225,7 @@
       <div class="card pad" id="right-main">
         <h2 data-text="about:right_title">Vores version</h2>
         <div class="muted" data-text="about:right_body">
-          Dette er vores plads til længere tekst. Den er altid synlig og kan vokse i højden.
+          <!-- Indhold hentes fra Supabase (about:right_body) -->
         </div>
       </div>
     </aside>
@@ -279,63 +295,67 @@
       /* Personer/partnere */
       if(window.sb){
         try{
-          var ppl=await window.sb.from('org_people')
+          var pplRes=await window.sb.from('org_people')
             .select('slot,name,title,photo_url,bio,partner_id')
             .in('slot',['top','mid','accounting','sub1','sub2','sub3']);
+          var ppl=pplRes.data||[];
 
-          var partnersById={}, ids=[];
-          (ppl.data||[]).forEach(p=>{ if(p.partner_id) ids.push(p.partner_id); });
+          var ids=[], partnersById={};
+          ppl.forEach(p=>{ if(p.partner_id) ids.push(p.partner_id); });
           if(ids.length){
-            var pr=await window.sb.from('partners')
+            var prRes=await window.sb.from('partners')
               .select('id,name,website,logo_url,logo_alt,category,active')
               .in('id',ids);
-            (pr.data||[]).forEach(x=>partnersById[x.id]=x);
+            (prRes.data||[]).forEach(x=>partnersById[x.id]=x);
           }
 
-          var bySlot={}; (ppl.data||[]).forEach(x=>bySlot[x.slot]=x);
+          var bySlot={}; ppl.forEach(x=>bySlot[x.slot]=x);
 
-          (function(){ var p=bySlot.top||{};
+          /* top */
+          { const p=bySlot.top||{};
             showPhoto('photo-top','top',p.photo_url);
             setText('name-top',p.name||document.getElementById('name-top').textContent);
             setText('title-top',p.title||document.getElementById('title-top').textContent);
-            if(p.bio){ var el=document.querySelector('#bio-top [data-text="about:bio_top"]'); if(el) el.innerHTML=p.bio; }
-          })();
+            if(p.bio){ const el=document.querySelector('#bio-top [data-text="about:bio_top"]'); if(el) el.innerHTML=p.bio; }
+          }
 
-          (function(){ var p=bySlot.mid||{};
+          /* mid (thomas) */
+          { const p=bySlot.mid||{};
             showPhoto('photo-mid','mid',p.photo_url);
             setText('name-mid',p.name||document.getElementById('name-mid').textContent);
             setText('title-mid',p.title||document.getElementById('title-mid').textContent);
-            if(p.bio){ var el=document.querySelector('#bio-thomas [data-text="about:thomas_bio"]'); if(el) el.innerHTML=p.bio; }
-          })();
+            if(p.bio){ const el=document.querySelector('#bio-thomas [data-text="about:thomas_bio"]'); if(el) el.innerHTML=p.bio; }
+          }
 
-          (function(){ var p=bySlot.accounting||{};
-            var partner=p.partner_id?partnersById[p.partner_id]:null;
-            var name=(partner&&partner.name)||p.name||document.getElementById('name-accounting').textContent;
-            var title=partner?(partner.category||'Partner'):(p.title||document.getElementById('title-accounting').textContent);
-            var logo=(partner&&partner.logo_url)||p.photo_url||'';
+          /* accounting */
+          { const p=bySlot.accounting||{};
+            const partner=p.partner_id?partnersById[p.partner_id]:null;
+            const name=(partner&&partner.name)||p.name||document.getElementById('name-accounting').textContent;
+            const title=partner?(partner.category||'Partner'):(p.title||document.getElementById('title-accounting').textContent);
+            const logo=(partner&&partner.logo_url)||p.photo_url||'';
             showPhoto('photo-accounting','accounting',logo);
             setText('name-accounting',name); setText('title-accounting',title);
-          })();
+          }
 
-          (function(){
-            var rows=[
-              {slot:'sub1',photo:'photo-sub-1',name:'name-sub-1',title:'title-sub-1'},
-              {slot:'sub2',photo:'photo-sub-2',name:'name-sub-2',title:'title-sub-2'},
-              {slot:'sub3',photo:'photo-sub-3',name:'name-sub-3',title:'title-sub-3'},
-            ];
-            rows.forEach(m=>{
-              var p=bySlot[m.slot]||{};
-              var partner=p.partner_id?partnersById[p.partner_id]:null;
-              var name=(partner&&partner.name)||p.name||document.getElementById(m.name).textContent;
-              var title=partner?(partner.category||'Partner'):(p.title||document.getElementById(m.title).textContent);
-              var logo=(partner&&partner.logo_url)||p.photo_url||'';
-              showPhoto(m.photo,'sub',logo);
-              setText(m.name,name); setText(m.title,title);
-            });
-          })();
+          /* subs */
+          [
+            {slot:'sub1',photo:'photo-sub-1',name:'name-sub-1',title:'title-sub-1'},
+            {slot:'sub2',photo:'photo-sub-2',name:'name-sub-2',title:'title-sub-2'},
+            {slot:'sub3',photo:'photo-sub-3',name:'name-sub-3',title:'title-sub-3'},
+          ].forEach(m=>{
+            const p=bySlot[m.slot]||{};
+            const partner=p.partner_id?partnersById[p.partner_id]:null;
+            const name=(partner&&partner.name)||p.name||document.getElementById(m.name).textContent;
+            const title=partner?(partner.category||'Partner'):(p.title||document.getElementById(m.title).textContent);
+            const logo=(partner&&partner.logo_url)||p.photo_url||'';
+            showPhoto(m.photo,'sub',logo);
+            setText(m.name,name);
+            setText(m.title,title);
+          });
+
         }catch(e){ console.warn('[about] org_people:',e); }
       } else {
-        /* uden Supabase: brug fallbacks + HTML */
+        /* Uden Supabase: brug fallbacks + HTML */
         showPhoto('photo-top','top','');
         showPhoto('photo-mid','mid','');
         showPhoto('photo-accounting','accounting','');
