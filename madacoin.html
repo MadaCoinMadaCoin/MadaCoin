@@ -13,12 +13,17 @@
       --bg-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
       --text:#fff; --muted:#cfd3d7; --primary:#9ad4ff;
       --card:#0b0b0c; --card-border:#2a2a2a; --shadow:0 12px 26px rgba(0,0,0,.5); --radius:16px;
-      --wrap:1200px; --gap:24px; --left-col:620px; --right-col:420px;
+      /* bredere lærred + større mellemrum for at få pyramidens luft */
+      --wrap:1400px; --gap:36px; --left-col:780px; --right-col:560px;
     }
 
     *{box-sizing:border-box}
+
+    /* sticky-footer layout */
     body{
       margin:0;
+      min-height:100vh;
+      display:flex; flex-direction:column;
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
       color:var(--text);
       background: var(--bg) no-repeat center/cover fixed;
@@ -53,9 +58,13 @@
     .layout{
       max-width:var(--wrap); margin:0 auto; padding:24px;
       display:grid; grid-template-columns:var(--left-col) var(--right-col); gap:var(--gap);
+      flex:1; /* skub footer i bund */
     }
-    @media (max-width:1100px){ :root{ --left-col:560px; --right-col:360px } }
-    @media (max-width:980px){ .layout{ grid-template-columns:1fr } }
+    @media (max-width:1200px){ :root{ --left-col:680px; --right-col:520px } }
+    @media (max-width:1080px){ :root{ --left-col:620px; --right-col:460px } }
+    @media (max-width:980px){
+      .layout{ grid-template-columns:1fr }
+    }
 
     .card{
       background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius);
@@ -65,11 +74,13 @@
     h2{ margin:0 0 10px; font-size:clamp(18px,2.2vw,22px) }
     .muted{ color:var(--muted) }
 
-    /* Venstre kolonne */
-    .org-left{ display:flex; flex-direction:column; gap:24px }
-    .row{ display:flex; gap:16px; align-items:flex-start }
+    /* Venstre kolonne – hold alt venstrestillet og ens bredde for bio-kortene */
+    .org-left{ display:flex; flex-direction:column; align-items:flex-start; gap:32px }
+    .row{ display:flex; gap:18px; align-items:flex-start }
     @media (max-width:820px){ .row{ flex-direction:column } }
-    .bio-card{ flex:1; min-width:240px }
+
+    /* Ens bredde til “Direktør · profil” og “Om Thomas” */
+    .bio-card{ width:440px; max-width:100% }
 
     .person,.peer,.sub{ display:flex; flex-direction:column; align-items:center; gap:10px }
 
@@ -81,7 +92,7 @@
       border:1px solid transparent; box-shadow:0 0 0 rgba(0,0,0,0);
     }
     .photo.has-photo{ border-color:#2a2a2a; box-shadow:0 8px 22px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.04) }
-    .photo.portrait{ background-position:50% 35% } /* skub udsnit lidt op på høje billeder */
+    .photo.portrait{ background-position:50% 35% }
     .sub .photo, .peer .photo{ width:120px; height:120px }
 
     .label{
@@ -91,13 +102,13 @@
     }
     .label .title{ opacity:.9; font-size:13px }
 
-    /* Højre kolonne */
-    .side-col{ display:flex; flex-direction:column; gap:24px }
-    .side-card{ min-height:180px }
+    /* Højre kolonne – skub kort helt til højre og giv fast pæn bredde */
+    .side-col{ display:flex; flex-direction:column; align-items:flex-end; gap:24px }
+    .side-card{ width:520px; max-width:100% }
 
-    /* Footer (slank) */
+    /* Footer (sticky i bunden) */
     .site-footer{
-      margin-top:28px;
+      margin-top:auto;
       padding:12px 16px;
       background:rgba(0,0,0,.75);
       border-top:1px solid rgba(255,255,255,.06);
@@ -137,7 +148,7 @@
 
       <!-- Række 2: Thomas (venstre – med bio til venstre) + Revisor (højre) -->
       <div class="row" id="row-mid">
-        <div class="peer-col" id="peercol-mid" style="display:flex;gap:16px;align-items:flex-start">
+        <div class="peer-col" id="peercol-mid" style="display:flex;gap:18px;align-items:flex-start">
           <article class="card pad bio-card" id="bio-thomas">
             <h2 data-text="about:thomas_bio_title">Om Thomas</h2>
             <div class="muted" data-text="about:thomas_bio">…</div>
@@ -187,7 +198,7 @@
       </div>
     </section>
 
-    <!-- HØJRE: tre sidebokse -->
+    <!-- HØJRE: tre sidebokse (trykket helt mod højre) -->
     <aside class="side-col">
       <div class="card pad side-card" id="side-1">
         <h2 data-text="about:right_1_title">Vores version</h2>
@@ -209,195 +220,163 @@
   </footer>
 
   <script>
+    /* Supabase er valgfrit – siden virker også uden nøgler */
     (function init(){
       if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON) {
         window.sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON);
       } else {
-        window.sb = null; // virker stadig via statiske fallbacks
+        window.sb = null;
       }
     })();
 
     (async function(){
-      // --------- Statisk storage-base (virker altid) ----------
       var STATIC_PROJECT = 'byrlebjwknppjbtbkozt';
       var STATIC_STORAGE_BASE = 'https://' + STATIC_PROJECT + '.supabase.co/storage/v1/object/public';
-
-      // Hvis SUPABASE_URL findes, brug den; ellers statisk
-      var STORAGE_BASE = (window.SUPABASE_URL && window.SUPABASE_URL.indexOf('supabase.co') > -1)
+      var STORAGE_BASE = (window.SUPABASE_URL && window.SUPABASE_URL.indexOf('supabase.co')>-1)
         ? window.SUPABASE_URL.replace(/\/+$/,'') + '/storage/v1/object/public'
         : STATIC_STORAGE_BASE;
 
-      // Pre-encoded SVG placeholder (MC-mønt)
       var PLACEHOLDER = 'data:image/svg+xml;utf8,%3Csvg xmlns%3D%22http%3A//www.w3.org/2000/svg%22 viewBox%3D%220 0 256 256%22%3E%3Ccircle cx%3D%22128%22 cy%3D%22128%22 r%3D%22118%22 fill%3D%22%23f7c14b%22 stroke%3D%22%236b4a0e%22 stroke-width%3D%226%22/%3E%3Ctext x%3D%2250%25%22 y%3D%2255%25%22 text-anchor%3D%22middle%22 font-family%3D%22Segoe%20UI%2CArial%22 font-size%3D%2288%22 font-weight%3D%22700%22 fill%3D%22%232b1b05%22%3EMC%3C/text%3E%3C/svg%3E';
 
-      // Fallbacks per slot
       function fallbackBySlot(slot){
-        if (slot === 'top')        return STORAGE_BASE + '/people/Owner.jpg';
-        if (slot === 'mid')        return STORAGE_BASE + '/people/ADM.jpg';
-        if (slot === 'accounting') return STORAGE_BASE + '/people/Revision.jpg';
+        if (slot==='top') return STORAGE_BASE + '/people/Owner.jpg';
+        if (slot==='mid') return STORAGE_BASE + '/people/ADM.jpg';
+        if (slot==='accounting') return STORAGE_BASE + '/people/Revision.jpg';
         return '';
       }
 
-      // Sæt baggrundsbillede + ramme/portrait
       function showPhoto(elId, slot, url){
-        var el = document.getElementById(elId);
-        if (!el) return;
+        var el=document.getElementById(elId); if(!el) return;
+        var fallback=fallbackBySlot(slot);
+        var hasReal=!!(url && String(url).trim());
+        var chosen=hasReal?url:(fallback||PLACEHOLDER);
+        el.style.backgroundImage="url('"+chosen+"')";
 
-        var fallback = fallbackBySlot(slot);
-        var hasReal = !!(url && String(url).trim());
-        var chosen = hasReal ? url : (fallback || PLACEHOLDER);
-
-        el.style.backgroundImage = "url('" + chosen + "')";
-
-        var img = new Image();
-        img.onload = function(){
-          if (img.naturalHeight > img.naturalWidth * 1.15) el.classList.add('portrait');
+        var img=new Image();
+        img.onload=function(){
+          if(img.naturalHeight>img.naturalWidth*1.15) el.classList.add('portrait');
           else el.classList.remove('portrait');
         };
-        img.src = chosen;
+        img.src=chosen;
 
-        var addFrame = hasReal;
-        if (!hasReal && slot === 'accounting' && fallback) addFrame = false; // Revision.jpg = placeholder
-        if (!hasReal && !fallback) addFrame = false;                         // MC coin placeholder
-        if (addFrame) el.classList.add('has-photo'); else el.classList.remove('has-photo');
+        var addFrame=hasReal;
+        if(!hasReal && slot==='accounting' && fallback) addFrame=false;
+        if(!hasReal && !fallback) addFrame=false;
+        if(addFrame) el.classList.add('has-photo'); else el.classList.remove('has-photo');
       }
+      function setText(id,val){ var el=document.getElementById(id); if(el && val) el.textContent=val; }
 
-      function setText(id, val){
-        var el = document.getElementById(id);
-        if (el && val) el.textContent = val;
-      }
-
-      // --------- Hent tekster hvis muligt ---------
-      if (window.sb){
+      /* Tekster */
+      if(window.sb){
         try{
-          var st = await window.sb.from('site_text').select('page,key,value').in('page',['common','about']);
-          if (st && st.data){
-            var dict = {};
-            st.data.forEach(function(r){ dict[r.page + ':' + r.key] = r.value; });
+          var st=await window.sb.from('site_text').select('page,key,value').in('page',['common','about']);
+          if(st && st.data){
+            var dict={}; st.data.forEach(function(r){ dict[r.page+':'+r.key]=r.value; });
             document.querySelectorAll('[data-text]').forEach(function(el){
-              var k = el.getAttribute('data-text');
-              if (dict[k]) el.innerHTML = dict[k];
+              var k=el.getAttribute('data-text'); if(dict[k]) el.innerHTML=dict[k];
             });
           }
-        }catch(e){ console.warn('[about] site_text:', e); }
+        }catch(e){ console.warn('[about] site_text:',e); }
       }
 
-      // --------- Hent personer/partnere hvis muligt ---------
-      if (window.sb){
+      /* Personer */
+      if(window.sb){
         try{
-          var ppl = await window.sb.from('org_people')
+          var ppl=await window.sb.from('org_people')
             .select('slot,name,title,photo_url,bio,partner_id')
             .in('slot',['top','mid','accounting','sub1','sub2','sub3']);
 
-          var partnersById = {};
-          var ids = [];
-          (ppl.data || []).forEach(function(p){ if (p.partner_id) ids.push(p.partner_id); });
-          if (ids.length){
-            var pr = await window.sb.from('partners')
+          var partnersById={}, ids=[];
+          (ppl.data||[]).forEach(function(p){ if(p.partner_id) ids.push(p.partner_id); });
+          if(ids.length){
+            var pr=await window.sb.from('partners')
               .select('id,name,website,logo_url,logo_alt,category,active')
-              .in('id', ids);
-            (pr.data || []).forEach(function(x){ partnersById[x.id] = x; });
+              .in('id',ids);
+            (pr.data||[]).forEach(function(x){ partnersById[x.id]=x; });
           }
 
-          var bySlot = {};
-          (ppl.data || []).forEach(function(x){ bySlot[x.slot] = x; });
+          var bySlot={}; (ppl.data||[]).forEach(function(x){ bySlot[x.slot]=x; });
 
-          // Julienne
-          (function(){
-            var p = bySlot.top || {};
-            showPhoto('photo-top', 'top', p.photo_url);
-            setText('name-top',  p.name  || document.getElementById('name-top').textContent);
-            setText('title-top', p.title || document.getElementById('title-top').textContent);
-            if (p.bio){
-              var el = document.querySelector('#bio-top [data-text="about:bio_top"]');
-              if (el) el.innerHTML = p.bio;
-            }
+          (function(){ var p=bySlot.top||{};
+            showPhoto('photo-top','top',p.photo_url);
+            setText('name-top',p.name||document.getElementById('name-top').textContent);
+            setText('title-top',p.title||document.getElementById('title-top').textContent);
+            if(p.bio){ var el=document.querySelector('#bio-top [data-text="about:bio_top"]'); if(el) el.innerHTML=p.bio; }
           })();
 
-          // Thomas
-          (function(){
-            var p = bySlot.mid || {};
-            showPhoto('photo-mid', 'mid', p.photo_url);
-            setText('name-mid',  p.name  || document.getElementById('name-mid').textContent);
-            setText('title-mid', p.title || document.getElementById('title-mid').textContent);
-            if (p.bio){
-              var el = document.querySelector('#bio-thomas [data-text="about:thomas_bio"]');
-              if (el) el.innerHTML = p.bio;
-            }
+          (function(){ var p=bySlot.mid||{};
+            showPhoto('photo-mid','mid',p.photo_url);
+            setText('name-mid',p.name||document.getElementById('name-mid').textContent);
+            setText('title-mid',p.title||document.getElementById('title-mid').textContent);
+            if(p.bio){ var el=document.querySelector('#bio-thomas [data-text="about:thomas_bio"]'); if(el) el.innerHTML=p.bio; }
           })();
 
-          // Accounting (partner eller person)
-          (function(){
-            var p = bySlot.accounting || {};
-            var partner = p.partner_id ? partnersById[p.partner_id] : null;
-            var name  = (partner && partner.name) || p.name  || document.getElementById('name-accounting').textContent;
-            var title = partner ? (partner.category || 'Partner') : (p.title || document.getElementById('title-accounting').textContent);
-            var logo  = (partner && partner.logo_url) || p.photo_url || '';
-            showPhoto('photo-accounting', 'accounting', logo);
-            setText('name-accounting', name);
-            setText('title-accounting', title);
+          (function(){ var p=bySlot.accounting||{};
+            var partner=p.partner_id?partnersById[p.partner_id]:null;
+            var name=(partner&&partner.name)||p.name||document.getElementById('name-accounting').textContent;
+            var title=partner?(partner.category||'Partner'):(p.title||document.getElementById('title-accounting').textContent);
+            var logo=(partner&&partner.logo_url)||p.photo_url||'';
+            showPhoto('photo-accounting','accounting',logo);
+            setText('name-accounting',name);
+            setText('title-accounting',title);
           })();
 
-          // Sub-roller (vises altid – med placeholder hvis tomt)
           (function(){
-            var rows = [
-              { slot:'sub1', photo:'photo-sub-1', name:'name-sub-1', title:'title-sub-1' },
-              { slot:'sub2', photo:'photo-sub-2', name:'name-sub-2', title:'title-sub-2' },
-              { slot:'sub3', photo:'photo-sub-3', name:'name-sub-3', title:'title-sub-3' },
+            var rows=[
+              {slot:'sub1',photo:'photo-sub-1',name:'name-sub-1',title:'title-sub-1'},
+              {slot:'sub2',photo:'photo-sub-2',name:'name-sub-2',title:'title-sub-2'},
+              {slot:'sub3',photo:'photo-sub-3',name:'name-sub-3',title:'title-sub-3'},
             ];
             rows.forEach(function(m){
-              var p = bySlot[m.slot] || {};
-              var partner = p.partner_id ? partnersById[p.partner_id] : null;
-              var name  = (partner && partner.name) || p.name  || document.getElementById(m.name).textContent;
-              var title = partner ? (partner.category || 'Partner') : (p.title || document.getElementById(m.title).textContent);
-              var logo  = (partner && partner.logo_url) || p.photo_url || '';
-              showPhoto(m.photo, 'sub', logo);
-              setText(m.name,  name);
-              setText(m.title, title);
+              var p=bySlot[m.slot]||{};
+              var partner=p.partner_id?partnersById[p.partner_id]:null;
+              var name=(partner&&partner.name)||p.name||document.getElementById(m.name).textContent;
+              var title=partner?(partner.category||'Partner'):(p.title||document.getElementById(m.title).textContent);
+              var logo=(partner&&partner.logo_url)||p.photo_url||'';
+              showPhoto(m.photo,'sub',logo);
+              setText(m.name,name); setText(m.title,title);
             });
           })();
-        }catch(e){ console.warn('[about] org_people:', e); }
+        }catch(e){ console.warn('[about] org_people:',e); }
       } else {
-        // Uden Supabase: brug kun fallbacks + eksisterende tekster i HTML
-        showPhoto('photo-top', 'top', '');
-        showPhoto('photo-mid', 'mid', '');
-        showPhoto('photo-accounting', 'accounting', '');
-        showPhoto('photo-sub-1', 'sub', '');
-        showPhoto('photo-sub-2', 'sub', '');
-        showPhoto('photo-sub-3', 'sub', '');
+        /* Uden Supabase: brug kun fallbacks */
+        showPhoto('photo-top','top','');
+        showPhoto('photo-mid','mid','');
+        showPhoto('photo-accounting','accounting','');
+        showPhoto('photo-sub-1','sub','');
+        showPhoto('photo-sub-2','sub','');
+        showPhoto('photo-sub-3','sub','');
       }
 
-      // Højre kolonne bokse (valgfrit når sb findes)
-      if (window.sb){
+      /* Højre bokse */
+      if(window.sb){
         try{
-          var bx = await window.sb.from('about_boxes').select('title,content,sort').order('sort',{ascending:true});
-          if (bx && bx.data && bx.data.length){
+          var bx=await window.sb.from('about_boxes').select('title,content,sort').order('sort',{ascending:true});
+          if(bx && bx.data && bx.data.length){
             var ids=['side-1','side-2','side-3'];
             bx.data.slice(0,3).forEach(function(row,i){
-              var root=document.getElementById(ids[i]); if (!root) return;
+              var root=document.getElementById(ids[i]); if(!root) return;
               var h2=root.querySelector('h2'); var body=root.querySelector('.muted');
-              if (row.title)   h2.innerHTML = row.title;
-              if (row.content) body.innerHTML = row.content;
+              if(row.title) h2.innerHTML=row.title;
+              if(row.content) body.innerHTML=row.content;
             });
           }
-        }catch(e){ console.warn('[about] about_boxes:', e); }
+        }catch(e){ console.warn('[about] about_boxes:',e); }
       }
 
-      // Social links
-      if (window.sb){
+      /* Social links */
+      if(window.sb){
         try{
           var root=document.getElementById('social-menu');
-          if (root){
-            var sl = await window.sb.from('social_links').select('name,url,icon,sort').order('sort',{ascending:true});
-            var items=(sl.data || []).filter(function(x){ return x && x.url && String(x.url).trim().length>0; });
-            if (!items.length) root.style.display='none';
-            else{
-              root.innerHTML = items.map(function(x){
-                return '<a href="'+x.url+'" target="_blank" rel="noopener" title="'+x.name+'"><span class="sr-only">'+x.name+'</span></a>';
-              }).join('');
-            }
+          if(root){
+            var sl=await window.sb.from('social_links').select('name,url,icon,sort').order('sort',{ascending:true});
+            var items=(sl.data||[]).filter(function(x){ return x && x.url && String(x.url).trim().length>0; });
+            if(!items.length) root.style.display='none';
+            else root.innerHTML=items.map(function(x){
+              return '<a href="'+x.url+'" target="_blank" rel="noopener" title="'+x.name+'"><span class="sr-only">'+x.name+'</span></a>';
+            }).join('');
           }
-        }catch(e){ console.warn('[about] social_links:', e); }
+        }catch(e){ console.warn('[about] social_links:',e); }
       }
     })();
   </script>
