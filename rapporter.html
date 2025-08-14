@@ -70,6 +70,14 @@ main{ flex: 1; }
 /* Fallback hvis du ikke har <main> på en side */
 footer{ margin-top: auto; }
 
+/* Topmenu: samme venstrejustering som de andre sider */
+header.wrap nav{
+  display: flex;
+  gap: 14px;
+  justify-content: flex-start; /* ← venstre */
+  text-align: left;            /* ← overstyr evt. text-align:center */
+  margin: 0;                   /* ← overstyr evt. margin: 0 auto; */
+}
 
 
     
@@ -169,6 +177,7 @@ footer{ margin-top: auto; }
 
 </body>
 </html>
+
 
 
 
