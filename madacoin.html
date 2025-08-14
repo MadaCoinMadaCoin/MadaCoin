@@ -8,53 +8,37 @@
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
   <style>
-    /* ====== Tema / design ====== */
     :root{
-      --bg: #061a2b;
-      --bg-image: url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
-      --text: #ffffff;
-      --muted:#cfd3d7;
-      --primary:#9ad4ff;
-
-      --card:#0b0b0c;
-      --card-border:#2a2a2a;
-      --shadow: 0 12px 26px rgba(0,0,0,.5);
-      --radius: 16px;
-
+      --bg:#061a2b;
+      --bg-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
+      --text:#fff; --muted:#cfd3d7; --primary:#9ad4ff;
+      --card:#0b0b0c; --card-border:#2a2a2a; --shadow:0 12px 26px rgba(0,0,0,.5); --radius:16px;
       --orange:#ff8a00;
-
-      --wrap: 1200px;
-      --gap: 24px;
-      --left-col: 480px;    /* venstre org-kolonne */
-      --right-col: 420px;   /* højre kort-kolonne */
+      --wrap:1200px; --gap:24px; --left-col:480px; --right-col:420px;
     }
-
     *{box-sizing:border-box}
     body{
-      margin:0;
-      font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+      margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
       color:var(--text);
-      background: var(--bg) no-repeat center/cover fixed;
-      background-image: var(--bg-image);
+      background:var(--bg) no-repeat center/cover fixed; background-image:var(--bg-image);
     }
     @media (max-width:900px){ body{ background-attachment:scroll } }
 
     a{ color:var(--primary); text-decoration:none }
     a:hover{ text-decoration:underline }
 
-    header{ border-bottom:1px solid rgba(255,255,255,.06); background: rgba(0,0,0,.35); backdrop-filter: blur(6px) }
-    .wrap{ max-width: var(--wrap); margin:0 auto; padding: 18px 24px }
-
-    nav{ display:flex; gap:14px; align-items:center; flex-wrap:wrap }
+    .wrap{ max-width:var(--wrap); margin:0 auto; padding:18px 24px }
+    header{ border-bottom:1px solid rgba(255,255,255,.06); background:transparent } /* ← ingen stor bjælke */
+    nav{ display:flex; gap:12px; align-items:center; flex-wrap:wrap }
+    /* Pills pr. link */
     nav a{
-      color:#fff; opacity:.92; padding:8px 12px; border-radius:10px; border:1px solid transparent;
-    }
-    nav a.active{
-      background:#0d0d0f; border-color:#333; text-decoration:none;
+      color:#fff; padding:8px 14px; border-radius:12px;
+      background:#0d0d0f; border:1px solid #333; text-decoration:none; opacity:.96;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
     }
+    nav a:hover{ filter:brightness(1.08) }
+    nav a.active{ border-color:#555; box-shadow: inset 0 1px 0 rgba(255,255,255,.12) }
 
-    /* Social menu (i header, skjules hvis tom) */
     .social-menu{ display:flex; gap:12px; flex-wrap:wrap; margin-top:8px }
     .social-menu a{
       display:inline-flex;align-items:center;justify-content:center;
@@ -62,89 +46,52 @@
     }
     .social-menu a:hover{ filter:brightness(1.1) }
 
-    /* ====== Layout-grid (3 kolonner) ====== */
     .layout{
-      max-width: var(--wrap);
-      margin: 0 auto;
-      padding: 24px;
-      display:grid;
-      grid-template-columns: var(--left-col) 1fr var(--right-col);
-      gap: var(--gap);
+      max-width:var(--wrap); margin:0 auto; padding:24px;
+      display:grid; grid-template-columns:var(--left-col) 1fr var(--right-col); gap:var(--gap);
     }
-    @media (max-width:1100px){
-      :root{ --left-col: 430px; --right-col: 360px }
-    }
-    @media (max-width:980px){
-      .layout{ grid-template-columns: 1fr }
-    }
+    @media (max-width:1100px){ :root{ --left-col:430px; --right-col:360px } }
+    @media (max-width:980px){ .layout{ grid-template-columns:1fr } }
 
-    /* ====== Kort ====== */
-    .card{
-      background:var(--card);
-      border:1px solid var(--card-border);
-      border-radius:var(--radius);
-      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.06);
-    }
+    .card{ background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius); box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,.06) }
     .card.pad{ padding:18px }
-    h1{ margin: 10px 0 12px; font-size: clamp(22px, 3.2vw, 34px) }
-    h2{ margin: 0 0 10px; font-size: clamp(18px, 2.2vw, 22px) }
-    .muted{ color: var(--muted) }
+    h1{ margin:10px 0 12px; font-size:clamp(22px,3.2vw,34px) }
+    h2{ margin:0 0 10px; font-size:clamp(18px,2.2vw,22px) }
+    .muted{ color:var(--muted) }
     .mb24{ margin-bottom:24px }
 
-    /* ====== Org-venstre kolonne (uden pile) ====== */
+    /* Org venstre */
     .org-left{ position:relative }
-    .person{
-      display:flex; flex-direction:column; align-items:center; gap:8px;
-      margin-bottom: 18px;
-    }
+    .person{ display:flex; flex-direction:column; align-items:center; gap:8px; margin-bottom:18px }
     .photo{
-      width: 170px; height: 170px; border-radius: 8px; background:#fff; /* hvid blok som i skitse */
-      box-shadow: inset 0 0 0 1px #dcdcdc;
-      background-position:center; background-size:cover; background-repeat:no-repeat;
+      width:170px;height:170px;border-radius:8px;background:#fff;box-shadow:inset 0 0 0 1px #dcdcdc;
+      background-position:center;background-size:cover;background-repeat:no-repeat;
     }
     .label{
-      min-width: 220px; text-align:center; padding:8px 14px; border-radius: 999px;
-      background:#0d0d0f; border:1px solid #333; box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-      line-height:1.2
+      min-width:220px;text-align:center;padding:8px 14px;border-radius:999px;
+      background:#0d0d0f;border:1px solid #333;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);line-height:1.2
     }
-    .label .title{ opacity:.9; font-size: 13px }
+    .label .title{ opacity:.9; font-size:13px }
 
-    /* Orange forbindelseslinjer */
-    .vlink{
-      width:6px; height:38px; background:var(--orange); border-radius:3px; margin: 6px auto 16px;
-    }
+    .vlink{ width:6px;height:38px;background:var(--orange);border-radius:3px;margin:6px auto 16px }
     .vlink.long{ height:58px }
 
-    .branch{ position:relative; padding-top: 26px; display:flex; gap: 36px; justify-content: space-between }
-    .branch .hbar{
-      position:absolute; top:0; left:6%; right:6%;
-      height:6px; background:var(--orange); border-radius:3px;
-    }
+    .branch{ position:relative; padding-top:26px; display:flex; gap:36px; justify-content:space-between }
+    .branch .hbar{ position:absolute; top:0; left:6%; right:6%; height:6px; background:var(--orange); border-radius:3px }
     .sub{ display:flex; flex-direction:column; align-items:center; gap:10px }
     .sub .photo{ width:120px; height:120px }
-    .sub::before{
-      content:""; width:6px; height:26px; background:var(--orange); border-radius:3px;
-      margin-bottom:4px;
-    }
+    .sub::before{ content:""; width:6px;height:26px;background:var(--orange);border-radius:3px;margin-bottom:4px }
 
-    /* ====== Info-kolonnen (midten) ====== */
     .info-col{ display:flex; flex-direction:column; gap:24px }
-    .info-card{ min-height: 170px }
+    .info-card{ min-height:170px }
 
-    /* ====== Sidekolonne (højre) ====== */
     .side-col{ display:flex; flex-direction:column; gap:24px }
-    .side-card{ min-height: 180px }
+    .side-card{ min-height:180px }
 
-    /* ====== Footer (fælles til side 2 og 3) ====== */
     .site-footer{
-      margin-top: 28px;
-      border-top:1px solid rgba(255,255,255,.06);
-      background:#000;
-      color:#fff;
-      text-align:center;
-      padding:20px;
+      margin-top:28px;border-top:1px solid rgba(255,255,255,.06);background:#000;color:#fff;text-align:center;padding:20px
     }
-    .site-footer a{ color:#fff; text-decoration: underline }
+    .site-footer a{ color:#fff; text-decoration:underline }
   </style>
 </head>
 <body>
@@ -158,9 +105,8 @@
   </header>
 
   <div class="layout">
-    <!-- Venstre: Org-diagram (uden pile) -->
+    <!-- Venstre: Org -->
     <section class="org-left">
-      <!-- Øverste (CEO) -->
       <div class="person" id="person-top">
         <div class="photo" id="photo-top" aria-label="Profilbillede"></div>
         <div class="label">
@@ -169,9 +115,8 @@
         </div>
       </div>
 
-      <div class="vlink"></div>
+      <div class="vlink" id="vlink-top-mid"></div>
 
-      <!-- Midt (Adm. dir / teknisk) -->
       <div class="person" id="person-mid">
         <div class="photo" id="photo-mid" aria-label="Profilbillede"></div>
         <div class="label">
@@ -180,11 +125,10 @@
         </div>
       </div>
 
-      <div class="vlink long"></div>
+      <div class="vlink long" id="vlink-mid-branch"></div>
 
-      <!-- Bund: tre underliggende bokse -->
-      <div class="branch">
-        <div class="hbar"></div>
+      <div class="branch" id="branch">
+        <div class="hbar" id="hbar"></div>
 
         <div class="sub" id="sub-1">
           <div class="photo" id="photo-sub-1"></div>
@@ -212,7 +156,7 @@
       </div>
     </section>
 
-    <!-- Midt: beskrivelser til top+midt -->
+    <!-- Midt: beskrivelser -->
     <section class="info-col">
       <article class="card pad info-card" id="bio-top" data-text="about:bio_top">
         <h2 data-text="about:bio_top_title">Profil beskrivelse</h2>
@@ -242,141 +186,126 @@
     </aside>
   </div>
 
-  <!-- Fælles footer (brug samme på side 3) -->
   <footer class="site-footer">
     <span data-text="common:footer">© 2025 MadaCoin. All rights reserved.</span>
   </footer>
 
   <script>
-    // ============= Supabase client =============
     (function initSupabase(){
-      if (!window.supabase || !window.supabase.createClient) {
-        console.warn('[about] Supabase lib mangler'); return;
-      }
-      if (!window.SUPABASE_URL || !window.SUPABASE_ANON) {
-        console.warn('[about] SUPABASE_URL/ANON mangler – kører fallback.'); return;
-      }
+      if (!window.supabase?.createClient) { console.warn('[about] Supabase lib mangler'); return; }
+      if (!window.SUPABASE_URL || !window.SUPABASE_ANON) { console.warn('[about] SUPABASE_URL/ANON mangler'); return; }
       window.sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON);
     })();
 
     (async () => {
-      const sb = window.sb;
-      if (!sb) return;
+      const sb = window.sb; if (!sb) return;
 
-      // 1) Settings → titel, (valgfrit) theme + favicons
-      try {
-        const { data, error } = await sb
-          .from('settings')
+      // Settings → titel/tema/favicons
+      try{
+        const { data } = await sb.from('settings')
           .select('site_title,favicon_svg_url,favicon_png_url,apple_touch_icon_url,theme_primary,bg_image_url,bg_color')
-          .eq('id', 1)
-          .single();
-
-        if (!error && data) {
+          .eq('id',1).single();
+        if (data){
           if (data.site_title) document.title = data.site_title;
-
-          const ensureLink = (id, rel, extra = {}) => {
-            let el = document.getElementById(id);
-            if (!el) { el = document.createElement('link'); el.id = id; el.rel = rel; document.head.appendChild(el); }
-            Object.assign(el, extra); return el;
-          };
-          if (data.favicon_svg_url) ensureLink('fav-svg', 'icon', { type: 'image/svg+xml', href: data.favicon_svg_url });
-          if (data.favicon_png_url) ensureLink('fav-png', 'icon', { href: data.favicon_png_url, sizes: 'any' });
-          if (data.apple_touch_icon_url) ensureLink('apple-icon', 'apple-touch-icon', { href: data.apple_touch_icon_url });
-
-          const root = document.documentElement;
+          const ensureLink=(id,rel,extra={})=>{let el=document.getElementById(id);if(!el){el=document.createElement('link');el.id=id;el.rel=rel;document.head.appendChild(el)}Object.assign(el,extra)};
+          if (data.favicon_svg_url) ensureLink('fav-svg','icon',{type:'image/svg+xml',href:data.favicon_svg_url});
+          if (data.favicon_png_url) ensureLink('fav-png','icon',{href:data.favicon_png_url,sizes:'any'});
+          if (data.apple_touch_icon_url) ensureLink('apple-icon','apple-touch-icon',{href:data.apple_touch_icon_url});
+          const root=document.documentElement;
           if (data.theme_primary) root.style.setProperty('--primary', data.theme_primary);
           if (data.bg_color) root.style.setProperty('--bg', data.bg_color);
           if (data.bg_image_url) root.style.setProperty('--bg-image', `url('${data.bg_image_url}')`);
         }
-      } catch(e){ console.warn('[about] settings:', e); }
+      }catch(e){ console.warn('[about] settings:', e); }
 
-      // 2) Tekst (common + about)
-      try {
-        const { data, error } = await sb
-          .from('site_text')
-          .select('page,key,value')
-          .in('page', ['common','about']);
-        if (!error && data) {
-          const dict = Object.fromEntries(data.map(r => [`${r.page}:${r.key}`, r.value]));
-          document.querySelectorAll('[data-text]').forEach(el => {
-            const key = el.getAttribute('data-text');
-            if (dict[key]) el.innerHTML = dict[key];
-          });
-        } else if (error) {
-          console.warn('[about] site_text fejl:', error);
+      // Fælles + about-tekster
+      try{
+        const { data } = await sb.from('site_text').select('page,key,value').in('page',['common','about']);
+        if (data){
+          const dict=Object.fromEntries(data.map(r=>[`${r.page}:${r.key}`,r.value]));
+          document.querySelectorAll('[data-text]').forEach(el=>{const k=el.getAttribute('data-text');if(dict[k]) el.innerHTML=dict[k]});
         }
-      } catch(e){ console.warn('[about] site_text:', e); }
+      }catch(e){ console.warn('[about] site_text:', e); }
 
-      // 3) Org-people (slots matcher layoutet)
-      try {
-        const { data, error } = await sb
-          .from('org_people')
+      // Org-people + auto-skjul af tomme slots og streger
+      try{
+        const { data } = await sb.from('org_people')
           .select('slot,name,title,photo_url,bio')
-          .in('slot', ['top','mid','sub1','sub2','sub3']);
-        if (!error && data?.length) {
-          const bySlot = Object.fromEntries(data.map(x => [x.slot, x]));
+          .in('slot',['top','mid','sub1','sub2','sub3']);
 
-          const fill = (slot, ids) => {
-            const p = bySlot[slot]; if (!p) return;
-            if (ids.photo && p.photo_url) {
-              const ph = document.getElementById(ids.photo);
-              if (ph) ph.style.backgroundImage = `url('${p.photo_url}')`;
-            }
-            if (ids.name && p.name)  document.getElementById(ids.name).textContent = p.name;
-            if (ids.title && p.title) document.getElementById(ids.title).textContent = p.title;
-            if (ids.bio && p.bio)    document.getElementById(ids.bio).innerHTML = p.bio;
-          };
+        const bySlot = Object.fromEntries((data||[]).map(x=>[x.slot,x]));
+        const exists = slot => {
+          const p = bySlot[slot]; if (!p) return false;
+          return ['name','title','photo_url','bio'].some(k => p[k] && String(p[k]).trim());
+        };
+        const hide = sel => document.querySelectorAll(sel).forEach(el => el && (el.style.display='none'));
 
-          fill('top',  { photo:'photo-top',  name:'name-top',  title:'title-top',  bio:'bio-top' });
-          fill('mid',  { photo:'photo-mid',  name:'name-mid',  title:'title-mid',  bio:'bio-mid' });
-          fill('sub1', { photo:'photo-sub-1',name:'name-sub-1',title:'title-sub-1' });
-          fill('sub2', { photo:'photo-sub-2',name:'name-sub-2',title:'title-sub-2' });
-          fill('sub3', { photo:'photo-sub-3',name:'name-sub-3',title:'title-sub-3' });
-        } else if (error) {
-          console.warn('[about] org_people fejl:', error);
+        // udfyld
+        const fill = (slot, ids) => {
+          const p=bySlot[slot]; if (!p) return;
+          if (ids.photo && p.photo_url){ const el=document.getElementById(ids.photo); if (el) el.style.backgroundImage=`url('${p.photo_url}')`; }
+          if (ids.name && p.name)  document.getElementById(ids.name).textContent=p.name;
+          if (ids.title && p.title) document.getElementById(ids.title).textContent=p.title;
+          if (ids.bio && p.bio)    document.getElementById(ids.bio).innerHTML=p.bio;
+        };
+        fill('top',  { photo:'photo-top',  name:'name-top',  title:'title-top',  bio:'bio-top'  });
+        fill('mid',  { photo:'photo-mid',  name:'name-mid',  title:'title-mid',  bio:'bio-mid'  });
+        fill('sub1', { photo:'photo-sub-1',name:'name-sub-1',title:'title-sub-1' });
+        fill('sub2', { photo:'photo-sub-2',name:'name-sub-2',title:'title-sub-2' });
+        fill('sub3', { photo:'photo-sub-3',name:'name-sub-3',title:'title-sub-3' });
+
+        // skjul tomme: sub-slots
+        if (!exists('sub1')) hide('#sub-1');
+        if (!exists('sub2')) hide('#sub-2');
+        if (!exists('sub3')) hide('#sub-3');
+
+        // horisontal bar kun hvis ≥2 subs synlige
+        const branch=document.getElementById('branch');
+        if (branch){
+          const visibleSubs=[...branch.querySelectorAll('.sub')].filter(el=>getComputedStyle(el).display!=='none');
+          if (visibleSubs.length===0){ hide('#branch'); }
+          else if (visibleSubs.length<=1){ hide('#hbar'); }
         }
-      } catch(e){ console.warn('[about] org_people:', e); }
 
-      // 4) Højre kolonne bokse
-      try {
-        const { data, error } = await sb
-          .from('about_boxes')
-          .select('title,content,sort')
-          .order('sort',{ascending:true});
-        if (!error && data?.length) {
-          const slots = [ 'side-1', 'side-2', 'side-3' ];
-          data.slice(0,3).forEach((row, i) => {
-            const root = document.getElementById(slots[i]); if (!root) return;
-            const h2 = root.querySelector('h2'); const body = root.querySelector('.muted');
-            if (row.title)   h2.innerHTML = row.title;
-            if (row.content) body.innerHTML = row.content;
+        // skjul midt-slot + tilstødende lodrette streger hvis tom
+        if (!exists('mid')){
+          hide('#person-mid'); hide('#vlink-mid-branch'); hide('#vlink-top-mid');
+        }
+        // skjul top-slot + første streg hvis tom (sjældent)
+        if (!exists('top')){
+          hide('#person-top'); hide('#vlink-top-mid');
+        }
+      }catch(e){ console.warn('[about] org_people:', e); }
+
+      // Højre kolonne bokse
+      try{
+        const { data } = await sb.from('about_boxes').select('title,content,sort').order('sort',{ascending:true});
+        if (data?.length){
+          const ids=['side-1','side-2','side-3'];
+          data.slice(0,3).forEach((row,i)=>{
+            const root=document.getElementById(ids[i]); if (!root) return;
+            const h2=root.querySelector('h2'); const body=root.querySelector('.muted');
+            if (row.title) h2.innerHTML=row.title;
+            if (row.content) body.innerHTML=row.content;
           });
-        } else if (error) {
-          console.warn('[about] about_boxes fejl:', error);
         }
-      } catch(e){ console.warn('[about] about_boxes:', e); }
+      }catch(e){ console.warn('[about] about_boxes:', e); }
 
-      // 5) Social links (skjul hele menuen hvis ingen)
-      try {
-        const root = document.getElementById('social-menu');
-        if (root) {
-          const { data, error } = await sb
-            .from('social_links')
-            .select('name,url,icon,sort')
-            .order('sort',{ascending:true});
-          if (!error && data) {
-            const items = data.filter(x => x?.url && String(x.url).trim().length > 0);
-            if (!items.length) root.style.display = 'none';
-            else {
-              root.innerHTML = items.map(x => `
-                <a href="${x.url}" target="_blank" rel="noopener" title="${x.name}">
-                  <span class="sr-only">${x.name}</span>
-                </a>
-              `).join('');
-            }
+      // Social links
+      try{
+        const root=document.getElementById('social-menu');
+        if (root){
+          const { data } = await sb.from('social_links').select('name,url,icon,sort').order('sort',{ascending:true});
+          const items=(data||[]).filter(x=>x?.url && String(x.url).trim().length>0);
+          if (!items.length) root.style.display='none';
+          else{
+            root.innerHTML = items.map(x=>`
+              <a href="${x.url}" target="_blank" rel="noopener" title="${x.name}">
+                <span class="sr-only">${x.name}</span>
+              </a>`).join('');
           }
         }
-      } catch(e){ console.warn('[about] social_links:', e); }
+      }catch(e){ console.warn('[about] social_links:', e); }
     })();
   </script>
 </body>
