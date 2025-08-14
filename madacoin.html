@@ -12,11 +12,13 @@
       --bg-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
       --text:#fff; --muted:#cfd3d7; --primary:#9ad4ff;
       --card:#0b0b0c; --card-border:#2a2a2a; --shadow:0 12px 26px rgba(0,0,0,.5); --radius:16px;
-      /* Lærred / kolonner som i paint-opsætningen */
-      --wrap:1500px;
+
+      /* Tre rigtige kolonner: venstre (bio), midt (pyramide), højre (stor tekst) */
+      --wrap:1700px;
       --gap:56px;
-      --left-col:560px;   /* venstre bio-kolonne */
-      --right-col:740px;  /* stor højre tekst */
+      --left-col:520px;
+      --center-col:520px;
+      --right-col:620px;
     }
 
     *{box-sizing:border-box}
@@ -29,9 +31,10 @@
     }
     @media (max-width:900px){ body{ background-attachment:scroll } }
 
-    /* Nav som på side 1/3 (pills) */
     header{ border-bottom:1px solid rgba(255,255,255,.06) }
     .wrap{ max-width:var(--wrap); margin:0 auto; padding:18px 24px }
+
+    /* Nav som på side 1/3 */
     nav{ display:flex; gap:12px; align-items:center; flex-wrap:wrap }
     nav a{
       color:#fff; padding:8px 14px; border-radius:12px;
@@ -41,15 +44,29 @@
     nav a:hover{ filter:brightness(1.08) }
     nav a.active{ border-color:#555; box-shadow: inset 0 1px 0 rgba(255,255,255,.12) }
 
-    /* Hovedlayout: venstre bio + højre stor tekst */
+    /* Tre-kolonne grid */
     .layout{
       max-width:var(--wrap); margin:0 auto; padding:24px;
-      display:grid; grid-template-columns:var(--left-col) var(--right-col); gap:var(--gap);
-      flex:1;
+      display:grid;
+      grid-template-columns: var(--left-col) var(--center-col) var(--right-col);
+      gap:var(--gap);
+      align-items:start;
+      flex:1; /* skub footer i bund */
     }
-    @media (max-width:1200px){ :root{ --left-col:520px; --right-col:680px } }
-    @media (max-width:1080px){ :root{ --left-col:480px; --right-col:640px } }
-    @media (max-width:1000px){ .layout{ grid-template-columns:1fr } }
+    @media (max-width:1400px){ :root{ --right-col:560px } }
+    @media (max-width:1280px){ :root{ --left-col:500px; --center-col:500px; --right-col:520px } }
+    @media (max-width:1120px){
+      /* 2 kolonner: venstre + midt over hinanden, stor tekst til højre */
+      .layout{ grid-template-columns: 1fr var(--right-col); }
+      .col-left{ grid-column: 1 / 2 }
+      .col-center{ grid-column: 1 / 2 }
+      .col-right{ grid-column: 2 / 3 }
+    }
+    @media (max-width:980px){
+      /* 1 kolonne på små skærme */
+      .layout{ grid-template-columns: 1fr }
+      .col-left,.col-center,.col-right{ grid-column: 1 / -1 }
+    }
 
     .card{
       background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius);
@@ -59,14 +76,12 @@
     h2{ margin:0 0 10px; font-size:clamp(18px,2.2vw,22px) }
     .muted{ color:var(--muted) }
 
-    /* Venstre kolonne – to smalle, lidt højere bio-kort */
+    /* VENSTRE: to smalle, lidt høje bio-kort */
     .org-left{ display:flex; flex-direction:column; gap:34px }
-    .bio-card{
-      width:360px; min-height:190px; max-width:100%;
-    }
+    .bio-card{ width:360px; min-height:190px; max-width:100% }
 
-    /* Midterkolonne (personer) */
-    .row-center{ display:flex; flex-direction:column; align-items:center; gap:34px }
+    /* MIDTEN: pyramiden */
+    .col-center{ display:flex; flex-direction:column; align-items:center; gap:34px }
     .people-mid{ display:flex; gap:64px; align-items:flex-start; justify-content:center }
 
     .person,.peer,.sub{ display:flex; flex-direction:column; align-items:center; gap:10px }
@@ -86,12 +101,10 @@
     }
     .label .title{ opacity:.9; font-size:13px }
 
-    /* Underroller – centreret række (pyramide) */
-    .sub-row{ display:flex; justify-content:center; gap:56px; margin-top:22px }
+    .sub-row{ display:flex; justify-content:center; gap:56px; margin-top:10px }
 
-    /* Højre stor tekst – altid synlig, vokser i højden */
-    .right-main{ align-self:start; }
-    .right-main .content{ line-height:1.55 }
+    /* HØJRE: stor permanent tekst */
+    .col-right .card{ width:100%; }
 
     /* Footer */
     .site-footer{
@@ -110,8 +123,8 @@
   </header>
 
   <div class="layout">
-    <!-- VENSTRE kolonne (bio-kort) -->
-    <section class="org-left">
+    <!-- VENSTRE kolonne -->
+    <section class="col-left org-left">
       <article class="card pad bio-card" id="bio-top">
         <h2 data-text="about:bio_top_title">Direktør · profil</h2>
         <div class="muted" data-text="about:bio_top">
@@ -127,65 +140,65 @@
       </article>
     </section>
 
-    <!-- HØJRE kolonne: STOR permanent tekst -->
-    <aside class="right-main">
-      <div class="card pad" id="right-main">
-        <h2 data-text="about:right_title">Vores version</h2>
-        <div class="muted content" data-text="about:right_body">
-          Dette er vores plads til længere tekst. Den er altid synlig og kan vokse i højden.
+    <!-- MIDTER kolonne (pyramiden) -->
+    <section class="col-center">
+      <div class="person">
+        <div class="photo" id="photo-top" aria-label="Julienne"></div>
+        <div class="label">
+          <div class="name" id="name-top">Julienne</div>
+          <div class="title" id="title-top">Ejer og Direktør</div>
         </div>
       </div>
 
-      <!-- MIDTERKOLONNE (personer) ligger visuelt mellem venstre og højre -->
-      <div class="row-center" style="margin-top:24px">
-        <div class="person">
-          <div class="photo" id="photo-top" aria-label="Julienne"></div>
+      <div class="people-mid">
+        <div class="peer">
+          <div class="photo" id="photo-mid"></div>
           <div class="label">
-            <div class="name" id="name-top">Julienne</div>
-            <div class="title" id="title-top">Ejer og Direktør</div>
+            <div class="name" id="name-mid">Thomas</div>
+            <div class="title" id="title-mid">Adm. Direktør · Udvikler</div>
           </div>
         </div>
 
-        <div class="people-mid">
-          <div class="peer">
-            <div class="photo" id="photo-mid"></div>
-            <div class="label">
-              <div class="name" id="name-mid">Thomas</div>
-              <div class="title" id="title-mid">Adm. Direktør · Udvikler</div>
-            </div>
-          </div>
-
-          <div class="peer">
-            <div class="photo" id="photo-accounting"></div>
-            <div class="label">
-              <div class="name" id="name-accounting">Revision &amp; Regnskab</div>
-              <div class="title" id="title-accounting">Partner</div>
-            </div>
+        <div class="peer">
+          <div class="photo" id="photo-accounting"></div>
+          <div class="label">
+            <div class="name" id="name-accounting">Revision &amp; Regnskab</div>
+            <div class="title" id="title-accounting">Partner</div>
           </div>
         </div>
+      </div>
 
-        <div class="sub-row">
-          <div class="sub">
-            <div class="photo" id="photo-sub-1"></div>
-            <div class="label">
-              <div class="name" id="name-sub-1">Navn</div>
-              <div class="title" id="title-sub-1">Rolle</div>
-            </div>
+      <div class="sub-row">
+        <div class="sub">
+          <div class="photo" id="photo-sub-1"></div>
+          <div class="label">
+            <div class="name" id="name-sub-1">Navn</div>
+            <div class="title" id="title-sub-1">Rolle</div>
           </div>
-          <div class="sub">
-            <div class="photo" id="photo-sub-2"></div>
-            <div class="label">
-              <div class="name" id="name-sub-2">Navn</div>
-              <div class="title" id="title-sub-2">Rolle</div>
-            </div>
+        </div>
+        <div class="sub">
+          <div class="photo" id="photo-sub-2"></div>
+          <div class="label">
+            <div class="name" id="name-sub-2">Navn</div>
+            <div class="title" id="title-sub-2">Rolle</div>
           </div>
-          <div class="sub">
-            <div class="photo" id="photo-sub-3"></div>
-            <div class="label">
-              <div class="name" id="name-sub-3">Navn</div>
-              <div class="title" id="title-sub-3">Rolle</div>
-            </div>
+        </div>
+        <div class="sub">
+          <div class="photo" id="photo-sub-3"></div>
+          <div class="label">
+            <div class="name" id="name-sub-3">Navn</div>
+            <div class="title" id="title-sub-3">Rolle</div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HØJRE kolonne (stor permanent tekst) -->
+    <aside class="col-right">
+      <div class="card pad" id="right-main">
+        <h2 data-text="about:right_title">Vores version</h2>
+        <div class="muted" data-text="about:right_body">
+          Dette er vores plads til længere tekst. Den er altid synlig og kan vokse i højden.
         </div>
       </div>
     </aside>
@@ -196,7 +209,7 @@
   </footer>
 
   <script>
-    /* Init Supabase hvis nøgler er sat – ellers falder vi tilbage til statiske værdier */
+    /* Supabase valgfri – siden virker med fallbacks */
     (function(){
       if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON) {
         window.sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON);
@@ -212,19 +225,15 @@
         ? window.SUPABASE_URL.replace(/\/+$/,'') + '/storage/v1/object/public'
         : STATIC_STORAGE_BASE;
 
-      /* Sprog: ?lang=da|en|…  (default 'da'). Hvis tabellen ikke har 'lang', bruger vi første match. */
-      var params = new URLSearchParams(location.search);
-      var LANG = (params.get('lang') || 'da').toLowerCase();
-
       var PLACEHOLDER = 'data:image/svg+xml;utf8,%3Csvg xmlns%3D%22http%3A//www.w3.org/2000/svg%22 viewBox%3D%220 0 256 256%22%3E%3Ccircle cx%3D%22128%22 cy%3D%22128%22 r%3D%22118%22 fill%3D%22%23f7c14b%22 stroke%3D%22%236b4a0e%22 stroke-width%3D%226%22/%3E%3Ctext x%3D%2250%25%22 y%3D%2255%25%22 text-anchor%3D%22middle%22 font-family%3D%22Segoe%20UI%2CArial%22 font-size%3D%2288%22 font-weight%3D%22700%22 fill%3D%22%232b1b05%22%3EMC%3C/text%3E%3C/svg%3E';
 
+      /* Hjælpere */
       function fallbackBySlot(slot){
         if (slot==='top')        return STORAGE_BASE + '/people/Owner.jpg';
         if (slot==='mid')        return STORAGE_BASE + '/people/ADM.jpg';
         if (slot==='accounting') return STORAGE_BASE + '/people/Revision.jpg';
         return '';
       }
-
       function showPhoto(elId, slot, url){
         var el=document.getElementById(elId); if(!el) return;
         var fallback=fallbackBySlot(slot);
@@ -237,31 +246,23 @@
           else el.classList.remove('portrait');
         }; img.src=chosen;
         var addFrame=hasReal;
-        if(!hasReal && slot==='accounting' && fallback) addFrame=false; /* Revision.jpg = placeholder */
+        if(!hasReal && slot==='accounting' && fallback) addFrame=false;
         if(!hasReal && !fallback) addFrame=false;
         el.classList.toggle('has-photo', addFrame);
       }
       function setText(id,val){ var el=document.getElementById(id); if(el && val!=null) el.textContent=val; }
 
-      /* Tekster (common + about) med sprogprioritet */
+      /* Hent tekster (common + about) hvis muligt */
       if(window.sb){
         try{
-          var q = window.sb.from('site_text').select('page,key,value,lang').in('page',['common','about']);
-          var res = await q;
-          if (res && res.data){
-            var dictDefault = {}, dictLang = {};
-            res.data.forEach(function(r){
-              var k = r.page + ':' + r.key;
-              if (r.lang && r.lang.toLowerCase() === LANG) dictLang[k] = r.value;
-              else if (!dictDefault[k]) dictDefault[k] = r.value;
-            });
-            document.querySelectorAll('[data-text]').forEach(function(el){
-              var k = el.getAttribute('data-text');
-              var v = (k in dictLang) ? dictLang[k] : dictDefault[k];
-              if (v) el.innerHTML = v;
+          var st=await window.sb.from('site_text').select('page,key,value').in('page',['common','about']);
+          if(st && st.data){
+            var dict={}; st.data.forEach(r=>dict[r.page+':'+r.key]=r.value);
+            document.querySelectorAll('[data-text]').forEach(el=>{
+              var k=el.getAttribute('data-text'); if(dict[k]) el.innerHTML=dict[k];
             });
           }
-        }catch(e){ console.warn('[about] site_text:', e); }
+        }catch(e){ console.warn('[about] site_text:',e); }
       }
 
       /* Personer og partnere */
@@ -279,7 +280,6 @@
               .in('id',ids);
             (pr.data||[]).forEach(x=>partnersById[x.id]=x);
           }
-
           var bySlot={}; (ppl.data||[]).forEach(x=>bySlot[x.slot]=x);
 
           (function(){ var p=bySlot.top||{};
@@ -321,9 +321,9 @@
               setText(m.name,name); setText(m.title,title);
             });
           })();
-        }catch(e){ console.warn('[about] org_people:', e); }
+        }catch(e){ console.warn('[about] org_people:',e); }
       } else {
-        /* Uden Supabase: brug fallbacks og standardtekster i HTML */
+        /* Uden Supabase: brug fallbacks og HTML-tekster */
         showPhoto('photo-top','top','');
         showPhoto('photo-mid','mid','');
         showPhoto('photo-accounting','accounting','');
