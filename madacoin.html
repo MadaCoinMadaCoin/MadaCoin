@@ -42,7 +42,20 @@
     .pill{display:inline-block;padding:3px 10px;border:1px solid #2a2a2a;border-radius:999px;font-size:12px;opacity:.9}
     .kbd{font-family:ui-monospace,Menlo,Monaco,monospace;background:#0e0e0f;border:1px solid #2b2b2b;border-bottom-color:#1c1c1c;padding:2px 6px;border-radius:6px}
 
-    footer { text-align: center; padding: 20px; background: #ddd; }
+        footer {
+  text-align: center;
+  padding: 20px;
+  background: #e4e6c5;
+  color: #000000;            /* ← tekstfarve hvid */
+}
+footer a {
+  color: #fff;            /* ← links også hvide */
+  text-decoration: none;
+}
+footer a:hover { text-decoration: underline; }
+
+/* Hvis din footer har class="muted", så fjern dæmpning */
+footer.muted { opacity: 1; }
     
   </style>
 </head>
@@ -139,6 +152,7 @@
 
 </body>
 </html>
+
 
 
 
