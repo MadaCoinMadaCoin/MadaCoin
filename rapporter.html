@@ -48,6 +48,28 @@
     header.wrap nav a{ opacity:.9; }
     header.wrap nav a:hover{ opacity:1; text-decoration:underline; }
 
+  
+  /* SIDE 3: gør header fuld bredde og venstrejusteret */
+header.wrap{
+  max-width: none !important;   /* fjern 1100px-begrænsning */
+  width: 100% !important;       /* brug hele bredden */
+  margin: 0 !important;         /* fjern auto-centre */
+  padding-left: 18px;           /* behold pæne indryk */
+  padding-right: 18px;
+  text-align: left !important;
+}
+
+/* og sørg for at links står til venstre i rækken */
+header.wrap nav{
+  display: flex !important;
+  justify-content: flex-start !important;
+  align-items: center;
+  gap: 14px;
+  margin: 0 !important;
+}
+
+
+    
     /* KORT UI-STIL TIL INDHOLD */
     .card{ background:#111; border:1px solid #252525; border-radius:16px; padding:18px; margin:14px 0; }
     h1,h2{ margin:12px 0; }
@@ -159,3 +181,4 @@
   </script>
 </body>
 </html>
+
