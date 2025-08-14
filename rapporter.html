@@ -78,6 +78,17 @@ header.wrap nav{
   text-align: left;            /* ← overstyr evt. text-align:center */
   margin: 0;                   /* ← overstyr evt. margin: 0 auto; */
 }
+/* Sørg for at footeren må være centreret */
+footer { text-align: center; }
+
+/* Lås topmenuen til venstre – selv hvis noget andet centrerer */
+header.wrap { text-align: left; }
+header.wrap nav{
+  display: flex;
+  gap: 14px;
+  justify-content: flex-start; /* venstre */
+  margin: 0;                   /* neutraliser evt. margin: 0 auto */
+}
 
 
     
@@ -177,6 +188,7 @@ header.wrap nav{
 
 </body>
 </html>
+
 
 
 
