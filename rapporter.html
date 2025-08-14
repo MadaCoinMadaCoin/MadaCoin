@@ -6,93 +6,70 @@
   <title>MadaCoin – Rapporter</title>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
-    body{
-      @media (max-width:800px){
-  body{ background-attachment:scroll; }
-}
+  /* BAGGRUND */
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
 
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+    background-color:#061a2b;
+    background-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-size:cover;
+    background-attachment:fixed;
 
-  /* KUN det her er ændret: */
-  background-color:#061a2b;
-  background-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
-  background-repeat:no-repeat;
-  background-position:center center;
-  background-size:cover;
-  background-attachment:fixed;
+    color:#eaeaea;
 
-  color:#eaeaea;
-}
+    /* Sticky footer layout */
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+  }
+  /* Slå 'fixed' fra på mobil */
+  @media (max-width:800px){
+    body{ background-attachment:scroll; }
+  }
 
-    header,footer{padding:14px 18px;border-bottom:1px solid #222}
-    a{color:#9ad4ff;text-decoration:none}
-    nav a{margin-right:14px;opacity:.9}
-    .wrap{max-width:1100px;margin:0 auto;padding:24px}
-    .card{background:#111;border:1px solid #252525;border-radius:16px;padding:18px;margin:14px 0}
-    h1,h2{margin:12px 0}
-    table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-    th,td{border-bottom:1px solid #262626;padding:10px;text-align:left}
-    .muted{opacity:.8}
-    .pill{display:inline-block;padding:3px 10px;border:1px solid #2a2a2a;border-radius:999px;font-size:12px;opacity:.9}
-    .right{text-align:right}
-    .empty{opacity:.7;border:1px dashed #2a2a2a;padding:16px;border-radius:14px}
-    details{background:#0f0f10;border:1px solid #212121;border-radius:12px;padding:10px}
-    summary{cursor:pointer}
-    ul{margin:6px 0 0 18px}
+  /* GENERELT LAYOUT */
+  header,footer{padding:14px 18px;border-bottom:1px solid #222}
+  a{color:#9ad4ff;text-decoration:none}
+  nav a{margin-right:14px;opacity:.9}
+  .wrap{max-width:1100px;margin:0 auto;padding:24px}
+  .card{background:#111;border:1px solid #252525;border-radius:16px;padding:18px;margin:14px 0}
+  h1,h2{margin:12px 0}
+  table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+  th,td{border-bottom:1px solid #262626;padding:10px;text-align:left}
+  .muted{opacity:.8}
+  .pill{display:inline-block;padding:3px 10px;border:1px solid #2a2a2a;border-radius:999px;font-size:12px;opacity:.9}
+  .right{text-align:right}
+  .empty{opacity:.7;border:1px dashed #2a2a2a;padding:16px;border-radius:14px}
+  details{background:#0f0f10;border:1px solid #212121;border-radius:12px;padding:10px}
+  summary{cursor:pointer}
+  ul{margin:6px 0 0 18px}
 
-    footer {
-  text-align: center;
-  padding: 20px;
-  background: #e4e6c5;
-  color: #000000;            /* ← tekstfarve hvid */
-}
-footer a {
-  color: #fff;            /* ← links også hvide */
-  text-decoration: none;
-}
-footer a:hover { text-decoration: underline; }
+  /* TOPMENU: venstrejusteret */
+  header.wrap{ text-align:left; }
+  header.wrap nav{
+    display:flex;
+    gap:14px;
+    justify-content:flex-start;
+    margin:0;
+  }
 
-/* Hvis din footer har class="muted", så fjern dæmpning */
-footer.muted { opacity: 1; }
+  /* FOOTER: sticky + hvid tekst */
+  main{ flex:1; }
+  footer{
+    margin-top:auto;
+    text-align:center;
+    padding:20px;
+    background:#e4e6c5;   /* din cremebjælke */
+    color:#fff;            /* hvid tekst */
+  }
+  footer a{ color:#fff; text-decoration:none; }
+  footer a:hover{ text-decoration:underline; }
+  footer.muted{ opacity:1; }
+</style>
 
-/* Sticky footer layout */
-body{
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;     /* fyld hele højden */
-  /* beholder gerne dine eksisterende body-styles her (bg osv.) */
-}
-
-/* Hvis du har <main> – lad det fylde resten */
-main{ flex: 1; }
-
-/* Fallback hvis du ikke har <main> på en side */
-footer{ margin-top: auto; }
-
-/* Topmenu: samme venstrejustering som de andre sider */
-header.wrap nav{
-  display: flex;
-  gap: 14px;
-  justify-content: flex-start; /* ← venstre */
-  text-align: left;            /* ← overstyr evt. text-align:center */
-  margin: 0;                   /* ← overstyr evt. margin: 0 auto; */
-}
-/* Sørg for at footeren må være centreret */
-footer { text-align: center; }
-
-/* Lås topmenuen til venstre – selv hvis noget andet centrerer */
-header.wrap { text-align: left; }
-header.wrap nav{
-  display: flex;
-  gap: 14px;
-  justify-content: flex-start; /* venstre */
-  margin: 0;                   /* neutraliser evt. margin: 0 auto */
-}
-
-
-    
-  </style>
 </head>
 <body>
   <header class="wrap">
@@ -188,6 +165,7 @@ header.wrap nav{
 
 </body>
 </html>
+
 
 
 
