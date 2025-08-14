@@ -40,6 +40,21 @@
     details{background:#0f0f10;border:1px solid #212121;border-radius:12px;padding:10px}
     summary{cursor:pointer}
     ul{margin:6px 0 0 18px}
+
+    footer {
+  text-align: center;
+  padding: 20px;
+  background: #e4e6c5;
+  color: #000000;            /* ← tekstfarve hvid */
+}
+footer a {
+  color: #fff;            /* ← links også hvide */
+  text-decoration: none;
+}
+footer a:hover { text-decoration: underline; }
+
+/* Hvis din footer har class="muted", så fjern dæmpning */
+footer.muted { opacity: 1; }
   </style>
 </head>
 <body>
@@ -73,20 +88,7 @@
     <div id="empty" class="empty" style="display:none">Ingen rapporter endnu.</div>
   </main>
 
-      footer {
-  text-align: center;
-  padding: 20px;
-  background: #e4e6c5;
-  color: #000000;            /* ← tekstfarve hvid */
-}
-footer a {
-  color: #fff;            /* ← links også hvide */
-  text-decoration: none;
-}
-footer a:hover { text-decoration: underline; }
-
-/* Hvis din footer har class="muted", så fjern dæmpning */
-footer.muted { opacity: 1; }
+    
 
   <script>
     function fmt(n){
@@ -149,6 +151,7 @@ footer.muted { opacity: 1; }
 
 </body>
 </html>
+
 
 
 
