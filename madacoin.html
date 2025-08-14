@@ -14,7 +14,8 @@
       --left-col: 520px;     /* venstre bio-kolonne */
       --center-col: 460px;   /* pyramiden (smal) */
       --right-col: 720px;    /* stor tekstkolonne */
-      --right-offset: 40px;  /* skub “Vores version” lidt ned */
+      --right-offset: 36px;  /* skub “Vores version” lidt OP (lavere tal = højere op) */
+      --right-gutter: 24px;  /* ekstra luft i højre side af “Vores version”-kolonnen */
 
       /* Offset for at skubbe pyramiden mod venstre (negativ værdi) */
       --center-offset: -36px;
@@ -42,7 +43,7 @@
     @media (max-width:900px){ body{ background-attachment:scroll } }
 
     /* Fælles container – matcher resten af sitet */
-    .wrap{ max-width:var(--wrap); margin:0 auto; padding:0 240px; }
+    .wrap{ max-width:var(--wrap); margin:0 auto; padding:0 24px; }
 
     /* NAV – venstre som side 1/3 og uden synlig streg */
     .site-nav{
@@ -133,8 +134,9 @@
     /* Højre kolonne – stor permanent tekst, lidt lavere end Julienne */
     .right-col{
       grid-column:3; grid-row:1 / span 3;
-      margin-top:var(--right-offset);
-      margin-left:8px; /* lidt ekstra luft mod pyramiden */
+      margin-top:var(--right-offset);   /* højere op = lavere tal */
+      margin-left:8px;                  /* luft mod pyramiden */
+      padding-right: var(--right-gutter); /* gør boksen smallere i højre side */
     }
     .right-col .card{ width:100% }
     .right-col #right-main .muted{ min-height: 8rem; } /* valgfri min-højde */
@@ -158,7 +160,7 @@
   </header>
 
   <div class="layout">
-    <!-- Venstre bio-kolonne (toppes med billeder via grid-rækker) -->
+    <!-- Venstre bio-kolonne -->
     <article class="card pad bio-card" id="bio-top">
       <h2 data-text="about:bio_top_title">Direktør · profil</h2>
       <div class="muted" data-text="about:bio_top">
@@ -275,6 +277,7 @@
         var hasReal=!!(url && String(url).trim());
         var chosen=hasReal?url:(fallback||PLACEHOLDER);
         el.style.backgroundImage="url('"+chosen+"')";
+
         var img=new Image();
         img.onload=function(){
           if(img.naturalHeight>img.naturalWidth*1.15) el.classList.add('portrait');
@@ -376,8 +379,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
