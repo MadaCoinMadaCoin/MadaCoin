@@ -6,29 +6,30 @@
   <title>MadaCoin – Rapporter</title>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
-  /* BAGGRUND */
-  body{
-    margin:0;
-    font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+ /* BAGGRUND + LAYOUT */
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+  color:#eaeaea;
 
-    background-color:#061a2b;
-    background-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
-    background-repeat:no-repeat;
-    background-position:center center;
-    background-size:cover;
-    background-attachment:fixed;
+  /* baggrund */
+  background-color:#061a2b;
+  background-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
+  background-repeat:no-repeat;
+  background-position:center center;
+  background-size:cover;
+  background-attachment:fixed;
 
-    color:#eaeaea;
+  /* sticky footer */
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+}
+/* mobil: slå fixed fra (skal stå UDENFOR body{}) */
+@media (max-width:800px){
+  body{ background-attachment:scroll; }
+}
 
-    /* Sticky footer layout */
-    display:flex;
-    flex-direction:column;
-    min-height:100vh;
-  }
-  /* Slå 'fixed' fra på mobil */
-  @media (max-width:800px){
-    body{ background-attachment:scroll; }
-  }
 
   /* GENERELT LAYOUT */
   header,footer{padding:14px 18px;border-bottom:1px solid #222}
@@ -165,6 +166,7 @@
 
 </body>
 </html>
+
 
 
 
