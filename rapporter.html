@@ -73,7 +73,20 @@
     <div id="empty" class="empty" style="display:none">Ingen rapporter endnu.</div>
   </main>
 
-  <footer class="wrap muted">© MadaCoin</footer>
+      footer {
+  text-align: center;
+  padding: 20px;
+  background: #e4e6c5;
+  color: #000000;            /* ← tekstfarve hvid */
+}
+footer a {
+  color: #fff;            /* ← links også hvide */
+  text-decoration: none;
+}
+footer a:hover { text-decoration: underline; }
+
+/* Hvis din footer har class="muted", så fjern dæmpning */
+footer.muted { opacity: 1; }
 
   <script>
     function fmt(n){
@@ -136,6 +149,7 @@
 
 </body>
 </html>
+
 
 
 
