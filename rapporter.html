@@ -68,6 +68,23 @@ body{
   footer a{ color:#000; text-decoration:none; }
   footer a:hover{ text-decoration:underline; }
   footer.muted{ opacity:1; }
+
+
+
+/* Lås header-menuen til venstre (vinder over alt andet) */
+header.wrap { text-align: left !important; }
+
+header.wrap nav{
+  display: flex !important;
+  justify-content: flex-start !important;  /* venstre */
+  align-items: center;
+  width: 100% !important;                  /* undgå max-content */
+  margin: 0 !important;                    /* neutraliser 0 auto */
+}
+
+header.wrap nav a{ margin: 0 14px 0 0; }
+
+    
 </style>
 
 </head>
@@ -165,6 +182,7 @@ body{
 
 </body>
 </html>
+
 
 
 
