@@ -6,28 +6,22 @@
   <title>Om MadaCoin</title>
   <link rel="preconnect" href="https://unpkg.com" />
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-
   <style>
     :root{
       --bg:#061a2b;
       --bg-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
       --text:#fff; --muted:#cfd3d7; --primary:#9ad4ff;
       --card:#0b0b0c; --card-border:#2a2a2a; --shadow:0 12px 26px rgba(0,0,0,.5); --radius:16px;
-
-      /* Lidt bredere lærred, større gap, højre kolonne bredere -> kommer længere ud til højre */
+      /* Lærred / kolonner som i paint-opsætningen */
       --wrap:1500px;
-      --gap:48px;
-      --left-col:620px;
-      --right-col:700px;
+      --gap:56px;
+      --left-col:560px;   /* venstre bio-kolonne */
+      --right-col:740px;  /* stor højre tekst */
     }
 
     *{box-sizing:border-box}
-
-    /* Sticky footer layout */
     body{
-      margin:0;
-      min-height:100vh;
-      display:flex; flex-direction:column;
+      margin:0; min-height:100vh; display:flex; flex-direction:column;
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
       color:var(--text);
       background: var(--bg) no-repeat center/cover fixed;
@@ -35,13 +29,9 @@
     }
     @media (max-width:900px){ body{ background-attachment:scroll } }
 
-    a{ color:var(--primary); text-decoration:none }
-    a:hover{ text-decoration:underline }
-
+    /* Nav som på side 1/3 (pills) */
+    header{ border-bottom:1px solid rgba(255,255,255,.06) }
     .wrap{ max-width:var(--wrap); margin:0 auto; padding:18px 24px }
-    header{ border-bottom:1px solid rgba(255,255,255,.06); background:transparent }
-
-    /* Nav = individuelle pills */
     nav{ display:flex; gap:12px; align-items:center; flex-wrap:wrap }
     nav a{
       color:#fff; padding:8px 14px; border-radius:12px;
@@ -51,22 +41,15 @@
     nav a:hover{ filter:brightness(1.08) }
     nav a.active{ border-color:#555; box-shadow: inset 0 1px 0 rgba(255,255,255,.12) }
 
-    .social-menu{ display:flex; gap:12px; flex-wrap:wrap; margin-top:8px }
-    .social-menu a{
-      display:inline-flex; align-items:center; justify-content:center;
-      width:36px; height:36px; border-radius:999px; background:#121214; border:1px solid #2a2a2a
-    }
-    .social-menu a:hover{ filter:brightness(1.1) }
-
-    /* 2-kolonne grid */
+    /* Hovedlayout: venstre bio + højre stor tekst */
     .layout{
       max-width:var(--wrap); margin:0 auto; padding:24px;
       display:grid; grid-template-columns:var(--left-col) var(--right-col); gap:var(--gap);
-      flex:1; /* skub footer i bund */
+      flex:1;
     }
-    @media (max-width:1250px){ :root{ --right-col:640px } }
-    @media (max-width:1150px){ :root{ --left-col:580px; --right-col:600px } }
-    @media (max-width:1024px){ .layout{ grid-template-columns:1fr } }
+    @media (max-width:1200px){ :root{ --left-col:520px; --right-col:680px } }
+    @media (max-width:1080px){ :root{ --left-col:480px; --right-col:640px } }
+    @media (max-width:1000px){ .layout{ grid-template-columns:1fr } }
 
     .card{
       background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius);
@@ -76,29 +59,25 @@
     h2{ margin:0 0 10px; font-size:clamp(18px,2.2vw,22px) }
     .muted{ color:var(--muted) }
 
-    /* VENSTRE kolonne – lige bredde på bio-kort -> smallere & lidt højere */
-    .org-left{ display:flex; flex-direction:column; align-items:flex-start; gap:36px }
-    .row{ display:flex; gap:20px; align-items:flex-start }
-    @media (max-width:820px){ .row{ flex-direction:column } }
-
+    /* Venstre kolonne – to smalle, lidt højere bio-kort */
+    .org-left{ display:flex; flex-direction:column; gap:34px }
     .bio-card{
-      width:340px;               /* smallere */
-      min-height:210px;          /* lidt højere tekstfelt */
-      max-width:100%;
+      width:360px; min-height:190px; max-width:100%;
     }
 
-    .person,.peer,.sub{ display:flex; flex-direction:column; align-items:center; gap:10px }
+    /* Midterkolonne (personer) */
+    .row-center{ display:flex; flex-direction:column; align-items:center; gap:34px }
+    .people-mid{ display:flex; gap:64px; align-items:flex-start; justify-content:center }
 
-    /* Foto/Logo – ingen ramme uden rigtigt foto; ramme ved rigtigt foto */
+    .person,.peer,.sub{ display:flex; flex-direction:column; align-items:center; gap:10px }
     .photo{
-      display:block;
-      width:170px; height:170px; border-radius:8px;
+      display:block; width:170px; height:170px; border-radius:8px;
       background:transparent; background-position:50% 50%; background-size:cover; background-repeat:no-repeat;
       border:1px solid transparent; box-shadow:0 0 0 rgba(0,0,0,0);
     }
     .photo.has-photo{ border-color:#2a2a2a; box-shadow:0 8px 22px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.04) }
-    .photo.portrait{ background-position:50% 35% } /* skub udsnit lidt op på høje billeder */
-    .sub .photo, .peer .photo{ width:120px; height:120px }
+    .photo.portrait{ background-position:50% 35% }
+    .peer .photo, .sub .photo{ width:120px; height:120px }
 
     .label{
       min-width:220px; text-align:center; padding:8px 14px; border-radius:999px;
@@ -107,23 +86,18 @@
     }
     .label .title{ opacity:.9; font-size:13px }
 
-    /* HØJRE kolonne – tryk kort helt mod højre, giv fast pæn bredde, og GEM som udgangspunkt */
-    .side-col{ display:flex; flex-direction:column; align-items:flex-end; gap:28px }
-    .side-card{
-      width:min(700px, 100%);
-      min-height:140px;           /* kan vokse i højden efter behov */
-      display:none;               /* vis kun når der findes indhold i Supabase */
-    }
+    /* Underroller – centreret række (pyramide) */
+    .sub-row{ display:flex; justify-content:center; gap:56px; margin-top:22px }
 
-    /* Footer (sticky i bunden) */
+    /* Højre stor tekst – altid synlig, vokser i højden */
+    .right-main{ align-self:start; }
+    .right-main .content{ line-height:1.55 }
+
+    /* Footer */
     .site-footer{
-      margin-top:auto;
-      padding:12px 16px;
-      background:rgba(0,0,0,.75);
-      border-top:1px solid rgba(255,255,255,.06);
-      color:#fff; text-align:center;
+      margin-top:auto; padding:12px 16px; color:#fff; text-align:center;
+      background:rgba(0,0,0,.75); border-top:1px solid rgba(255,255,255,.06);
     }
-    .site-footer a{ color:#fff; text-decoration:underline }
   </style>
 </head>
 <body>
@@ -133,93 +107,86 @@
       <a href="/madacoin.html" class="active" data-text="common:nav_about">Om</a>
       <a href="/rapporter.html" data-text="common:nav_reports">Rapporter</a>
     </nav>
-    <div class="social-menu" id="social-menu"></div>
   </header>
 
   <div class="layout">
-    <!-- VENSTRE: org + bio tæt ved billederne -->
+    <!-- VENSTRE kolonne (bio-kort) -->
     <section class="org-left">
-      <!-- Række 1: Juliennes bio (venstre) + Julienne (højre) -->
-      <div class="row" id="row-top">
-        <article class="card pad bio-card" id="bio-top">
-          <h2 data-text="about:bio_top_title">Direktør · profil</h2>
-          <p class="muted" data-text="about:bio_top">CM Manager for InnoGames for 10 years with up to 4 workers directly under me.</p>
-        </article>
+      <article class="card pad bio-card" id="bio-top">
+        <h2 data-text="about:bio_top_title">Direktør · profil</h2>
+        <div class="muted" data-text="about:bio_top">
+          CM Manager for InnoGames for 10 years with up to 4 workers directly under me.
+        </div>
+      </article>
 
-        <div class="person" id="person-top">
-          <div class="photo" id="photo-top" aria-label="Profilbillede"></div>
+      <article class="card pad bio-card" id="bio-thomas">
+        <h2 data-text="about:thomas_bio_title">Om Thomas</h2>
+        <div class="muted" data-text="about:thomas_bio">
+          CM Manager for InnoGames for 10 years with up to 4 workers directly under me.
+        </div>
+      </article>
+    </section>
+
+    <!-- HØJRE kolonne: STOR permanent tekst -->
+    <aside class="right-main">
+      <div class="card pad" id="right-main">
+        <h2 data-text="about:right_title">Vores version</h2>
+        <div class="muted content" data-text="about:right_body">
+          Dette er vores plads til længere tekst. Den er altid synlig og kan vokse i højden.
+        </div>
+      </div>
+
+      <!-- MIDTERKOLONNE (personer) ligger visuelt mellem venstre og højre -->
+      <div class="row-center" style="margin-top:24px">
+        <div class="person">
+          <div class="photo" id="photo-top" aria-label="Julienne"></div>
           <div class="label">
             <div class="name" id="name-top">Julienne</div>
             <div class="title" id="title-top">Ejer og Direktør</div>
           </div>
         </div>
-      </div>
 
-      <!-- Række 2: Thomas (venstre – med bio til venstre) + Revisor (højre) -->
-      <div class="row" id="row-mid">
-        <div class="peer-col" id="peercol-mid" style="display:flex;gap:20px;align-items:flex-start">
-          <article class="card pad bio-card" id="bio-thomas">
-            <h2 data-text="about:thomas_bio_title">Om Thomas</h2>
-            <div class="muted" data-text="about:thomas_bio">CM Manager for InnoGames for 10 years with up to 4 workers directly under me.</div>
-          </article>
-
-          <div class="peer" id="peer-mid">
+        <div class="people-mid">
+          <div class="peer">
             <div class="photo" id="photo-mid"></div>
             <div class="label">
               <div class="name" id="name-mid">Thomas</div>
               <div class="title" id="title-mid">Adm. Direktør · Udvikler</div>
             </div>
           </div>
+
+          <div class="peer">
+            <div class="photo" id="photo-accounting"></div>
+            <div class="label">
+              <div class="name" id="name-accounting">Revision &amp; Regnskab</div>
+              <div class="title" id="title-accounting">Partner</div>
+            </div>
+          </div>
         </div>
 
-        <div class="peer" id="peer-accounting">
-          <div class="photo" id="photo-accounting"></div>
-          <div class="label">
-            <div class="name" id="name-accounting">Revision &amp; Regnskab</div>
-            <div class="title" id="title-accounting">Partner</div>
+        <div class="sub-row">
+          <div class="sub">
+            <div class="photo" id="photo-sub-1"></div>
+            <div class="label">
+              <div class="name" id="name-sub-1">Navn</div>
+              <div class="title" id="title-sub-1">Rolle</div>
+            </div>
+          </div>
+          <div class="sub">
+            <div class="photo" id="photo-sub-2"></div>
+            <div class="label">
+              <div class="name" id="name-sub-2">Navn</div>
+              <div class="title" id="title-sub-2">Rolle</div>
+            </div>
+          </div>
+          <div class="sub">
+            <div class="photo" id="photo-sub-3"></div>
+            <div class="label">
+              <div class="name" id="name-sub-3">Navn</div>
+              <div class="title" id="title-sub-3">Rolle</div>
+            </div>
           </div>
         </div>
-      </div>
-
-      <!-- Række 3: underroller (tre bokse) -->
-      <div class="row">
-        <div class="sub" id="sub-1">
-          <div class="photo" id="photo-sub-1"></div>
-          <div class="label">
-            <div class="name" id="name-sub-1">Navn</div>
-            <div class="title" id="title-sub-1">Rolle</div>
-          </div>
-        </div>
-        <div class="sub" id="sub-2">
-          <div class="photo" id="photo-sub-2"></div>
-          <div class="label">
-            <div class="name" id="name-sub-2">Navn</div>
-            <div class="title" id="title-sub-2">Rolle</div>
-          </div>
-        </div>
-        <div class="sub" id="sub-3">
-          <div class="photo" id="photo-sub-3"></div>
-          <div class="label">
-            <div class="name" id="name-sub-3">Navn</div>
-            <div class="title" id="title-sub-3">Rolle</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- HØJRE: tre sidebokse (skjult indtil der kommer indhold fra Supabase) -->
-    <aside class="side-col">
-      <div class="card pad side-card" id="side-1">
-        <h2 data-text="about:right_1_title">Vores version</h2>
-        <div class="muted" data-text="about:right_1">…</div>
-      </div>
-      <div class="card pad side-card" id="side-2">
-        <h2 data-text="about:right_2_title">opdelt</h2>
-        <div class="muted" data-text="about:right_2">…</div>
-      </div>
-      <div class="card pad side-card" id="side-3">
-        <h2 data-text="about:right_3_title">flere gange</h2>
-        <div class="muted" data-text="about:right_3">…</div>
       </div>
     </aside>
   </div>
@@ -229,8 +196,8 @@
   </footer>
 
   <script>
-    /* Supabase er valgfrit – siden virker også uden nøgler */
-    (function init(){
+    /* Init Supabase hvis nøgler er sat – ellers falder vi tilbage til statiske værdier */
+    (function(){
       if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON) {
         window.sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON);
       } else {
@@ -245,11 +212,15 @@
         ? window.SUPABASE_URL.replace(/\/+$/,'') + '/storage/v1/object/public'
         : STATIC_STORAGE_BASE;
 
+      /* Sprog: ?lang=da|en|…  (default 'da'). Hvis tabellen ikke har 'lang', bruger vi første match. */
+      var params = new URLSearchParams(location.search);
+      var LANG = (params.get('lang') || 'da').toLowerCase();
+
       var PLACEHOLDER = 'data:image/svg+xml;utf8,%3Csvg xmlns%3D%22http%3A//www.w3.org/2000/svg%22 viewBox%3D%220 0 256 256%22%3E%3Ccircle cx%3D%22128%22 cy%3D%22128%22 r%3D%22118%22 fill%3D%22%23f7c14b%22 stroke%3D%22%236b4a0e%22 stroke-width%3D%226%22/%3E%3Ctext x%3D%2250%25%22 y%3D%2255%25%22 text-anchor%3D%22middle%22 font-family%3D%22Segoe%20UI%2CArial%22 font-size%3D%2288%22 font-weight%3D%22700%22 fill%3D%22%232b1b05%22%3EMC%3C/text%3E%3C/svg%3E';
 
       function fallbackBySlot(slot){
-        if (slot==='top') return STORAGE_BASE + '/people/Owner.jpg';
-        if (slot==='mid') return STORAGE_BASE + '/people/ADM.jpg';
+        if (slot==='top')        return STORAGE_BASE + '/people/Owner.jpg';
+        if (slot==='mid')        return STORAGE_BASE + '/people/ADM.jpg';
         if (slot==='accounting') return STORAGE_BASE + '/people/Revision.jpg';
         return '';
       }
@@ -260,38 +231,40 @@
         var hasReal=!!(url && String(url).trim());
         var chosen=hasReal?url:(fallback||PLACEHOLDER);
         el.style.backgroundImage="url('"+chosen+"')";
-
         var img=new Image();
         img.onload=function(){
           if(img.naturalHeight>img.naturalWidth*1.15) el.classList.add('portrait');
           else el.classList.remove('portrait');
-        };
-        img.src=chosen;
-
+        }; img.src=chosen;
         var addFrame=hasReal;
-        if(!hasReal && slot==='accounting' && fallback) addFrame=false;
+        if(!hasReal && slot==='accounting' && fallback) addFrame=false; /* Revision.jpg = placeholder */
         if(!hasReal && !fallback) addFrame=false;
-        if(addFrame) el.classList.add('has-photo'); else el.classList.remove('has-photo');
+        el.classList.toggle('has-photo', addFrame);
       }
-      function setText(id,val){ var el=document.getElementById(id); if(el && val) el.textContent=val; }
+      function setText(id,val){ var el=document.getElementById(id); if(el && val!=null) el.textContent=val; }
 
-      /* Højre-kort: skjul alle fra start (vis kun hvis der findes indhold) */
-      document.querySelectorAll('.side-card').forEach(function(el){ el.style.display='none'; });
-
-      /* Tekster */
+      /* Tekster (common + about) med sprogprioritet */
       if(window.sb){
         try{
-          var st=await window.sb.from('site_text').select('page,key,value').in('page',['common','about']);
-          if(st && st.data){
-            var dict={}; st.data.forEach(function(r){ dict[r.page+':'+r.key]=r.value; });
+          var q = window.sb.from('site_text').select('page,key,value,lang').in('page',['common','about']);
+          var res = await q;
+          if (res && res.data){
+            var dictDefault = {}, dictLang = {};
+            res.data.forEach(function(r){
+              var k = r.page + ':' + r.key;
+              if (r.lang && r.lang.toLowerCase() === LANG) dictLang[k] = r.value;
+              else if (!dictDefault[k]) dictDefault[k] = r.value;
+            });
             document.querySelectorAll('[data-text]').forEach(function(el){
-              var k=el.getAttribute('data-text'); if(dict[k]) el.innerHTML = dict[k];
+              var k = el.getAttribute('data-text');
+              var v = (k in dictLang) ? dictLang[k] : dictDefault[k];
+              if (v) el.innerHTML = v;
             });
           }
-        }catch(e){ console.warn('[about] site_text:',e); }
+        }catch(e){ console.warn('[about] site_text:', e); }
       }
 
-      /* Personer */
+      /* Personer og partnere */
       if(window.sb){
         try{
           var ppl=await window.sb.from('org_people')
@@ -299,15 +272,15 @@
             .in('slot',['top','mid','accounting','sub1','sub2','sub3']);
 
           var partnersById={}, ids=[];
-          (ppl.data||[]).forEach(function(p){ if(p.partner_id) ids.push(p.partner_id); });
+          (ppl.data||[]).forEach(p=>{ if(p.partner_id) ids.push(p.partner_id); });
           if(ids.length){
             var pr=await window.sb.from('partners')
               .select('id,name,website,logo_url,logo_alt,category,active')
               .in('id',ids);
-            (pr.data||[]).forEach(function(x){ partnersById[x.id]=x; });
+            (pr.data||[]).forEach(x=>partnersById[x.id]=x);
           }
 
-          var bySlot={}; (ppl.data||[]).forEach(function(x){ bySlot[x.slot]=x; });
+          var bySlot={}; (ppl.data||[]).forEach(x=>bySlot[x.slot]=x);
 
           (function(){ var p=bySlot.top||{};
             showPhoto('photo-top','top',p.photo_url);
@@ -329,8 +302,7 @@
             var title=partner?(partner.category||'Partner'):(p.title||document.getElementById('title-accounting').textContent);
             var logo=(partner&&partner.logo_url)||p.photo_url||'';
             showPhoto('photo-accounting','accounting',logo);
-            setText('name-accounting',name);
-            setText('title-accounting',title);
+            setText('name-accounting',name); setText('title-accounting',title);
           })();
 
           (function(){
@@ -339,7 +311,7 @@
               {slot:'sub2',photo:'photo-sub-2',name:'name-sub-2',title:'title-sub-2'},
               {slot:'sub3',photo:'photo-sub-3',name:'name-sub-3',title:'title-sub-3'},
             ];
-            rows.forEach(function(m){
+            rows.forEach(m=>{
               var p=bySlot[m.slot]||{};
               var partner=p.partner_id?partnersById[p.partner_id]:null;
               var name=(partner&&partner.name)||p.name||document.getElementById(m.name).textContent;
@@ -349,55 +321,15 @@
               setText(m.name,name); setText(m.title,title);
             });
           })();
-        }catch(e){ console.warn('[about] org_people:',e); }
+        }catch(e){ console.warn('[about] org_people:', e); }
       } else {
-        /* Uden Supabase: brug kun fallbacks */
+        /* Uden Supabase: brug fallbacks og standardtekster i HTML */
         showPhoto('photo-top','top','');
         showPhoto('photo-mid','mid','');
         showPhoto('photo-accounting','accounting','');
         showPhoto('photo-sub-1','sub','');
         showPhoto('photo-sub-2','sub','');
         showPhoto('photo-sub-3','sub','');
-      }
-
-      /* Højre bokse – vis KUN dem der har tekst i Supabase */
-      if(window.sb){
-        try{
-          var bx=await window.sb.from('about_boxes').select('title,content,sort').order('sort',{ascending:true});
-          var ids=['side-1','side-2','side-3'];
-          if(bx && bx.data){
-            bx.data.forEach(function(row,i){
-              var root=document.getElementById(ids[i]); if(!root) return;
-              var h2=root.querySelector('h2'); var body=root.querySelector('.muted');
-              var has = (row && ((row.title&&row.title.trim()) || (row.content&&row.content.trim())));
-              if(has){
-                if(row.title)   h2.innerHTML = row.title;
-                if(row.content) body.innerHTML = row.content;
-                root.style.display='';
-              } else {
-                root.style.display='none';
-              }
-            });
-          }
-        }catch(e){ console.warn('[about] about_boxes:',e); }
-      } else {
-        /* Ingen DB: hold dem skjult (= tomme) */
-        document.querySelectorAll('.side-card').forEach(function(el){ el.style.display='none'; });
-      }
-
-      /* Social links */
-      if(window.sb){
-        try{
-          var root=document.getElementById('social-menu');
-          if(root){
-            var sl=await window.sb.from('social_links').select('name,url,icon,sort').order('sort',{ascending:true});
-            var items=(sl.data||[]).filter(function(x){ return x && x.url && String(x.url).trim().length>0; });
-            if(!items.length) root.style.display='none';
-            else root.innerHTML=items.map(function(x){
-              return '<a href="'+x.url+'" target="_blank" rel="noopener" title="'+x.name+'"><span class="sr-only">'+x.name+'</span></a>';
-            }).join('');
-          }
-        }catch(e){ console.warn('[about] social_links:',e); }
       }
     })();
   </script>
