@@ -6,96 +6,77 @@
   <title>MadaCoin – Rapporter</title>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
- /* BAGGRUND + LAYOUT */
-body{
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
-  color:#eaeaea;
+    /* BAGGRUND + LAYOUT */
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+      color:#eaeaea;
 
-  /* baggrund */
-  background-color:#061a2b;
-  background-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
-  background-repeat:no-repeat;
-  background-position:center center;
-  background-size:cover;
-  background-attachment:fixed;
+      /* baggrund */
+      background-color:#061a2b;
+      /* skift evt. .png til .jpg hvis dit billede er .jpg */
+      background-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
+      background-repeat:no-repeat;
+      background-position:center center;
+      background-size:cover;
+      background-attachment:fixed;
 
-  /* sticky footer */
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
-}
-/* mobil: slå fixed fra (skal stå UDENFOR body{}) */
-@media (max-width:800px){
-  body{ background-attachment:scroll; }
-}
+      /* sticky footer */
+      display:flex;
+      flex-direction:column;
+      min-height:100vh;
+    }
+    /* mobil: slå fixed fra for glidere scroll */
+    @media (max-width:800px){
+      body{ background-attachment:scroll; }
+    }
 
+    /* GENERELT LAYOUT */
+    header{ padding:14px 18px; border-bottom:1px solid #222; position:relative; z-index:5; }
+    a{ color:#9ad4ff; text-decoration:none; }
+    .wrap{ max-width:1100px; margin:0 auto; padding:24px; }
 
-  /* GENERELT LAYOUT */
-  header,footer{padding:14px 18px;border-bottom:1px solid #222}
-  a{color:#9ad4ff;text-decoration:none}
-  nav a{margin-right:14px;opacity:.9}
-  .wrap{max-width:1100px;margin:0 auto;padding:24px}
-  .card{background:#111;border:1px solid #252525;border-radius:16px;padding:18px;margin:14px 0}
-  h1,h2{margin:12px 0}
-  table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-  th,td{border-bottom:1px solid #262626;padding:10px;text-align:left}
-  .muted{opacity:.8}
-  .pill{display:inline-block;padding:3px 10px;border:1px solid #2a2a2a;border-radius:999px;font-size:12px;opacity:.9}
-  .right{text-align:right}
-  .empty{opacity:.7;border:1px dashed #2a2a2a;padding:16px;border-radius:14px}
-  details{background:#0f0f10;border:1px solid #212121;border-radius:12px;padding:10px}
-  summary{cursor:pointer}
-  ul{margin:6px 0 0 18px}
+    /* TOPMENU: venstrejusteret og jævn afstand */
+    header.wrap{ text-align:left; }
+    header.wrap nav{
+      display:flex;
+      gap:14px;
+      justify-content:flex-start;
+      align-items:center;
+      margin:0;
+    }
+    header.wrap nav a{ opacity:.9; }
+    header.wrap nav a:hover{ opacity:1; text-decoration:underline; }
 
-  /* TOPMENU: venstrejusteret */
-  header.wrap{ text-align:left; }
-  header.wrap nav{
-    display:flex;
-    gap:14px;
-    justify-content:flex-start;
-    margin:0;
-  }
+    /* KORT UI-STIL TIL INDHOLD */
+    .card{ background:#111; border:1px solid #252525; border-radius:16px; padding:18px; margin:14px 0; }
+    h1,h2{ margin:12px 0; }
+    table{ width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+    th,td{ border-bottom:1px solid #262626; padding:10px; text-align:left; }
+    .muted{ opacity:.8; }
+    .right{ text-align:right; }
+    .empty{ opacity:.7; border:1px dashed #2a2a2a; padding:16px; border-radius:14px; }
 
-  /* FOOTER: sticky + sort tekst */
-  main{ flex:1; }
-  footer{
-  text-align:center;
-  padding:20px;
-  background:#e4e6c5;  /* creme */
-  color:#000;          /* sort tekst */
-}
-  footer a{ color:#000; text-decoration:none; }
-  footer a:hover{ text-decoration:underline; }
-  footer.muted{ opacity:1; }
-
-
-
-/* Lås header-menuen til venstre (vinder over alt andet) */
-header.wrap { text-align: left !important; }
-
-header.wrap nav{
-  display: flex !important;
-  justify-content: flex-start !important;  /* venstre */
-  align-items: center;
-  width: 100% !important;                  /* undgå max-content */
-  margin: 0 !important;                    /* neutraliser 0 auto */
-}
-
-header.wrap nav a{ margin: 0 14px 0 0; }
-
-    
-</style>
-
+    /* FOOTER: creme + sort tekst + sticky */
+    main{ flex:1; }
+    footer{
+      margin-top:auto;
+      text-align:center;
+      padding:20px;
+      background:#e4e6c5; /* creme */
+      color:#000;         /* sort tekst */
+    }
+    footer a{ color:#000; text-decoration:none; }
+    footer a:hover{ text-decoration:underline; }
+  </style>
 </head>
 <body>
   <header class="wrap">
     <nav>
       <a href="/index.html">Home</a>
       <a href="/madacoin.html">Om MadaCoin</a>
-      <a href="/rapporter.html">Rapporter</a>
+      <a href="/rapporter.html" aria-current="page">Rapporter</a>
     </nav>
-
   </header>
 
   <main class="wrap">
@@ -119,7 +100,9 @@ header.wrap nav a{ margin: 0 14px 0 0; }
     <div id="empty" class="empty" style="display:none">Ingen rapporter endnu.</div>
   </main>
 
-    
+  <footer>
+    <span id="footer-text">© 2025 MadaCoin. All rights reserved.</span>
+  </footer>
 
   <script>
     function fmt(n){
@@ -133,7 +116,8 @@ header.wrap nav a{ margin: 0 14px 0 0; }
     } else {
       const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
       // Forventet tabel `reports`:
-      // id (uuid), period (text '2025-07'), mcd_in (numeric), mcd_out (numeric), mcd_balance (numeric), mcn_revenue (numeric), notes_md (text), links (json[])
+      // id (uuid), period (text '2025-07'), mcd_in (numeric), mcd_out (numeric),
+      // mcd_balance (numeric), mcn_revenue (numeric), notes_md (text), links (json[])
       sb.from('reports').select('*').order('period',{ascending:false}).then(({ data, error }) => {
         if (error) { console.error(error); document.getElementById('empty').style.display='block'; return; }
         if (!data || !data.length) { document.getElementById('empty').style.display='block'; return; }
@@ -152,7 +136,7 @@ header.wrap nav a{ margin: 0 14px 0 0; }
         document.getElementById('sum-bal').textContent = fmt(sum.bal);
         document.getElementById('sum-mcn').textContent = fmt(sum.mcn);
 
-        // Liste
+        // Liste af rapporter
         const host = document.getElementById('list');
         data.forEach(r => {
           const card = document.createElement('div');
@@ -173,25 +157,5 @@ header.wrap nav a{ margin: 0 14px 0 0; }
       });
     }
   </script>
-
-  
-
-
-  
-<footer><span id="footer-text">© 2025 MadaCoin. All rights reserved.</span></footer>
-
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
