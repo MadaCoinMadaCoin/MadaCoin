@@ -30,6 +30,22 @@
       --bg-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
       --text:#fff; --muted:#cfd3d7; --primary:#9ad4ff;
       --card:#0b0b0c; --card-border:#2a2a2a; --shadow:0 12px 26px rgba(0,0,0,.5); --radius:16px;
+
+      /* ===== FÆLLES NAV-VARIABLER ===== */
+      --nav-gap: 14px;
+      --nav-height: 44px;
+      --nav-pad-x: 16px;
+      --nav-pad-y: 10px;
+
+      --nav-shift-x: 0px;   /* venstre(-) / højre(+) */
+      --nav-shift-y: -2px;  /* op(-) / ned(+) */
+
+      --nav-text: #fff;
+      --nav-bg: #0d0d0f;
+      --nav-border: #333;
+      --nav-hover-bg: #151517;
+      --nav-hover-border: #444;
+      --nav-active: #5aa9ff;
     }
 
     *{box-sizing:border-box}
@@ -45,7 +61,44 @@
     /* Fælles container – matcher resten af sitet (HUSK højre indryk 240px) */
     .wrap{ max-width:var(--wrap); margin:0 auto; padding:0 240px; }
 
-    /* NAV – gennemsigtig top (kun pille-knapper); sticky for touch */
+    /* ===== FÆLLES NAV-STIL ===== */
+    .nav{
+      display:flex; align-items:center; flex-wrap:wrap;
+      gap: var(--nav-gap);
+      transform: translate(var(--nav-shift-x), var(--nav-shift-y));
+      justify-content:flex-start; /* nav--left default */
+    }
+    .nav.nav--left{ justify-content:flex-start; }
+    .nav.nav--center{ justify-content:center; }
+    .nav.nav--right{ justify-content:flex-end; }
+
+    .nav a{
+      display:inline-flex; align-items:center; justify-content:center;
+      height: var(--nav-height);
+      padding: var(--nav-pad-y) var(--nav-pad-x);
+      color: var(--nav-text);
+      background: var(--nav-bg);
+      border:1px solid var(--nav-border);
+      border-radius:12px;
+      text-decoration:none; opacity:.96;
+      position: relative; z-index: 1; pointer-events: auto;
+      -webkit-tap-highlight-color: rgba(255,255,255,.15);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .nav a:hover,
+    .nav a:focus-visible{
+      background: var(--nav-hover-bg);
+      border-color: var(--nav-hover-border);
+    }
+    /* aktiv markering – støtter både aria-current, .is-active og eksisterende .active */
+    .nav a[aria-current="page"],
+    .nav a.is-active,
+    .nav a.active{
+      border-color: var(--nav-active);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset;
+    }
+
+    /* NAV – gennemsigtig top; sticky for touch */
     .site-nav{
       position: sticky;
       top: 0;
@@ -57,19 +110,10 @@
     }
     .site-nav::before,
     .site-nav::after{ display:none !important; content:none !important; }
-    .site-nav nav{
-      display:flex; gap:12px; align-items:center; flex-wrap:wrap;
-      justify-content:flex-start;
-    }
-    .site-nav nav a{
-      color:#fff; padding:8px 14px; border-radius:12px;
-      background:#0d0d0f; border:1px solid #333; text-decoration:none; opacity:.96;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-      position: relative; z-index: 1; pointer-events: auto;
-      -webkit-tap-highlight-color: rgba(255,255,255,.15);
-    }
-    .site-nav nav a:hover{ filter:brightness(1.08) }
-    .site-nav nav a.active{ border-color:#555; box-shadow: inset 0 1px 0 rgba(255,255,255,.12) }
+
+    /* Tidligere .site-nav nav/* knap-styles er neutraliseret – .nav styrer nu */
+    .site-nav nav{ /* .nav på selve <nav> håndterer layout */ }
+    .site-nav nav a{ text-decoration:none; } /* bevar kun no-underline */
 
     /* Mobil: mindre indryk i nav (desktop bevarer 240px i .wrap) */
     @media (max-width: 900px){
@@ -196,7 +240,8 @@
 <body>
   <header class="site-nav">
     <div class="wrap">
-      <nav>
+      <!-- FÆLLES NAV (samme som side 1) -->
+      <nav class="nav nav--left" style="--nav-shift-x:0px; --nav-shift-y:-2px;">
         <a href="/index.html" data-text="common:nav_home">Home</a>
         <a href="/madacoin.html" class="active" data-text="common:nav_about">Om</a>
         <a href="/rapporter.html" data-text="common:nav_reports">Rapporter</a>
