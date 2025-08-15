@@ -37,78 +37,6 @@
       body{ background-attachment: scroll; }
     }
 
-    /* ===== FÆLLES NAV-VARIABLER & STIL (match side 2) ===== */
-    :root{
-      --wrap: 1680px;
-
-      --nav-gap: 14px;
-      --nav-height: 44px;
-      --nav-pad-x: 16px;
-      --nav-pad-y: 10px;
-
-      --nav-shift-x: 0px;   /* venstre(-) / højre(+) – pr. side */
-      --nav-shift-y: -2px;  /* op(-) / ned(+) – pr. side */
-
-      --nav-text: #fff;
-      --nav-bg: #0d0d0f;
-      --nav-border: #333;
-      --nav-hover-bg: #151517;
-      --nav-hover-border: #444;
-      --nav-active: #5aa9ff;
-    }
-
-    /* Container som side 2 */
-    .wrap{ max-width: var(--wrap); margin: 0 auto; padding: 0 240px; }
-
-    /* Sticky, gennemsigtig top-nav (som side 2) */
-    .site-nav{
-      position: sticky;
-      top: 0;
-      z-index: 9999;
-      padding: 8px 0;
-      background: transparent !important;
-      border-bottom: none !important;
-      box-shadow: none !important;
-    }
-    .site-nav::before,
-    .site-nav::after{ display:none !important; content:none !important; }
-
-    /* Fælles nav-layout + knapper */
-    .nav{
-      display:flex; align-items:center; flex-wrap:wrap;
-      gap: var(--nav-gap);
-      justify-content:flex-start; /* nav--left default */
-      transform: translate(var(--nav-shift-x), var(--nav-shift-y));
-    }
-    .nav.nav--left{ justify-content:flex-start; }
-    .nav.nav--center{ justify-content:center; }
-    .nav.nav--right{ justify-content:flex-end; }
-
-    .nav a{
-      display:inline-flex; align-items:center; justify-content:center;
-      height: var(--nav-height);
-      padding: var(--nav-pad-y) var(--nav-pad-x);
-      color: var(--nav-text);
-      background: var(--nav-bg);
-      border:1px solid var(--nav-border);
-      border-radius:12px;
-      text-decoration:none; opacity:.96;
-      position:relative; z-index:1; pointer-events:auto;
-      -webkit-tap-highlight-color: rgba(255,255,255,.15);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-    }
-    .nav a:hover,
-    .nav a:focus-visible{
-      background: var(--nav-hover-bg);
-      border-color: var(--nav-hover-border);
-    }
-    .nav a[aria-current="page"],
-    .nav a.is-active,
-    .nav a.active{
-      border-color: var(--nav-active);
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset;
-    }
-
     .madagascar-container {
       position: absolute;
       top: 0%;
@@ -150,7 +78,6 @@
     }
     .social-menu a img { width: 22px; height: 22px; }
 
-    /* Beholderbredde for content (uændret) */
     .content-box {
       padding: 10px;
       padding-top: 1px;
@@ -268,29 +195,81 @@
     footer a:hover { text-decoration: underline; }
     footer.muted { opacity: 1; }
 
-    /* Mobil: samme indryk som side 2 */
-    @media (max-width: 900px){
-      .site-nav .wrap,
-      .site-nav{
-        padding-left: 16px;
-        padding-right: 24px;
-      }
+    /* === FÆLLES HEADER + NAV (venstrejusteret, ens på alle sider) === */
+    :root{
+      --nav-gap:14px;
+      --nav-height:44px;
+      --nav-pad-x:16px;
+      --nav-pad-y:10px;
+      --nav-shift-x:0px;         /* venstre(-) / højre(+) */
+      --nav-shift-y:-2px;        /* op(-) / ned(+) */
+
+      --nav-text:#fff;
+      --nav-bg:#0d0d0f;
+      --nav-border:#333;
+      --nav-hover-bg:#151517;
+      --nav-hover-border:#444;
+      --nav-active:#5aa9ff;
     }
-    @media (max-width: 768px) {
-      .madagascar-container img { width: 92vw; max-width: 520px; }
-      .content-box { margin-top: 240px; padding: 12px; }
-      .coin-section { gap: 24px; }
+    .site-nav{
+      position:sticky; top:0; z-index:9999;
+      padding:24px 0;
+      background:transparent !important;
+      border:0 !important; box-shadow:none !important;
     }
+    .site-nav::before, .site-nav::after{ display:none !important; content:none !important; }
+    .site-nav .nav-inner{
+      max-width:1100px;
+      margin:0 auto;
+      padding:0 24px;
+    }
+    .nav{
+      display:flex; align-items:center; flex-wrap:wrap;
+      gap:var(--nav-gap);
+      justify-content:flex-start; /* venstre */
+      transform:translate(var(--nav-shift-x), var(--nav-shift-y));
+    }
+    .nav a{
+      display:inline-flex; align-items:center; justify-content:center;
+      height:var(--nav-height);
+      padding:var(--nav-pad-y) var(--nav-pad-x);
+      color:var(--nav-text);
+      background:var(--nav-bg);
+      border:1px solid var(--nav-border);
+      border-radius:12px;
+      text-decoration:none; opacity:.96;
+      position:relative; z-index:1; pointer-events:auto;
+      -webkit-tap-highlight-color: rgba(255,255,255,.15);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .nav a:hover,
+    .nav a:focus-visible{
+      background:var(--nav-hover-bg);
+      border-color:var(--nav-hover-border);
+    }
+    .nav a[aria-current="page"],
+    .nav a.is-active,
+    .nav a.active{
+      border-color:var(--nav-active);
+      box-shadow:0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset;
+    }
+
+    /* Mobil-indryk i header (samme på alle sider) */
+    @media (max-width:900px){
+      .site-nav .nav-inner{ padding-left:16px; padding-right:24px; }
+    }
+
+    /* (ingen .wrap-regel i header længere – header er isoleret via .nav-inner) */
   </style>
 
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-  <!-- ØVERSTE MENU (match side 2) -->
+  <!-- ØVERSTE MENU (ensret) -->
   <header class="site-nav">
-    <div class="wrap">
-      <nav class="nav nav--left" style="--nav-shift-x:0px; --nav-shift-y:-2px;">
+    <div class="nav-inner">
+      <nav class="nav" style="--nav-shift-y:-2px;">
         <a href="/index.html" aria-current="page">Home</a>
         <a href="/madacoin.html">Om MadaCoin</a>
         <a href="/rapporter.html">Rapporter</a>
