@@ -8,7 +8,7 @@
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
     :root{
-      /* Lærred og kolonner (desktop) */
+      /* Desktop-lærred og kolonner */
       --wrap: 1680px;
       --gap: 84px;
       --left-col: 520px;
@@ -16,20 +16,24 @@
       --right-col: 720px;
       --right-offset: 36px;
       --right-gutter: 24px;
-
-      /* Offset for pyramiden (desktop) */
       --center-offset: -36px;
 
       /* Foto-størrelser (desktop) */
-      --photo-top: 144px;     /* Julienne */
-      --photo-peer: 108px;    /* Thomas + Revision */
-      --photo-sub: 102px;     /* underroller */
+      --photo-top: 144px;      /* Julienne */
+      --photo-peer: 108px;     /* Thomas + Revision */
+      --photo-sub: 102px;      /* underroller */
 
       /* Farver/stil */
       --bg:#061a2b;
       --bg-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
       --text:#fff; --muted:#cfd3d7; --primary:#9ad4ff;
       --card:#0b0b0c; --card-border:#2a2a2a; --shadow:0 12px 26px rgba(0,0,0,.5); --radius:16px;
+
+      /* Nav parametre (samme som side 1) */
+      --edge-pad:24px;
+      --nav-gap:14px; --nav-pad-x:14px; --nav-pad-y:8px;
+      --nav-text:#fff; --nav-bg:#0d0d0f; --nav-border:#333;
+      --nav-hover-bg:#151517; --nav-hover-border:#444; --nav-active:#5aa9ff;
     }
 
     *{box-sizing:border-box}
@@ -40,46 +44,41 @@
       color:var(--text);
       background: var(--bg) no-repeat center/cover fixed;
       background-image: var(--bg-image);
-      overflow-x: hidden; /* undgå utilsigtet vandret scroll */
+      overflow-x:hidden;
     }
     @media (max-width:900px){ body{ background-attachment:scroll } }
 
-    /* Fælles container – desktop har ekstra højre indryk */
-    .wrap{ max-width:var(--wrap); margin:0 auto; padding:0 240px; }
-
-    /* NAV – gennemsigtig top; sticky for touch */
+    /* NAV – venstre-justeret som side 1 */
     .site-nav{
-      position: sticky;
-      top: 0;
-      z-index: 9999;
-      padding: 8px 0;
-      background: transparent !important;
-      border-bottom: none !important;
-      box-shadow: none !important;
+      position: sticky; top: 0; z-index: 9999;
+      padding: 24px 0;
+      background: transparent !important; border: 0 !important; box-shadow:none !important;
     }
-    .site-nav::before,
-    .site-nav::after{ display:none !important; content:none !important; }
+    .site-nav::before,.site-nav::after{ display:none !important; content:none !important; }
+    .nav-inner{ padding-left:var(--edge-pad); padding-right:var(--edge-pad); }
     .site-nav nav{
-      display:flex; gap:12px; align-items:center; flex-wrap:wrap;
-      justify-content:flex-start;
+      display:flex; gap:var(--nav-gap); align-items:center; flex-wrap:wrap; justify-content:flex-start; transform:translateY(-2px);
     }
     .site-nav nav a{
-      color:#fff; padding:8px 14px; border-radius:12px;
-      background:#0d0d0f; border:1px solid #333; text-decoration:none; opacity:.96;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-      position: relative; z-index: 1; pointer-events: auto;
-      -webkit-tap-highlight-color: rgba(255,255,255,.15);
-      font-size: 1rem;
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:var(--nav-pad-y) var(--nav-pad-x);
+      color:var(--nav-text); background:var(--nav-bg); border:1px solid var(--nav-border);
+      border-radius:12px; text-decoration:none; opacity:.96; box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+      position:relative; z-index:1; pointer-events:auto; -webkit-tap-highlight-color:rgba(255,255,255,.15);
+      font-size:1rem;
     }
-    .site-nav nav a:hover{ filter:brightness(1.08) }
-    .site-nav nav a.active{ border-color:#555; box-shadow: inset 0 1px 0 rgba(255,255,255,.12) }
+    .site-nav nav a:hover{ background:var(--nav-hover-bg); border-color:var(--nav-hover-border); }
+    .site-nav nav a.active{ border-color:var(--nav-active); box-shadow:0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset; }
+
+    /* Fælles container (kun til indhold – NAV bruger .nav-inner) */
+    .wrap{ max-width:var(--wrap); margin:0 auto; padding:0 240px; }
 
     /* Tre kolonner (desktop) */
     .layout{
       max-width:var(--wrap); margin:0 auto; padding:24px;
       display:grid;
       grid-template-columns: var(--left-col) var(--center-col) var(--right-col);
-      grid-template-rows: auto auto auto;  /* 1: Julienne, 2: Thomas/Revision, 3: underroller */
+      grid-template-rows: auto auto auto;
       gap:var(--gap);
       align-items:start;
       flex:1;
@@ -92,6 +91,7 @@
       box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,.06)
     }
     .card.pad{ padding:18px }
+    h1{ font-size:clamp(22px,2.6vw,26px); line-height:1.25; margin:0 0 .5em; }
     h2{ margin:0 0 10px; font-size:clamp(18px,2.2vw,22px) }
     .muted{ color:var(--muted) }
 
@@ -145,8 +145,8 @@
     .right-col{
       grid-column:3; grid-row:1 / span 3;
       margin-top:var(--right-offset);
-      margin-left:8px;
-      padding-right: var(--right-gutter);
+      margin-left:8px;                 /* luft mod pyramiden */
+      padding-right: var(--right-gutter); /* giver plads til højre */
       position: relative; z-index: 0;
     }
     .right-col .card{ width:100% }
@@ -186,55 +186,54 @@
       background:rgba(0,0,0,.75); border-top:1px solid rgba(255,255,255,.06);
     }
 
-    /* ============ MOBIL (matcher forsiden) ============ */
+    /* ============ MOBIL (match side 1) ============ */
     @media (max-width: 900px){
-      /* Typografi – samme skala som på forsiden */
+      /* Typografi */
       body{ font-size: .95rem; }
       h1{ font-size: clamp(18px, 6.2vw, 22px); }
       h2{ font-size: clamp(16px, 5.2vw, 20px); }
 
-      /* Fjern desktop-indryk og giv plads til sociale ikoner i venstre side */
-      .wrap{ padding: 0 16px; }
+      /* Layout: 1 kolonne, venstre indryk pga sociale ikoner */
       .layout{
+        grid-template-columns: 1fr;
+        grid-auto-flow: row; grid-auto-rows: auto;
+        gap: 18px;
         padding: 12px 16px 24px;
         padding-left: calc(16px + 76px);   /* 16px base + ~76px ikonkolonne */
-        grid-template-columns: 1fr;        /* 1 kolonne layout */
-        grid-auto-rows: auto;
-        gap: 18px;
       }
 
-      /* Pyramiden – ingen sideforskydning på mobil */
+      /* Nulstil desktop-placeringer → ingen overlap */
+      .layout > *{
+        grid-column: 1 !important;
+        grid-row: auto !important;
+        min-width: 0;
+      }
       .center-col{ transform:none; }
 
-      /* Alle sektioner i én kolonne */
-      #bio-top, #bio-thomas, .right-col, #pyr-top, #pyr-mid, #pyr-sub { grid-column: 1; }
-      .right-col{ margin-top: 8px; padding-right: 0; }
+      /* Stak peers lodret */
+      .people-mid{ flex-direction:column; align-items:center; gap:14px; width:100%; }
+      .peer{ width:100%; }
 
-      /* Mindre fotos */
-      :root{
-        --photo-top: 120px;
-        --photo-peer: 96px;
-        --photo-sub: 88px;
-      }
-      .label{ min-width: 0; max-width: 280px; }
+      /* Labels mere fleksible */
+      .label{ max-width: 92vw; }
+
+      /* “Vores version” luft til kanten */
+      .right-col{ margin: 0; padding: 0; }
+      .right-col .card{ width:100%; margin:0; box-sizing:border-box; }
 
       /* Partner-stribe samme indryk */
       .partners.wrap{ padding-left: calc(16px + 76px); padding-right: 16px; }
-    }
 
-    /* Mobil: mindre indryk i nav (desktop bevarer 240px i .wrap) */
-    @media (max-width: 900px){
-      .site-nav .wrap,
-      .site-nav{
-        padding-left: 16px;
-        padding-right: 24px;
-      }
+      /* Nav: lidt smallere padding (kun mobil) */
+      .site-nav{ padding: 16px 0; }
+      .nav-inner{ padding-left:16px; padding-right:24px; }
     }
   </style>
 </head>
 <body>
+  <!-- NAV (venstre-justeret) -->
   <header class="site-nav">
-    <div class="wrap">
+    <div class="nav-inner">
       <nav>
         <a href="/index.html" data-text="common:nav_home">Home</a>
         <a href="/madacoin.html" class="active" data-text="common:nav_about">Om</a>
