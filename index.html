@@ -19,10 +19,16 @@
   <meta name="twitter:title" content="MadaCoin — Donations for Madagascar">
   <meta name="twitter:description" content="Støt udvikling i Madagaskar gennem MadaCoin.">
 
+  <!-- Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
   <style>
-    /* Base layout */
+    /* ===== Base typografi (match Side 2) ===== */
+    html{ font-size:16px; }
     body{
-      font-family: Arial, sans-serif;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+      font-size: 1rem;   /* 16px base */
+      line-height: 1.5;
       margin: 0;
       padding: 0;
 
@@ -36,26 +42,82 @@
     @media (max-width: 800px){
       body{ background-attachment: scroll; }
     }
+    button, input, select, textarea { font: inherit; }
 
-    .madagascar-container {
-      position: absolute;
-      top: 0%;
-      left: 52%;
-      transform: translateX(-50%);
-      z-index: 1;
-    }
-    .madagascar-container img {
-      width: 90vw;
-      max-width: 600px;
-      height: auto;
-      border-radius: 10px;
+    /* Globale overskrifter – fælles på alle sider */
+    h1{ font-size: clamp(22px, 2.6vw, 26px); line-height: 1.25; margin: 0 0 .5em; }
+    h2{ font-size: clamp(18px, 2.2vw, 22px); line-height: 1.3;  margin: 0 0 .5em; }
+    h3{ font-size: clamp(16px, 1.8vw, 18px); line-height: 1.35; margin: 0 0 .5em; }
+
+    /* ===== Fælles header + nav (venstrejusteret) ===== */
+    :root{
+      --nav-gap:14px;
+      --nav-height:44px;
+      --nav-pad-x:16px;
+      --nav-pad-y:10px;
+      --nav-shift-x:0px;
+      --nav-shift-y:-2px;
+
+      --nav-text:#fff;
+      --nav-bg:#0d0d0f;
+      --nav-border:#333;
+      --nav-hover-bg:#151517;
+      --nav-hover-border:#444;
+      --nav-active:#5aa9ff;
+
+      /* Social menu offset (lige under header) */
+      --social-top: 110px;    /* tweak her hvis du vil have den tættere/fjernere */
     }
 
+    .site-nav{
+      position:sticky; top:0; z-index:9999;
+      padding:24px 0;
+      background:transparent !important;
+      border:0 !important; box-shadow:none !important;
+    }
+    .site-nav::before, .site-nav::after{ display:none !important; content:none !important; }
+    .site-nav .nav-inner{
+      max-width:1100px;
+      margin:0 auto;
+      padding:0 24px;
+    }
+    .nav{
+      display:flex; align-items:center; flex-wrap:wrap;
+      gap:var(--nav-gap);
+      justify-content:flex-start;
+      transform:translate(var(--nav-shift-x), var(--nav-shift-y));
+    }
+    .nav a{
+      display:inline-flex; align-items:center; justify-content:center;
+      height:var(--nav-height);
+      padding:var(--nav-pad-y) var(--nav-pad-x);
+      color:var(--nav-text);
+      background:var(--nav-bg);
+      border:1px solid var(--nav-border);
+      border-radius:12px;
+      text-decoration:none; opacity:.96;
+      position:relative; z-index:1; pointer-events:auto;
+      -webkit-tap-highlight-color: rgba(255,255,255,.15);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+      font-size: 1rem; /* ens nav-tekst */
+    }
+    .nav a:hover,
+    .nav a:focus-visible{
+      background:var(--nav-hover-bg);
+      border-color:var(--nav-hover-border);
+    }
+    .nav a[aria-current="page"],
+    .nav a.is-active,
+    .nav a.active{
+      border-color: var(--nav-active);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset;
+    }
+
+    /* ===== Social menu – rykket op under knapperne ===== */
     .social-menu {
       position: fixed;
-      top: 50%;
+      top: var(--social-top);   /* låst lige under header */
       left: 20px;
-      transform: translateY(-50%);
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -77,6 +139,21 @@
       transform: translateY(-2px);
     }
     .social-menu a img { width: 22px; height: 22px; }
+
+    /* ===== Page-indhold (uændret) ===== */
+    .madagascar-container {
+      position: absolute;
+      top: 0%;
+      left: 52%;
+      transform: translateX(-50%);
+      z-index: 1;
+    }
+    .madagascar-container img {
+      width: 90vw;
+      max-width: 600px;
+      height: auto;
+      border-radius: 10px;
+    }
 
     .content-box {
       padding: 10px;
@@ -149,7 +226,8 @@
       width: 100%;
       max-width: 700px;
     }
-    .roadmap-box h2 { margin: 0; color: #444; font-size: 1.2rem; }
+    .roadmap-box h2 { margin: 0; color: #444; font-size: inherit; } /* ← arver global h2 */
+
     .description { font-size: 0.8rem; margin: 0; color: #555; }
     .step-images {
       display: flex; flex-wrap: wrap; gap: 10px; max-width: 100%;
@@ -195,74 +273,17 @@
     footer a:hover { text-decoration: underline; }
     footer.muted { opacity: 1; }
 
-    /* === FÆLLES HEADER + NAV (venstrejusteret, ens på alle sider) === */
-    :root{
-      --nav-gap:14px;
-      --nav-height:44px;
-      --nav-pad-x:16px;
-      --nav-pad-y:10px;
-      --nav-shift-x:0px;         /* venstre(-) / højre(+) */
-      --nav-shift-y:-2px;        /* op(-) / ned(+) */
-
-      --nav-text:#fff;
-      --nav-bg:#0d0d0f;
-      --nav-border:#333;
-      --nav-hover-bg:#151517;
-      --nav-hover-border:#444;
-      --nav-active:#5aa9ff;
-    }
-    .site-nav{
-      position:sticky; top:0; z-index:9999;
-      padding:24px 0;
-      background:transparent !important;
-      border:0 !important; box-shadow:none !important;
-    }
-    .site-nav::before, .site-nav::after{ display:none !important; content:none !important; }
-    .site-nav .nav-inner{
-      max-width:1100px;
-      margin:0 auto;
-      padding:0 24px;
-    }
-    .nav{
-      display:flex; align-items:center; flex-wrap:wrap;
-      gap:var(--nav-gap);
-      justify-content:flex-start; /* venstre */
-      transform:translate(var(--nav-shift-x), var(--nav-shift-y));
-    }
-    .nav a{
-      display:inline-flex; align-items:center; justify-content:center;
-      height:var(--nav-height);
-      padding:var(--nav-pad-y) var(--nav-pad-x);
-      color:var(--nav-text);
-      background:var(--nav-bg);
-      border:1px solid var(--nav-border);
-      border-radius:12px;
-      text-decoration:none; opacity:.96;
-      position:relative; z-index:1; pointer-events:auto;
-      -webkit-tap-highlight-color: rgba(255,255,255,.15);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-    }
-    .nav a:hover,
-    .nav a:focus-visible{
-      background:var(--nav-hover-bg);
-      border-color:var(--nav-hover-border);
-    }
-    .nav a[aria-current="page"],
-    .nav a.is-active,
-    .nav a.active{
-      border-color:var(--nav-active);
-      box-shadow:0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset;
-    }
-
-    /* Mobil-indryk i header (samme på alle sider) */
+    /* Mobil: lidt behagelig indrykning i header + social offset en smule lavere */
     @media (max-width:900px){
       .site-nav .nav-inner{ padding-left:16px; padding-right:24px; }
+      :root{ --social-top: 120px; }
     }
-
-    /* (ingen .wrap-regel i header længere – header er isoleret via .nav-inner) */
+    @media (max-width: 768px) {
+      .madagascar-container img { width: 92vw; max-width: 520px; }
+      .content-box { margin-top: 240px; padding: 12px; }
+      .coin-section { gap: 24px; }
+    }
   </style>
-
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -277,7 +298,7 @@
     </div>
   </header>
 
-  <!-- VENSTREMENU SOCIAL -->
+  <!-- VENSTREMENU SOCIAL – lige under knapperne -->
   <div class="social-menu" id="social-menu"></div>
 
   <!-- Ø-billedet -->
@@ -387,7 +408,6 @@
     </div>
   </section>
 
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = "https://byrlebjwknppjbtbkozt.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
