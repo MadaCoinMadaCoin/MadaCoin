@@ -48,9 +48,9 @@
     h2{ font-size:clamp(18px,2.2vw,22px); line-height:1.3;  margin:0 0 .5em; }
     h3{ font-size:clamp(16px,1.8vw,18px); line-height:1.35; margin:0 0 .5em; }
 
-    /* ========== Layoutvariabler ========== */
+    /* ========== Layout-variabler ========== */
     :root{
-      --edge-pad: 24px;     /* venstre/højre kant-indrykning (samme alle sider) */
+      --edge-pad: 24px;
 
       /* NAV */
       --nav-gap:14px; --nav-pad-x:14px; --nav-pad-y:8px;
@@ -60,108 +60,85 @@
       /* Social */
       --social-top: 104px;
 
-      /* HERO placering/størrelse */
-      --hero-top: 118px;                 /* afstand fra top til hero-kort (desktop) */
-      --hero-left-offset: 66px;          /* social ikonkolonne + luft */
+      /* HERO placering/størrelse (desktop) */
+      --hero-top: 118px;
+      --hero-left-offset: 66px;     /* social ikonkolonne + luft */
       --hero-width: clamp(320px, 30vw, 520px);
     }
 
-    /* ========== Ø-billedet (som før) ========== */
-    .madagascar-container {
-      position: absolute;
-      top: 0%;
-      left: 52%;
-      transform: translateX(-50%);
-      z-index: 1;
+    /* ========== Ø-billedet (desktop) ========== */
+    .madagascar-container{
+      position: absolute; top:0%; left:52%; transform:translateX(-50%); z-index:1;
     }
-    .madagascar-container img {
-      width: 90vw;
-      max-width: 600px;
-      height: auto;
-      border-radius: 10px;
-    }
+    .madagascar-container img{ width:90vw; max-width:600px; height:auto; border-radius:10px; }
 
-    /* ========== NAV – venstrejusteret (match side 2/3) ========== */
+    /* ========== NAV – venstrejusteret ========== */
     .site-nav{
-      position: sticky;
-      top: 0;
-      z-index: 9999;
-      padding: 24px 0;
-      background: transparent !important;
-      border: 0 !important;
-      box-shadow: none !important;
+      position: sticky; top: 0; z-index: 9999; padding: 24px 0;
+      background: transparent !important; border: 0 !important; box-shadow:none !important;
     }
     .site-nav::before, .site-nav::after{ display:none !important; content:none !important; }
-    .site-nav .nav-inner{
-      max-width: none;
-      margin: 0;
-      padding-left: var(--edge-pad);
-      padding-right: var(--edge-pad);
-    }
-    .nav{
-      display:flex; gap:var(--nav-gap); align-items:center; flex-wrap:wrap; justify-content:flex-start;
-      transform: translateY(-2px);
-    }
+    .site-nav .nav-inner{ padding-left:var(--edge-pad); padding-right:var(--edge-pad); }
+    .nav{ display:flex; gap:var(--nav-gap); align-items:center; flex-wrap:wrap; justify-content:flex-start; transform:translateY(-2px); }
     .nav a{
       display:inline-flex; align-items:center; justify-content:center;
       padding:var(--nav-pad-y) var(--nav-pad-x);
-      color:var(--nav-text);
-      background:var(--nav-bg);
-      border:1px solid var(--nav-border);
-      border-radius:12px;
-      text-decoration:none;
-      opacity:.96;
-      position:relative; z-index:1; pointer-events:auto;
-      -webkit-tap-highlight-color:rgba(255,255,255,.15);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+      color:var(--nav-text); background:var(--nav-bg); border:1px solid var(--nav-border);
+      border-radius:12px; text-decoration:none; opacity:.96; box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+      position:relative; z-index:1; pointer-events:auto; -webkit-tap-highlight-color:rgba(255,255,255,.15);
       font-size:1rem;
     }
     .nav a:hover{ background:var(--nav-hover-bg); border-color:var(--nav-hover-border); }
-    .nav a[aria-current="page"]{
-      border-color:var(--nav-active);
-      box-shadow:0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset;
+    .nav a[aria-current="page"]{ border-color:var(--nav-active); box-shadow:0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset; }
+
+    /* ========== REKLAMEBANNER (desktop/tablet) ========== */
+    .perk-banner{
+      display:block;
+      margin: 0; padding: 10px 16px;
+      background: linear-gradient(90deg, #0f2a1a, #0a2030);
+      border-top:1px solid rgba(186,247,201,.15);
+      border-bottom:1px solid rgba(154,212,255,.12);
+    }
+    .perk-banner a{
+      display:flex; align-items:center; justify-content:center; gap:10px;
+      text-decoration:none; color:#cfefff; font-size:14px; line-height:1.3;
+      text-align:center; flex-wrap:wrap;
+    }
+    .perk-pill{
+      display:inline-flex; align-items:center; justify-content:center;
+      min-width:34px; height:24px; padding:0 10px; border-radius:999px;
+      background:#0d0d0f; border:1px solid #2a2a2a; box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+      font-weight:600; font-size:12px; letter-spacing:.3px; opacity:.96;
+    }
+    .perk-pill.mcd{ color:#ffe08a; }
+    .perk-pill.mcn{ color:#9ad4ff; }
+    .perk-cta{
+      display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:10px;
+      background:#0b0b0c; border:1px solid #2a2a2a; box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+      color:#bff0ff; font-weight:600; font-size:13px;
     }
 
-    /* ========== Sociale links – venstre 24px ========== */
-    .social-menu {
-      position: fixed;
-      top: var(--social-top);
-      left: var(--edge-pad);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      z-index: 1000;
+    /* ========== Sociale links ========== */
+    .social-menu{
+      position: fixed; top: var(--social-top); left: var(--edge-pad);
+      display:flex; flex-direction:column; gap:10px; z-index:1000;
     }
-    .social-menu a {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 42px;
-      height: 42px;
-      background-color: rgba(0, 0, 0, 0.7);
-      border-radius: 8px;
-      text-decoration: none;
-      transition: background-color 0.2s ease, transform 0.15s ease;
+    .social-menu a{
+      display:flex; align-items:center; justify-content:center; width:42px; height:42px;
+      background-color: rgba(0,0,0,.7); border-radius:8px; text-decoration:none; transition: background-color .2s, transform .15s;
     }
-    .social-menu a:hover { background-color: rgba(0, 0, 0, 0.85); transform: translateY(-2px); }
-    .social-menu a img { width: 22px; height: 22px; }
+    .social-menu a:hover{ background-color: rgba(0,0,0,.85); transform: translateY(-2px); }
+    .social-menu a img{ width:22px; height:22px; }
 
     /* ========== HERO-kort (Variant A) ========== */
     .hero{
-      position: absolute;
-      top: var(--hero-top);
-      left: calc(var(--edge-pad) + var(--hero-left-offset));
-      width: var(--hero-width);
-      z-index: 3;
-      background:#0b0b0c; border:1px solid #2a2a2a; border-radius:16px;
-      box-shadow:0 12px 26px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06);
-      padding:16px 18px;
+      position: absolute; top: var(--hero-top); left: calc(var(--edge-pad) + var(--hero-left-offset)); width: var(--hero-width);
+      z-index: 3; background:#0b0b0c; border:1px solid #2a2a2a; border-radius:16px;
+      box-shadow:0 12px 26px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06); padding:16px 18px;
     }
     .hero .ribbon{
-      display:inline-block; margin:-2px 0 8px; padding:4px 10px;
-      border-radius:999px; font-size:12px; letter-spacing:.2px;
-      background:#102414; border:1px solid #1d3d22; color:#baf7c9;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+      display:inline-block; margin:-2px 0 8px; padding:4px 10px; border-radius:999px; font-size:12px; letter-spacing:.2px;
+      background:#102414; border:1px solid #1d3d22; color:#baf7c9; box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
     }
     .hero .sub{ color:#cfd3d7; margin:.25rem 0 .5rem; }
     .hero .points{ display:flex; flex-wrap:wrap; gap:6px 8px; margin:.5rem 0 .75rem; }
@@ -170,8 +147,7 @@
     .hero .btn{
       display:inline-flex; align-items:center; justify-content:center; gap:8px;
       padding:9px 14px; border-radius:12px; text-decoration:none; cursor:pointer;
-      background:#0d0d0f; border:1px solid #333; color:#fff;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+      background:#0d0d0f; border:1px solid #333; color:#fff; box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
       transition:filter .15s ease, transform .15s ease;
     }
     .hero .btn:hover{ filter:brightness(1.08); transform:translateY(-1px); }
@@ -180,153 +156,96 @@
     .hero .perks a{ color:#9ad4ff; text-decoration:none; }
     .hero .perks a:hover{ text-decoration:underline; }
 
-    /* Responsiv: mellem skærme → hero bliver normal sektion; mobil → skjul */
+    /* ========== Responsiv adfærd ========== */
     @media (max-width: 1200px){
-      .hero{
-        position: static;
-        width: min(92vw, 720px);
-        margin: 8px auto 0;
-        left: auto; top: auto;
-      }
-    }
-    @media (max-width: 900px){
-      :root{ --social-top: 116px; }
-      .hero{ display:none; }
+      .hero{ position: static; width: min(92vw, 720px); margin: 8px auto 0; left:auto; top:auto; }
     }
 
-    /* ========== Beholderbredde til øvrigt indhold (som før) ========== */
+    /* ========== Indholdsbokse (som før) ========== */
     .wrap{ max-width: 1100px; margin: 0 auto; padding: 24px; }
 
-    .content-box {
-      padding: 10px;
-      padding-top: 1px;
-      border-radius: 20px;
-      margin-top: 400px;
-      max-width: 1000px;
-      margin: 400px auto 10px;
+    .content-box{
+      padding: 10px; padding-top: 1px; border-radius: 20px;
+      margin-top: 400px; max-width: 1000px; margin: 400px auto 10px;
     }
 
-    .coin-section {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 200px;
-      margin-top: 10px;
-      padding-top: 25px;
-    }
-    .coin {
+    .coin-section{ display:flex; flex-wrap:wrap; justify-content:center; gap:200px; margin-top:10px; padding-top:25px; }
+    .coin{
       background: rgba(255, 248, 220, 0.95);
-      margin: 10px;
-      padding: 10px;
-      border-radius: 15px;
-      width: 320px;
-      text-align: center;
-      box-shadow: 0 0 12px rgba(0,0,0,0.1);
-      border: 2px solid #e5c100;
+      margin:10px; padding:10px; border-radius:15px; width:320px; text-align:center;
+      box-shadow:0 0 12px rgba(0,0,0,0.1); border:2px solid #e5c100;
     }
-    .coin img {
-      width: 300px;
-      height: 300px;
-      border-radius: 10px;
-      margin-bottom: 10px;
-      object-fit: cover;
-    }
-    .coin-description { font-size: 0.9rem; margin-bottom: 10px; color: #333; }
+    .coin img{ width:300px; height:300px; border-radius:10px; margin-bottom:10px; object-fit:cover; }
+    .coin-description{ font-size:.9rem; margin-bottom:10px; color:#333; }
 
-    .button {
+    .button{
       background: linear-gradient(135deg, #FFD700, #DAA520);
-      color: #004d73 !important;
-      padding: 10px 20px;
-      border: none;
-      margin-top: 10px;
-      cursor: pointer;
-      border-radius: 5px;
-      font-weight: bold;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      transition: all 0.3s ease-in-out;
+      color:#004d73 !important; padding:10px 20px; border:none; margin-top:10px; cursor:pointer;
+      border-radius:5px; font-weight:bold; box-shadow:0 4px 8px rgba(0,0,0,0.2); transition: all .3s ease-in-out;
     }
-    .button:hover { background: linear-gradient(135deg, #FFC107, #B8860B); transform: scale(1.05); }
+    .button:hover{ background: linear-gradient(135deg, #FFC107, #B8860B); transform: scale(1.05); }
 
-    .roadmap {
-      margin: 40px auto;
-      max-width: 800px;
-      padding: 0 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .roadmap-box {
+    .roadmap{ margin:40px auto; max-width:800px; padding:0 20px; display:flex; flex-direction:column; align-items:center; }
+    .roadmap-box{
       background: rgba(255, 248, 220, 0.95);
-      padding: 15px 50px;
-      border-radius: 20px;
-      border: 2px solid #e5c100;
-      box-shadow: 0 0 12px rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 30px;
-      width: 100%;
-      max-width: 700px;
+      padding:15px 50px; border-radius:20px; border:2px solid #e5c100; box-shadow:0 0 12px rgba(0,0,0,0.1);
+      display:flex; flex-direction:column; gap:10px; margin-bottom:30px; width:100%; max-width:700px;
     }
-    .roadmap-box h2 { margin: 0; color: #444; font-size: 1.2rem; }
-    .description { font-size: 0.8rem; margin: 0; color: #555; }
-    .step-images {
-      display: flex; flex-wrap: wrap; gap: 10px; max-width: 100%;
-      justify-content: flex-start; margin-top: 10px;
-    }
-    .step-images img {
-      width: 80px; height: 80px; object-fit: cover; cursor: pointer;
-      margin: 5px; transition: transform 0.3s ease-in-out;
-    }
-    .roadmap-thumb { cursor: zoom-in; }
+    .roadmap-box h2{ margin:0; color:#444; font-size:1.2rem; }
+    .description{ font-size:.8rem; margin:0; color:#555; }
+    .step-images{ display:flex; flex-wrap:wrap; gap:10px; max-width:100%; justify-content:flex-start; margin-top:10px; }
+    .step-images img{ width:80px; height:80px; object-fit:cover; cursor:pointer; margin:5px; transition: transform .3s; }
+    .roadmap-thumb{ cursor: zoom-in; }
 
     /* --- Roadmap Lightbox --- */
-    #rm-lightbox {
-      position: fixed; inset: 0;
-      display: none; align-items: center; justify-content: center;
-      z-index: 100000; /* ← HØJT lag så den altid er øverst */
+    #rm-lightbox{
+      position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 100000;
     }
-    #rm-lightbox.active { display: flex; }
-    #rm-lightbox .rm-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.85); }
-    body.modal-open { overflow: hidden; height: 100vh; }
-    #rm-lightbox { overscroll-behavior: contain; }
-    #rm-lightbox, #rm-lightbox * { touch-action: none; }
-
+    #rm-lightbox.active{ display:flex; }
+    #rm-lightbox .rm-backdrop{ position:absolute; inset:0; background: rgba(0,0,0,.85); }
+    body.modal-open{ overflow:hidden; height:100vh; }
+    #rm-lightbox{ overscroll-behavior: contain; }
+    #rm-lightbox, #rm-lightbox *{ touch-action: none; }
     #rm-image{
-      -webkit-touch-callout: none;
-      position: relative;
-      max-width: 100vw;
-      max-height: 100vh;
-      transform-origin: center center;
-      touch-action: none;
-      user-select: none;
-      -webkit-user-drag: none;
-      cursor: zoom-out;
+      -webkit-touch-callout:none; position:relative; max-width:100vw; max-height:100vh; transform-origin:center center;
+      touch-action:none; user-select:none; -webkit-user-drag:none; cursor:zoom-out;
     }
 
-    footer {
-      text-align: center;
-      padding: 20px;
-      background: #e4e6c5;
-      color: #000000;
-    }
-    footer a { color: #fff; text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
-    footer.muted { opacity: 1; }
+    footer{ text-align:center; padding:20px; background:#e4e6c5; color:#000; }
+    footer a{ color:#fff; text-decoration:none; }
+    footer a:hover{ text-decoration:underline; }
+    footer.muted{ opacity:1; }
 
-    @media (max-width: 768px) {
-      .madagascar-container img { width: 92vw; max-width: 520px; }
-      .content-box { margin-top: 240px; padding: 12px; }
-      .coin-section { gap: 24px; }
-      /* Mobil: lidt behagelig indrykning i header */
-      .site-nav .nav-inner { padding-left: 16px; padding-right: 24px; }
+    /* ========== MOBIL (<=900px) ========== */
+    @media (max-width: 900px){
       :root{ --social-top: 116px; }
+
+      /* Skjul Øen */
+      .madagascar-container{ display:none; }
+
+      /* Skjul topbanner – vi bruger hero’ens egen ribbon på mobil */
+      .perk-banner{ display:none; }
+
+      /* Hero øverst */
+      .hero{
+        display:block; position: static; width: calc(100vw - 32px);
+        margin: 8px auto 10px;
+      }
+
+      /* Mindre afstand før mønter */
+      .content-box{ margin: 12px auto 10px !important; padding: 12px; }
+
+      /* Formindsk mønter markant */
+      .coin-section{ gap:16px; padding-top:10px; margin-top:6px; }
+      .coin{ width:180px; padding:8px; border-radius:12px; }
+      .coin img{ width:160px; height:160px; margin-bottom:8px; }
+      .coin-description{ font-size:.85rem; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ØVERSTE MENU – venstrejusteret (match side 2/3) -->
+  <!-- NAV -->
   <header class="site-nav">
     <div class="nav-inner">
       <nav class="nav">
@@ -337,10 +256,20 @@
     </div>
   </header>
 
-  <!-- VENSTREMENU SOCIAL -->
+  <!-- REKLAMEBANNER (desktop/tablet) -->
+  <div class="perk-banner">
+    <a href="/perks.html" aria-label="Se vilkår & partnere">
+      <span class="perk-pill mcd">MCD</span>
+      <span class="perk-pill mcn">MCN</span>
+      <span data-text="common:perks_ribbon_text">25% hotelrabat til MCD &amp; MCN holders</span>
+      <span class="perk-cta" data-text="common:perks_ribbon_link">Se vilkår &amp; partnere</span>
+    </a>
+  </div>
+
+  <!-- VENSTRE Social -->
   <div class="social-menu" id="social-menu"></div>
 
-  <!-- HERO ved siden af øen (Variant A) -->
+  <!-- HERO (desktop ved øen / mobil øverst) -->
   <section class="hero" id="home-hero">
     <div class="ribbon" data-text="home:hero_ribbon">NYHED: 25% hotelrabat til MCD &amp; MCN holders</div>
     <h1 data-text="home:hero_title">Donér. Byg. Forandr Madagaskar.</h1>
@@ -360,7 +289,7 @@
     </div>
   </section>
 
-  <!-- Ø-billedet -->
+  <!-- Ø-billedet (skjules på mobil) -->
   <div class="madagascar-container">
     <img src="https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/sign/backgrounds/ChatGPT%20Image%2026.%20jul.%202025,%2002.34.32.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8wZTcxMmNhYy0yZjA2LTQ2Y2YtYjRlMC1lOTcyZjJiNmQwNjEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJiYWNrZ3JvdW5kcy9DaGF0R1BUIEltYWdlIDI2LiBqdWwuIDIwMjUsIDAyLjM0LjMyLnBuZyIsImlhdCI6MTc1MzY0ODA0NCwiZXhwIjo4ODE1MzU2MTY0NH0.NgGHOp8k38S34w-iR6M3TCjEFJENQ1MRdjmpv4CLKRY"
          alt="Madagaskar Ø" />
@@ -467,7 +396,7 @@
       });
     }
 
-    /* Coins-billeder (som før) */
+    /* Coins-billeder */
     const base = "https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public";
     const pub = (...p) => `${base}/${p.map(encodeURIComponent).join('/')}`;
     function setCoinImages() {
@@ -477,7 +406,7 @@
       if (d) d.src = pub('images','MadaCoin_D.png');
     }
 
-    /* Roadmap-billeder + KLIK-binding (robust) */
+    /* Roadmap-billeder + klik-binding */
     const buckets = ["roadmap1", "roadmap2", "roadmap3", "roadmap4"];
     const steps = [
       { title: "Køb byggegrund - Opret projekt kontor", desc: "Når målet er opfyldt, køber vi byggegrund og opretter projektkontor." },
@@ -488,11 +417,9 @@
     function renderRoadmap() {
       const root = document.getElementById('roadmap');
       root.innerHTML = '';
-
       buckets.forEach((bucket, idx) => {
         const stepIndex = idx + 1;
         const s = steps[idx] || { title: `Roadmap ${stepIndex}`, desc: '' };
-
         const box = document.createElement('div');
         box.className = 'roadmap-box';
         box.innerHTML = `
@@ -501,9 +428,7 @@
           <div class="step-images" id="imgs-${stepIndex}"></div>
         `;
         root.appendChild(box);
-
         const wrap = document.getElementById(`imgs-${stepIndex}`);
-
         for (let i = 1; i <= 10; i++) {
           const url = `${base}/${bucket}/Roadmap_${stepIndex}_pic_${i}.png`;
           const img = document.createElement('img');
@@ -511,8 +436,6 @@
           img.src = url;
           img.classList.add('roadmap-thumb');
           img.onerror = () => img.remove();
-
-          // ↓ Bind direkte til lightbox, én gang pr. billede
           if (!img.dataset.lbBound) {
             img.dataset.lbBound = "1";
             img.addEventListener('click', (e) => {
@@ -521,19 +444,13 @@
               if (typeof openLightbox === 'function') openLightbox(full);
             }, { passive: false });
           }
-
           wrap.appendChild(img);
         }
-
-        setTimeout(() => {
-          if (!wrap.querySelector('img')) {
-            wrap.innerHTML = `<p style="color:#666;margin:6px 0;">Billeder kommer snart…</p>`;
-          }
-        }, 500);
+        setTimeout(() => { if (!wrap.querySelector('img')) wrap.innerHTML = `<p style="color:#666;margin:6px 0;">Billeder kommer snart…</p>`; }, 500);
       });
     }
 
-    /* YouTube (som før) */
+    /* YouTube */
     function getYouTubeId(url) {
       if (!url) return null;
       try {
@@ -597,10 +514,7 @@
         .order("created_at", { ascending: false });
       if (error) { console.error(error); return; }
       const videos = (data || []).map(v => ({ ...v, _id: getYouTubeId(v.youtube_url) })).filter(v => v._id);
-      if (!videos.length) {
-        document.getElementById("yt-section").style.display = "none";
-        return;
-      }
+      if (!videos.length) { document.getElementById("yt-section").style.display = "none"; return; }
       document.getElementById("yt-section").style.display = "";
       renderPlayer(videos[0]._id);
       renderThumbs(videos, videos[0]._id);
@@ -609,18 +523,14 @@
     /* Init */
     function attachHeroActions(){
       const btn = document.getElementById('hero-primary');
-      if(btn){
-        btn.addEventListener('click', ()=> openTransak('MCD', '0xa594586B04f1b6782EC906B49882EbD0E652a388'));
-      }
+      if(btn){ btn.addEventListener('click', ()=> openTransak('MCD', '0xa594586B04f1b6782EC906B49882EbD0E652a388')); }
     }
 
-    function renderRoadmapLight(){ renderRoadmap(); } // alias for klarhed
-
     window.addEventListener('load', async () => {
-      await loadSiteText();          // ← henter hero-tekster m.m. fra Supabase
-      await renderSocialLinks();     // sociale links fra Supabase
+      await loadSiteText();      // henter (common + home) – inkl. banner-tekster
+      await renderSocialLinks(); // sociale
       setCoinImages();
-      renderRoadmapLight();          // ← opretter billeder + klik-handler
+      renderRoadmap();
       initYouTube();
       attachHeroActions();
     });
@@ -628,47 +538,31 @@
 
   <script>
     /* === ROADMAP LIGHTBOX — START === */
-    let rmBox, rmImg;
-    let scale = 1, tx = 0, ty = 0;
-    const MIN_SCALE = 1, MAX_SCALE = 4;
-
-    let justOpenedAt = 0;
-
+    let rmBox, rmImg; let scale = 1, tx = 0, ty = 0; const MIN_SCALE = 1, MAX_SCALE = 4;
     function applyTransform(){ if (!rmImg) return; rmImg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`; }
     function centerReset(){ scale = 1; tx = 0; ty = 0; applyTransform(); }
     function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
-
-    let touchMoved = false, pinchStartDist = 0, pinchStartScale = 1;
-    let panStartX = 0, panStartY = 0, panning = false;
+    let touchMoved = false, pinchStartDist = 0, pinchStartScale = 1; let panStartX = 0, panStartY = 0, panning = false;
 
     function openLightbox(src){
       rmImg.src = src; centerReset();
       document.body.classList.add('modal-open');
       rmBox.classList.add('active'); rmBox.setAttribute('aria-hidden','false');
-      justOpenedAt = Date.now();
     }
     function closeLightbox(){
       document.body.classList.remove('modal-open');
       rmBox.classList.remove('active'); rmBox.setAttribute('aria-hidden','true');
       rmImg.src = '';
     }
-
     function rmWheelHandler(e){
       e.preventDefault();
       const rect = rmImg.getBoundingClientRect();
       const cx = e.clientX - (rect.left + rect.width/2) - tx;
       const cy = e.clientY - (rect.top  + rect.height/2) - ty;
-
-      const old = scale;
-      const factor = Math.exp(-e.deltaY * 0.0015);
-      scale = clamp(scale * factor, MIN_SCALE, MAX_SCALE);
-
-      const k = scale / old;
-      tx -= cx * (k - 1);
-      ty -= cy * (k - 1);
-      applyTransform();
+      const old = scale; const factor = Math.exp(-e.deltaY * 0.0015);
+      scale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * factor));
+      const k = scale / old; tx -= cx * (k - 1); ty -= cy * (k - 1); applyTransform();
     }
-
     function rmTouchStart(e){
       touchMoved=false;
       if (e.touches.length===2){
@@ -685,36 +579,24 @@
         e.preventDefault();
         const [a,b]=e.touches;
         const dist=Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY);
-        scale=clamp(pinchStartScale*(dist/pinchStartDist),MIN_SCALE,MAX_SCALE);
+        scale=Math.max(MIN_SCALE, Math.min(MAX_SCALE, pinchStartScale*(dist/pinchStartDist)));
         applyTransform(); touchMoved=true;
       } else if (e.touches.length===1 && panning){
         e.preventDefault();
-        const t=e.touches[0];
-        tx=t.clientX - panStartX; ty=t.clientY - panStartY;
-        applyTransform(); touchMoved=true;
+        const t=e.touches[0]; tx=t.clientX - panStartX; ty=t.clientY - panStartY; applyTransform(); touchMoved=true;
       }
     }
-    function rmTouchEnd(){
-      panning=false;
-      if (!touchMoved){ if (scale>1) centerReset(); else closeLightbox(); }
-    }
+    function rmTouchEnd(){ panning=false; if (!touchMoved){ if (scale>1) centerReset(); else closeLightbox(); } }
 
     window.addEventListener('load', () => {
-      rmBox=document.getElementById('rm-lightbox');
-      rmImg=document.getElementById('rm-image');
-      if (!rmBox || !rmImg) return;
-
-      // Ikke længere behov for at auto-binde her – renderRoadmap binder klik på hvert billede.
+      rmBox=document.getElementById('rm-lightbox'); rmImg=document.getElementById('rm-image'); if (!rmBox || !rmImg) return;
       rmBox.addEventListener('click', (e) => {
         const clickedBackdrop = e.target===rmBox || e.target.classList.contains('rm-backdrop');
         const clickedImage    = e.target===rmImg;
         if (clickedBackdrop || clickedImage) closeLightbox();
       }, { passive:true });
-
       rmImg.addEventListener('wheel', rmWheelHandler, { passive:false });
-      rmImg.addEventListener('click', () => {
-        if (scale>1) centerReset(); else closeLightbox();
-      });
+      rmImg.addEventListener('click', () => { if (scale>1) centerReset(); else closeLightbox(); });
       rmImg.addEventListener('touchstart', rmTouchStart, { passive:true });
       rmImg.addEventListener('touchmove',  rmTouchMove,  { passive:false });
       rmImg.addEventListener('touchend',   rmTouchEnd,   { passive:true });
