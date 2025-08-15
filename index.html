@@ -19,6 +19,9 @@
   <meta name="twitter:title" content="MadaCoin — Donations for Madagascar">
   <meta name="twitter:description" content="Støt udvikling i Madagaskar gennem MadaCoin.">
 
+  <!-- Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
   <style>
     /* ========== Fælles typografi og box model ========== */
     *,*::before,*::after{ box-sizing: border-box; }
@@ -40,27 +43,30 @@
       body{ background-attachment: scroll; }
     }
 
-    /* Overskrifter (samme som side 2) */
+    /* Overskrifter (samme som side 2/3) */
     h1{ font-size:clamp(22px,2.6vw,26px); line-height:1.25; margin:0 0 .5em; }
     h2{ font-size:clamp(18px,2.2vw,22px); line-height:1.3;  margin:0 0 .5em; }
     h3{ font-size:clamp(16px,1.8vw,18px); line-height:1.35; margin:0 0 .5em; }
 
     /* ========== Layoutvariabler ========== */
     :root{
-      --edge-pad: 24px;     /* venstre/højre kant-indrykning (som side 2) */
-      --nav-gap:14px;
-      --nav-pad-x:14px;
-      --nav-pad-y:8px;
-      --nav-text:#fff;
-      --nav-bg:#0d0d0f;
-      --nav-border:#333;
-      --nav-hover-bg:#151517;
-      --nav-hover-border:#444;
-      --nav-active:#5aa9ff;
-      --social-top: 104px;  /* social-ikoner under menuen */
+      --edge-pad: 24px;     /* venstre/højre kant-indrykning (samme alle sider) */
+
+      /* NAV */
+      --nav-gap:14px; --nav-pad-x:14px; --nav-pad-y:8px;
+      --nav-text:#fff; --nav-bg:#0d0d0f; --nav-border:#333;
+      --nav-hover-bg:#151517; --nav-hover-border:#444; --nav-active:#5aa9ff;
+
+      /* Social */
+      --social-top: 104px;
+
+      /* HERO placering/størrelse */
+      --hero-top: 118px;                 /* afstand fra top til hero-kort (desktop) */
+      --hero-left-offset: 66px;          /* social ikonkolonne + luft */
+      --hero-width: clamp(320px, 30vw, 520px);
     }
 
-    /* ========== Ø-billedet ========== */
+    /* ========== Ø-billedet (som før) ========== */
     .madagascar-container {
       position: absolute;
       top: 0%;
@@ -75,7 +81,7 @@
       border-radius: 10px;
     }
 
-    /* ========== NAV – samme stil som side 2, venstre 24px ========== */
+    /* ========== NAV – venstrejusteret (match side 2/3) ========== */
     .site-nav{
       position: sticky;
       top: 0;
@@ -116,7 +122,7 @@
       box-shadow:0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset;
     }
 
-    /* ========== Sociale links – spejler venstre kant (24px) ========== */
+    /* ========== Sociale links – venstre 24px ========== */
     .social-menu {
       position: fixed;
       top: var(--social-top);
@@ -140,7 +146,55 @@
     .social-menu a:hover { background-color: rgba(0, 0, 0, 0.85); transform: translateY(-2px); }
     .social-menu a img { width: 22px; height: 22px; }
 
-    /* ========== Beholderbredde til øvrigt indhold ========== */
+    /* ========== HERO-kort (Variant A) ========== */
+    .hero{
+      position: absolute;
+      top: var(--hero-top);
+      left: calc(var(--edge-pad) + var(--hero-left-offset));
+      width: var(--hero-width);
+      z-index: 3;
+      background:#0b0b0c; border:1px solid #2a2a2a; border-radius:16px;
+      box-shadow:0 12px 26px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06);
+      padding:16px 18px;
+    }
+    .hero .ribbon{
+      display:inline-block; margin:-2px 0 8px; padding:4px 10px;
+      border-radius:999px; font-size:12px; letter-spacing:.2px;
+      background:#102414; border:1px solid #1d3d22; color:#baf7c9;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .hero .sub{ color:#cfd3d7; margin:.25rem 0 .5rem; }
+    .hero .points{ display:flex; flex-wrap:wrap; gap:6px 8px; margin:.5rem 0 .75rem; }
+    .hero .pt{ padding:6px 10px; border-radius:999px; background:#0d0d0f; border:1px solid #333; box-shadow:inset 0 1px 0 rgba(255,255,255,.06); font-size:.9rem; opacity:.96; }
+    .hero .btns{ display:flex; gap:10px; flex-wrap:wrap; }
+    .hero .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:9px 14px; border-radius:12px; text-decoration:none; cursor:pointer;
+      background:#0d0d0f; border:1px solid #333; color:#fff;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+      transition:filter .15s ease, transform .15s ease;
+    }
+    .hero .btn:hover{ filter:brightness(1.08); transform:translateY(-1px); }
+    .hero .btn.primary{ background:linear-gradient(135deg,#FFD700,#DAA520); color:#1c2630; border-color:#865c10; }
+    .hero .perks{ margin-top:.6rem; font-size:.9rem; color:#cfd3d7; }
+    .hero .perks a{ color:#9ad4ff; text-decoration:none; }
+    .hero .perks a:hover{ text-decoration:underline; }
+
+    /* Responsiv: mellem skærme → hero bliver normal sektion; mobil → skjul */
+    @media (max-width: 1200px){
+      .hero{
+        position: static;
+        width: min(92vw, 720px);
+        margin: 8px auto 0;
+        left: auto; top: auto;
+      }
+    }
+    @media (max-width: 900px){
+      :root{ --social-top: 116px; }
+      .hero{ display:none; }
+    }
+
+    /* ========== Beholderbredde til øvrigt indhold (som før) ========== */
     .wrap{ max-width: 1100px; margin: 0 auto; padding: 24px; }
 
     .content-box {
@@ -269,12 +323,10 @@
       :root{ --social-top: 116px; }
     }
   </style>
-
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-  <!-- ØVERSTE MENU – venstrejusteret (match side 2) -->
+  <!-- ØVERSTE MENU – venstrejusteret (match side 2/3) -->
   <header class="site-nav">
     <div class="nav-inner">
       <nav class="nav">
@@ -287,6 +339,26 @@
 
   <!-- VENSTREMENU SOCIAL -->
   <div class="social-menu" id="social-menu"></div>
+
+  <!-- HERO ved siden af øen (Variant A) -->
+  <section class="hero" id="home-hero">
+    <div class="ribbon" data-text="home:hero_ribbon">NYHED: 25% hotelrabat til MCD &amp; MCN holders</div>
+    <h1 data-text="home:hero_title">Donér. Byg. Forandr Madagaskar.</h1>
+    <p class="sub" data-text="home:hero_sub">MadaCoin gør donationer til skoler, solenergi og lokale jobs — med fuld gennemsigtighed.</p>
+    <div class="points">
+      <span class="pt" data-text="home:hero_point1">Skolebyggeri</span>
+      <span class="pt" data-text="home:hero_point2">Solceller &amp; batterier</span>
+      <span class="pt" data-text="home:hero_point3">Åbne rapporter</span>
+    </div>
+    <div class="btns">
+      <button class="btn primary" id="hero-primary" data-text="home:hero_cta_primary">Støt med MadaCoin</button>
+      <a class="btn" href="/rapporter.html" data-text="home:hero_cta_secondary">Se rapporter</a>
+    </div>
+    <div class="perks">
+      <span data-text="home:hero_perks_blurb">Kvalificér med <strong>≥ 5.000 MCD</strong> eller samlet <strong>≥ 5.000 USD</strong> i MCD/MCN. 1 kode pr. 60. dag. Gælder udvalgte hoteller &amp; ferieboliger i Madagaskar.</span>
+      &nbsp; <a href="/perks.html" data-text="home:hero_perks_link">Se vilkår &amp; partnere</a>
+    </div>
+  </section>
 
   <!-- Ø-billedet -->
   <div class="madagascar-container">
@@ -313,7 +385,21 @@
   <!-- ROADMAP -->
   <div class="roadmap" id="roadmap"></div>
 
+  <!-- YouTube (skjules automatisk hvis ingen data) -->
+  <section id="yt-section" style="margin:40px 0;">
+    <div style="max-width:1000px;margin:0 auto;">
+      <div id="yt-player" style="position:relative;padding-top:56.25%;border:2px solid #222;border-radius:14px;overflow:hidden;"></div>
+      <div id="yt-thumbs" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px;margin-top:16px;"></div>
+    </div>
+  </section>
+
   <script>
+    /* Supabase klient */
+    const SUPABASE_URL = "https://byrlebjwknppjbtbkozt.supabase.co";
+    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
+    const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null;
+    window.sb = sb;
+
     /* Transak (placeholder) */
     const TRANSAK_KEY = "DIN_API_KEY";
     function openTransak(symbol, wallet) {
@@ -325,10 +411,64 @@
       window.open(url, "_blank", "width=500,height=700");
     }
 
-    /* Supabase public base */
-    const base = "https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public";
+    /* Site text loader (common + home) */
+    async function loadSiteText(){
+      if(!sb) return {};
+      try{
+        const { data, error } = await sb.from('site_text').select('page,key,value').in('page',['common','home']);
+        if(error){ console.warn('[site_text]', error); return {}; }
+        const dict={}; (data||[]).forEach(r=>dict[`${r.page}:${r.key}`]=r.value);
+        document.querySelectorAll('[data-text]').forEach(el=>{
+          const k=el.getAttribute('data-text'); if(dict[k]!=null) el.innerHTML=dict[k];
+        });
+        return dict;
+      }catch(e){ console.warn('[site_text ex]', e); return {}; }
+    }
 
-    /* Coins */
+    /* Social links */
+    function normalizeUrl(url) {
+      if (!url) return null;
+      const u = url.trim();
+      if (/^https?:\/\//i.test(u)) return u;
+      return 'https://' + u;
+    }
+    function iconUrlFor(platform) {
+      const formattedName = platform.charAt(0).toUpperCase() + platform.slice(1).toLowerCase();
+      const { data } = sb.storage.from('social.icons').getPublicUrl(`${formattedName}.svg`);
+      return data?.publicUrl || null;
+    }
+    function fallbackIconUrl() {
+      const { data } = sb.storage.from('social.icons').getPublicUrl('Globe.svg');
+      return data?.publicUrl || '';
+    }
+    async function renderSocialLinks() {
+      const el = document.getElementById('social-menu');
+      if(!el || !sb) return;
+      el.innerHTML = '';
+      const { data, error } = await sb
+        .from('social_links')
+        .select('platform,url,is_active,sort_order')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+      if (error) { console.error('Fejl ved hentning af social_links:', error); return; }
+      const globe = fallbackIconUrl();
+      (data || []).filter(r => r.url && r.url.trim() !== '').forEach(r => {
+        const platform = (r.platform || '').trim();
+        const href = normalizeUrl(r.url);
+        if (!href) return;
+        const a = document.createElement('a');
+        a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer';
+        a.title = platform; a.setAttribute('aria-label', platform);
+        const img = document.createElement('img');
+        img.src = iconUrlFor(platform) || globe;
+        img.onerror = () => { img.src = globe; };
+        a.appendChild(img);
+        el.appendChild(a);
+      });
+    }
+
+    /* Coins-billeder (som før) */
+    const base = "https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public";
     const pub = (...p) => `${base}/${p.map(encodeURIComponent).join('/')}`;
     function setCoinImages() {
       const c = document.getElementById('coinC');
@@ -337,7 +477,7 @@
       if (d) d.src = pub('images','MadaCoin_D.png');
     }
 
-    /* Roadmap-billeder */
+    /* Roadmap-billeder (som før) */
     const buckets = ["roadmap1", "roadmap2", "roadmap3", "roadmap4"];
     const steps = [
       { title: "Køb byggegrund - Opret projekt kontor", desc: "Når målet er opfyldt, køber vi byggegrund og opretter projektkontor." },
@@ -345,15 +485,12 @@
       { title: "Solcellepark og batterier", desc: "Når målet er opnået, installerer vi solceller og batterier." },
       { title: "Byg en Skole", desc: "Byggeprojekt fra børnehave til gymnasium." }
     ];
-
     function renderRoadmap() {
       const root = document.getElementById('roadmap');
       root.innerHTML = '';
-
       buckets.forEach((bucket, idx) => {
         const stepIndex = idx + 1;
         const s = steps[idx] || { title: `Roadmap ${stepIndex}`, desc: '' };
-
         const box = document.createElement('div');
         box.className = 'roadmap-box';
         box.innerHTML = `
@@ -362,9 +499,7 @@
           <div class="step-images" id="imgs-${stepIndex}"></div>
         `;
         root.appendChild(box);
-
         const wrap = document.getElementById(`imgs-${stepIndex}`);
-
         for (let i = 1; i <= 10; i++) {
           const url = `${base}/${bucket}/Roadmap_${stepIndex}_pic_${i}.png`;
           const img = document.createElement('img');
@@ -374,7 +509,6 @@
           img.onerror = () => img.remove();
           wrap.appendChild(img);
         }
-
         setTimeout(() => {
           if (!wrap.querySelector('img')) {
             wrap.innerHTML = `<p style="color:#666;margin:6px 0;">Billeder kommer snart…</p>`;
@@ -383,25 +517,7 @@
       });
     }
 
-    renderRoadmap();
-    setCoinImages();
-  </script>
-
-  <!-- YouTube (skjules automatisk hvis ingen data) -->
-  <section id="yt-section" style="margin:40px 0;">
-    <div style="max-width:1000px;margin:0 auto;">
-      <div id="yt-player" style="position:relative;padding-top:56.25%;border:2px solid #222;border-radius:14px;overflow:hidden;"></div>
-      <div id="yt-thumbs" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px;margin-top:16px;"></div>
-    </div>
-  </section>
-
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script>
-    const SUPABASE_URL = "https://byrlebjwknppjbtbkozt.supabase.co";
-    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-    window.sb = sb;
-
+    /* YouTube (som før) */
     function getYouTubeId(url) {
       if (!url) return null;
       try {
@@ -415,7 +531,6 @@
       } catch { return null; }
     }
     function thumbUrl(id) { return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`; }
-
     function renderPlayer(id) {
       const el = document.getElementById("yt-player");
       el.innerHTML = `
@@ -428,7 +543,6 @@
           style="position:absolute;inset:0;width:100%;height:100%;"
         ></iframe>`;
     }
-
     function renderThumbs(videos, activeId) {
       const wrap = document.getElementById("yt-thumbs");
       wrap.innerHTML = "";
@@ -456,7 +570,6 @@
         wrap.appendChild(btn);
       });
     }
-
     async function initYouTube() {
       const { data, error } = await sb
         .from("youtube_videos")
@@ -466,67 +579,34 @@
         .neq("youtube_url", "")
         .order("sort_order", { ascending: true, nullsFirst: false })
         .order("created_at", { ascending: false });
-
       if (error) { console.error(error); return; }
-
-      const videos = (data || [])
-        .map(v => ({ ...v, _id: getYouTubeId(v.youtube_url) }))
-        .filter(v => v._id);
-
+      const videos = (data || []).map(v => ({ ...v, _id: getYouTubeId(v.youtube_url) })).filter(v => v._id);
       if (!videos.length) {
         document.getElementById("yt-section").style.display = "none";
         return;
       }
-
       document.getElementById("yt-section").style.display = "";
       renderPlayer(videos[0]._id);
       renderThumbs(videos, videos[0]._id);
     }
-    initYouTube();
 
-    // Social links (samme som side 2)
-    function normalizeUrl(url) {
-      if (!url) return null;
-      const u = url.trim();
-      if (/^https?:\/\//i.test(u)) return u;
-      return 'https://' + u;
+    /* Init */
+    function attachHeroActions(){
+      const btn = document.getElementById('hero-primary');
+      if(btn){
+        btn.addEventListener('click', ()=> openTransak('MCD', '0xa594586B04f1b6782EC906B49882EbD0E652a388'));
+      }
     }
-    function iconUrlFor(platform) {
-      const formattedName = platform.charAt(0).toUpperCase() + platform.slice(1).toLowerCase();
-      const { data } = sb.storage.from('social.icons').getPublicUrl(`${formattedName}.svg`);
-      return data?.publicUrl || null;
-    }
-    function fallbackIconUrl() {
-      const { data } = sb.storage.from('social.icons').getPublicUrl('Globe.svg');
-      return data?.publicUrl || '';
-    }
-    async function renderSocialLinks() {
-      const el = document.getElementById('social-menu');
-      el.innerHTML = '';
-      const { data, error } = await sb
-        .from('social_links')
-        .select('platform,url,is_active,sort_order')
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true });
-      if (error) { console.error('Fejl ved hentning af social_links:', error); return; }
-      const globe = fallbackIconUrl();
-      (data || []).filter(r => r.url && r.url.trim() !== '').forEach(r => {
-        const platform = (r.platform || '').trim();
-        const href = normalizeUrl(r.url);
-        if (!href) return;
-        const a = document.createElement('a');
-        a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer';
-        a.title = platform; a.setAttribute('aria-label', platform);
-        const img = document.createElement('img');
-        img.src = iconUrlFor(platform) || globe;
-        img.onerror = () => { img.src = globe; };
-        a.appendChild(img);
-        el.appendChild(a);
-      });
-    }
-    window.addEventListener('load', () => {
-      renderSocialLinks();
-      setTimeout(renderSocialLinks, 500);
+
+    function renderRoadmapLight(){ renderRoadmap(); } // alias for klarhed
+
+    window.addEventListener('load', async () => {
+      await loadSiteText();          // ← henter hero-tekster m.m. fra Supabase
+      await renderSocialLinks();     // sociale links fra Supabase
+      setCoinImages();
+      renderRoadmapLight();
+      initYouTube();
+      attachHeroActions();
     });
   </script>
 
