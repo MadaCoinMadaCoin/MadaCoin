@@ -37,15 +37,17 @@
       body{ background-attachment: scroll; }
     }
 
-    /* ===== FÆLLES NAV-VARIABLER & STIL ===== */
+    /* ===== FÆLLES NAV-VARIABLER & STIL (match side 2) ===== */
     :root{
+      --wrap: 1680px;
+
       --nav-gap: 14px;
       --nav-height: 44px;
       --nav-pad-x: 16px;
       --nav-pad-y: 10px;
 
-      --nav-shift-x: 0px;   /* venstre(-) / højre(+) – justér pr. side */
-      --nav-shift-y: -2px;  /* op(-) / ned(+) – justér pr. side */
+      --nav-shift-x: 0px;   /* venstre(-) / højre(+) – pr. side */
+      --nav-shift-y: -2px;  /* op(-) / ned(+) – pr. side */
 
       --nav-text: #fff;
       --nav-bg: #0d0d0f;
@@ -54,16 +56,34 @@
       --nav-hover-border: #444;
       --nav-active: #5aa9ff;
     }
+
+    /* Container som side 2 */
+    .wrap{ max-width: var(--wrap); margin: 0 auto; padding: 0 240px; }
+
+    /* Sticky, gennemsigtig top-nav (som side 2) */
+    .site-nav{
+      position: sticky;
+      top: 0;
+      z-index: 9999;
+      padding: 8px 0;
+      background: transparent !important;
+      border-bottom: none !important;
+      box-shadow: none !important;
+    }
+    .site-nav::before,
+    .site-nav::after{ display:none !important; content:none !important; }
+
+    /* Fælles nav-layout + knapper */
     .nav{
-      display:flex; align-items:center;
+      display:flex; align-items:center; flex-wrap:wrap;
       gap: var(--nav-gap);
-      transform: translate(var(--nav-shift-x), var(--nav-shift-y));
-      flex-wrap:wrap;
       justify-content:flex-start; /* nav--left default */
+      transform: translate(var(--nav-shift-x), var(--nav-shift-y));
     }
     .nav.nav--left{ justify-content:flex-start; }
     .nav.nav--center{ justify-content:center; }
     .nav.nav--right{ justify-content:flex-end; }
+
     .nav a{
       display:inline-flex; align-items:center; justify-content:center;
       height: var(--nav-height);
@@ -83,7 +103,8 @@
       border-color: var(--nav-hover-border);
     }
     .nav a[aria-current="page"],
-    .nav a.is-active{
+    .nav a.is-active,
+    .nav a.active{
       border-color: var(--nav-active);
       box-shadow: 0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset;
     }
@@ -129,39 +150,7 @@
     }
     .social-menu a img { width: 22px; height: 22px; }
 
-    /* Øverste navigation – gennemsigtig top (ingen bjælke) */
-    header.wrap{
-      padding: 14px 18px;
-      position: sticky;   /* klikbar/øverst på mobil */
-      top: 0;
-      z-index: 9999;
-      background: transparent !important;  /* ← fjern bjælken */
-      box-shadow: none !important;
-      border-bottom: 0 !important;
-    }
-
-    /* FALBACK til ældre side-1 selektor (lader den spille pænt med .nav) */
-    header.wrap nav{
-      display:flex; gap:var(--nav-gap); align-items:center; flex-wrap:wrap; justify-content:flex-start;
-      transform: translate(var(--nav-shift-x), var(--nav-shift-y));
-    }
-    header.wrap nav a{
-      /* ingen margin/left/top her – .nav håndterer spacing/position */
-      color: var(--nav-text);
-      text-decoration: none;
-      position: relative; z-index: 1; pointer-events: auto;
-      -webkit-tap-highlight-color: rgba(255,255,255,.15);
-      padding: var(--nav-pad-y) var(--nav-pad-x);
-      border-radius:12px; background: var(--nav-bg); border:1px solid var(--nav-border);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-      opacity:.96;
-    }
-    header.wrap nav a:hover,
-    header.wrap nav a[aria-current="page"]{ text-decoration: underline; }
-
-    /* Beholderbredde */
-    .wrap{ max-width: 1100px; margin: 0 auto; padding: 24px; }
-
+    /* Beholderbredde for content (uændret) */
     .content-box {
       padding: 10px;
       padding-top: 1px;
@@ -279,12 +268,18 @@
     footer a:hover { text-decoration: underline; }
     footer.muted { opacity: 1; }
 
+    /* Mobil: samme indryk som side 2 */
+    @media (max-width: 900px){
+      .site-nav .wrap,
+      .site-nav{
+        padding-left: 16px;
+        padding-right: 24px;
+      }
+    }
     @media (max-width: 768px) {
       .madagascar-container img { width: 92vw; max-width: 520px; }
       .content-box { margin-top: 240px; padding: 12px; }
       .coin-section { gap: 24px; }
-      /* Mobil: lidt behagelig indrykning i header */
-      header.wrap { padding-left: 16px; padding-right: 24px; }
     }
   </style>
 
@@ -292,14 +287,15 @@
 </head>
 <body>
 
-  <!-- ØVERSTE MENU -->
-  <header class="wrap">
-    <!-- Bemærk: nu med fælles .nav og et lille nudge op -->
-    <nav class="nav nav--left" style="--nav-shift-x:0px; --nav-shift-y:-2px;">
-      <a href="/index.html" aria-current="page">Home</a>
-      <a href="/madacoin.html">Om MadaCoin</a>
-      <a href="/rapporter.html">Rapporter</a>
-    </nav>
+  <!-- ØVERSTE MENU (match side 2) -->
+  <header class="site-nav">
+    <div class="wrap">
+      <nav class="nav nav--left" style="--nav-shift-x:0px; --nav-shift-y:-2px;">
+        <a href="/index.html" aria-current="page">Home</a>
+        <a href="/madacoin.html">Om MadaCoin</a>
+        <a href="/rapporter.html">Rapporter</a>
+      </nav>
+    </div>
   </header>
 
   <!-- VENSTREMENU SOCIAL -->
