@@ -19,232 +19,145 @@
   <meta name="twitter:title" content="MadaCoin — Donations for Madagascar">
   <meta name="twitter:description" content="Støt udvikling i Madagaskar gennem MadaCoin.">
 
-  <!-- Supabase -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
   <style>
-    /* ========== Fælles typografi og box model ========== */
-    *,*::before,*::after{ box-sizing: border-box; }
-    html{ font-size:16px; }
+    *,*::before,*::after{ box-sizing:border-box }
+    html{ font-size:16px }
     body{
-      font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
-      font-size: 1rem; line-height: 1.5;
-      margin: 0; padding: 0;
-      color:#fff;
-      background-color: #061a2b; /* fallback */
-      background-image: url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
-      background-repeat: no-repeat;
-      background-position: center center;
-      background-size: cover;
-      background-attachment: fixed; /* desktop */
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+      font-size:1rem; line-height:1.5; margin:0; padding:0; color:#fff;
+      background:#061a2b no-repeat center/cover fixed;
+      background-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
       overflow-x:hidden;
     }
-    @media (max-width: 800px){
-      body{ background-attachment: scroll; }
-    }
+    @media (max-width:800px){ body{ background-attachment:scroll } }
 
-    /* Overskrifter (samme som side 2/3) */
-    h1{ font-size:clamp(22px,2.6vw,26px); line-height:1.25; margin:0 0 .5em; }
-    h2{ font-size:clamp(18px,2.2vw,22px); line-height:1.3;  margin:0 0 .5em; }
-    h3{ font-size:clamp(16px,1.8vw,18px); line-height:1.35; margin:0 0 .5em; }
+    h1{ font-size:clamp(22px,2.6vw,26px); line-height:1.25; margin:0 0 .5em }
+    h2{ font-size:clamp(18px,2.2vw,22px); line-height:1.3; margin:0 0 .5em }
+    h3{ font-size:clamp(16px,1.8vw,18px); line-height:1.35; margin:0 0 .5em }
 
-    /* ========== Layout-variabler ========== */
     :root{
-      --edge-pad: 24px;
-
-      /* NAV */
+      --edge-pad:24px;
       --nav-gap:14px; --nav-pad-x:14px; --nav-pad-y:8px;
       --nav-text:#fff; --nav-bg:#0d0d0f; --nav-border:#333;
       --nav-hover-bg:#151517; --nav-hover-border:#444; --nav-active:#5aa9ff;
+      --social-top:104px;
 
-      /* Social */
-      --social-top: 104px;
-
-      /* HERO placering/størrelse (desktop) */
-      --hero-top: 118px;
-      --hero-left-offset: 66px;     /* social ikonkolonne + luft */
-      --hero-width: clamp(320px, 30vw, 520px);
+      /* Hero (desktop) */
+      --hero-top:118px; --hero-left-offset:66px; --hero-width:clamp(320px,30vw,520px);
     }
 
-    /* ========== Ø-billedet (desktop) ========== */
-    .madagascar-container{
-      position: absolute; top:0%; left:52%; transform:translateX(-50%); z-index:1;
-    }
-    .madagascar-container img{ width:90vw; max-width:600px; height:auto; border-radius:10px; }
+    /* Øen */
+    .madagascar-container{ position:absolute; top:0%; left:52%; transform:translateX(-50%); z-index:1; }
+    .madagascar-container img{ width:90vw; max-width:600px; height:auto; border-radius:10px }
 
-    /* ========== NAV – venstrejusteret ========== */
-    .site-nav{
-      position: sticky; top: 0; z-index: 9999; padding: 24px 0;
-      background: transparent !important; border: 0 !important; box-shadow:none !important;
-    }
-    .site-nav::before, .site-nav::after{ display:none !important; content:none !important; }
-    .site-nav .nav-inner{ padding-left:var(--edge-pad); padding-right:var(--edge-pad); }
-    .nav{ display:flex; gap:var(--nav-gap); align-items:center; flex-wrap:wrap; justify-content:flex-start; transform:translateY(-2px); }
+    /* NAV */
+    .site-nav{ position:sticky; top:0; z-index:9999; padding:24px 0; background:transparent!important }
+    .site-nav::before,.site-nav::after{ display:none!important; content:none!important }
+    .site-nav .nav-inner{ padding-left:var(--edge-pad); padding-right:var(--edge-pad) }
+    .nav{ display:flex; gap:var(--nav-gap); align-items:center; flex-wrap:wrap; justify-content:flex-start; transform:translateY(-2px) }
     .nav a{
       display:inline-flex; align-items:center; justify-content:center;
       padding:var(--nav-pad-y) var(--nav-pad-x);
       color:var(--nav-text); background:var(--nav-bg); border:1px solid var(--nav-border);
-      border-radius:12px; text-decoration:none; opacity:.96; box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
-      position:relative; z-index:1; pointer-events:auto; -webkit-tap-highlight-color:rgba(255,255,255,.15);
-      font-size:1rem;
+      border-radius:12px; text-decoration:none; opacity:.96; box-shadow:inset 0 1px 0 rgba(255,255,255,.06)
     }
-    .nav a:hover{ background:var(--nav-hover-bg); border-color:var(--nav-hover-border); }
-    .nav a[aria-current="page"]{ border-color:var(--nav-active); box-shadow:0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset; }
+    .nav a:hover{ background:var(--nav-hover-bg); border-color:var(--nav-hover-border) }
+    .nav a[aria-current="page"]{ border-color:var(--nav-active); box-shadow:0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset }
 
-    /* ========== REKLAMEBANNER (desktop/tablet) ========== */
-    .perk-banner{
-      display:block;
-      margin: 0; padding: 10px 16px;
-      background: linear-gradient(90deg, #0f2a1a, #0a2030);
-      border-top:1px solid rgba(186,247,201,.15);
-      border-bottom:1px solid rgba(154,212,255,.12);
-    }
-    .perk-banner a{
-      display:flex; align-items:center; justify-content:center; gap:10px;
-      text-decoration:none; color:#cfefff; font-size:14px; line-height:1.3;
-      text-align:center; flex-wrap:wrap;
-    }
-    .perk-pill{
-      display:inline-flex; align-items:center; justify-content:center;
-      min-width:34px; height:24px; padding:0 10px; border-radius:999px;
-      background:#0d0d0f; border:1px solid #2a2a2a; box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
-      font-weight:600; font-size:12px; letter-spacing:.3px; opacity:.96;
-    }
-    .perk-pill.mcd{ color:#ffe08a; }
-    .perk-pill.mcn{ color:#9ad4ff; }
-    .perk-cta{
-      display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:10px;
-      background:#0b0b0c; border:1px solid #2a2a2a; box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
-      color:#bff0ff; font-weight:600; font-size:13px;
-    }
+    /* Social */
+    .social-menu{ position:fixed; top:var(--social-top); left:var(--edge-pad); display:flex; flex-direction:column; gap:10px; z-index:1000 }
+    .social-menu a{ display:flex; align-items:center; justify-content:center; width:42px; height:42px; background:rgba(0,0,0,.7); border-radius:8px; text-decoration:none; transition:background-color .2s, transform .15s }
+    .social-menu a:hover{ background:rgba(0,0,0,.85); transform:translateY(-2px) }
+    .social-menu a img{ width:22px; height:22px }
 
-    /* ========== Sociale links ========== */
-    .social-menu{
-      position: fixed; top: var(--social-top); left: var(--edge-pad);
-      display:flex; flex-direction:column; gap:10px; z-index:1000;
-    }
-    .social-menu a{
-      display:flex; align-items:center; justify-content:center; width:42px; height:42px;
-      background-color: rgba(0,0,0,.7); border-radius:8px; text-decoration:none; transition: background-color .2s, transform .15s;
-    }
-    .social-menu a:hover{ background-color: rgba(0,0,0,.85); transform: translateY(-2px); }
-    .social-menu a img{ width:22px; height:22px; }
-
-    /* ========== HERO-kort (Variant A) ========== */
+    /* HERO */
     .hero{
-      position: absolute; top: var(--hero-top); left: calc(var(--edge-pad) + var(--hero-left-offset)); width: var(--hero-width);
-      z-index: 3; background:#0b0b0c; border:1px solid #2a2a2a; border-radius:16px;
-      box-shadow:0 12px 26px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06); padding:16px 18px;
+      position:absolute; top:var(--hero-top);
+      left:calc(var(--edge-pad) + var(--hero-left-offset));
+      width:var(--hero-width); z-index:3;
+      background:#0b0b0c; border:1px solid #2a2a2a; border-radius:16px;
+      box-shadow:0 12px 26px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06);
+      padding:16px 18px;
     }
     .hero .ribbon{
       display:inline-block; margin:-2px 0 8px; padding:4px 10px; border-radius:999px; font-size:12px; letter-spacing:.2px;
-      background:#102414; border:1px solid #1d3d22; color:#baf7c9; box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+      background:#102414; border:1px solid #1d3d22; color:#baf7c9; box-shadow:inset 0 1px 0 rgba(255,255,255,.06)
     }
-    .hero .sub{ color:#cfd3d7; margin:.25rem 0 .5rem; }
-    .hero .points{ display:flex; flex-wrap:wrap; gap:6px 8px; margin:.5rem 0 .75rem; }
-    .hero .pt{ padding:6px 10px; border-radius:999px; background:#0d0d0f; border:1px solid #333; box-shadow:inset 0 1px 0 rgba(255,255,255,.06); font-size:.9rem; opacity:.96; }
-    .hero .btns{ display:flex; gap:10px; flex-wrap:wrap; }
+    .hero .sub{ color:#cfd3d7; margin:.25rem 0 .5rem }
+    .hero .points{ display:flex; flex-wrap:wrap; gap:6px 8px; margin:.5rem 0 .75rem }
+    .hero .pt{ padding:6px 10px; border-radius:999px; background:#0d0d0f; border:1px solid #333; box-shadow:inset 0 1px 0 rgba(255,255,255,.06); font-size:.9rem; opacity:.96 }
+    .hero .btns{ display:flex; gap:10px; flex-wrap:wrap }
     .hero .btn{
       display:inline-flex; align-items:center; justify-content:center; gap:8px;
       padding:9px 14px; border-radius:12px; text-decoration:none; cursor:pointer;
       background:#0d0d0f; border:1px solid #333; color:#fff; box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
-      transition:filter .15s ease, transform .15s ease;
+      transition:filter .15s, transform .15s
     }
-    .hero .btn:hover{ filter:brightness(1.08); transform:translateY(-1px); }
-    .hero .btn.primary{ background:linear-gradient(135deg,#FFD700,#DAA520); color:#1c2630; border-color:#865c10; }
-    .hero .perks{ margin-top:.6rem; font-size:.9rem; color:#cfd3d7; }
-    .hero .perks a{ color:#9ad4ff; text-decoration:none; }
-    .hero .perks a:hover{ text-decoration:underline; }
+    .hero .btn:hover{ filter:brightness(1.08); transform:translateY(-1px) }
+    .hero .btn.primary{ background:linear-gradient(135deg,#FFD700,#DAA520); color:#1c2630; border-color:#865c10 }
+    .hero .perks{ margin-top:.6rem; font-size:.9rem; color:#cfd3d7 }
+    .hero .perks a{ color:#9ad4ff; text-decoration:none }
+    .hero .perks a:hover{ text-decoration:underline }
 
-    /* ========== Responsiv adfærd ========== */
-    @media (max-width: 1200px){
-      .hero{ position: static; width: min(92vw, 720px); margin: 8px auto 0; left:auto; top:auto; }
-    }
-
-    /* ========== Indholdsbokse (som før) ========== */
-    .wrap{ max-width: 1100px; margin: 0 auto; padding: 24px; }
-
-    .content-box{
-      padding: 10px; padding-top: 1px; border-radius: 20px;
-      margin-top: 400px; max-width: 1000px; margin: 400px auto 10px;
+    @media (max-width:1200px){
+      .hero{ position:static; width:min(92vw,720px); margin:8px auto 0 }
     }
 
-    .coin-section{ display:flex; flex-wrap:wrap; justify-content:center; gap:200px; margin-top:10px; padding-top:25px; }
-    .coin{
-      background: rgba(255, 248, 220, 0.95);
-      margin:10px; padding:10px; border-radius:15px; width:320px; text-align:center;
-      box-shadow:0 0 12px rgba(0,0,0,0.1); border:2px solid #e5c100;
-    }
-    .coin img{ width:300px; height:300px; border-radius:10px; margin-bottom:10px; object-fit:cover; }
-    .coin-description{ font-size:.9rem; margin-bottom:10px; color:#333; }
+    /* Indhold (som før) */
+    .wrap{ max-width:1100px; margin:0 auto; padding:24px }
+    .content-box{ padding:10px 10px 1px; border-radius:20px; margin:400px auto 10px; max-width:1000px }
+    .coin-section{ display:flex; flex-wrap:wrap; justify-content:center; gap:200px; margin-top:10px; padding-top:25px }
+    .coin{ background:rgba(255,248,220,.95); margin:10px; padding:10px; border-radius:15px; width:320px; text-align:center; box-shadow:0 0 12px rgba(0,0,0,.1); border:2px solid #e5c100 }
+    .coin img{ width:300px; height:300px; border-radius:10px; margin-bottom:10px; object-fit:cover }
+    .coin-description{ font-size:.9rem; margin-bottom:10px; color:#333 }
+    .button{ background:linear-gradient(135deg,#FFD700,#DAA520); color:#004d73!important; padding:10px 20px; border:none; margin-top:10px; cursor:pointer; border-radius:5px; font-weight:bold; box-shadow:0 4px 8px rgba(0,0,0,.2); transition:all .3s }
+    .button:hover{ background:linear-gradient(135deg,#FFC107,#B8860B); transform:scale(1.05) }
 
-    .button{
-      background: linear-gradient(135deg, #FFD700, #DAA520);
-      color:#004d73 !important; padding:10px 20px; border:none; margin-top:10px; cursor:pointer;
-      border-radius:5px; font-weight:bold; box-shadow:0 4px 8px rgba(0,0,0,0.2); transition: all .3s ease-in-out;
-    }
-    .button:hover{ background: linear-gradient(135deg, #FFC107, #B8860B); transform: scale(1.05); }
+    .roadmap{ margin:40px auto; max-width:800px; padding:0 20px; display:flex; flex-direction:column; align-items:center }
+    .roadmap-box{ background:rgba(255,248,220,.95); padding:15px 50px; border-radius:20px; border:2px solid #e5c100; box-shadow:0 0 12px rgba(0,0,0,.1); display:flex; flex-direction:column; gap:10px; margin-bottom:30px; width:100%; max-width:700px }
+    .roadmap-box h2{ margin:0; color:#444; font-size:1.2rem }
+    .description{ font-size:.8rem; margin:0; color:#555 }
+    .step-images{ display:flex; flex-wrap:wrap; gap:10px; max-width:100%; justify-content:flex-start; margin-top:10px }
+    .step-images img{ width:80px; height:80px; object-fit:cover; cursor:pointer; margin:5px; transition:transform .3s }
+    .roadmap-thumb{ cursor:zoom-in }
 
-    .roadmap{ margin:40px auto; max-width:800px; padding:0 20px; display:flex; flex-direction:column; align-items:center; }
-    .roadmap-box{
-      background: rgba(255, 248, 220, 0.95);
-      padding:15px 50px; border-radius:20px; border:2px solid #e5c100; box-shadow:0 0 12px rgba(0,0,0,0.1);
-      display:flex; flex-direction:column; gap:10px; margin-bottom:30px; width:100%; max-width:700px;
-    }
-    .roadmap-box h2{ margin:0; color:#444; font-size:1.2rem; }
-    .description{ font-size:.8rem; margin:0; color:#555; }
-    .step-images{ display:flex; flex-wrap:wrap; gap:10px; max-width:100%; justify-content:flex-start; margin-top:10px; }
-    .step-images img{ width:80px; height:80px; object-fit:cover; cursor:pointer; margin:5px; transition: transform .3s; }
-    .roadmap-thumb{ cursor: zoom-in; }
+    /* Lightbox */
+    #rm-lightbox{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:100000 }
+    #rm-lightbox.active{ display:flex }
+    #rm-lightbox .rm-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.85) }
+    body.modal-open{ overflow:hidden; height:100vh }
+    #rm-image{ -webkit-touch-callout:none; position:relative; max-width:100vw; max-height:100vh; transform-origin:center; touch-action:none; user-select:none; -webkit-user-drag:none; cursor:zoom-out }
 
-    /* --- Roadmap Lightbox --- */
-    #rm-lightbox{
-      position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 100000;
-    }
-    #rm-lightbox.active{ display:flex; }
-    #rm-lightbox .rm-backdrop{ position:absolute; inset:0; background: rgba(0,0,0,.85); }
-    body.modal-open{ overflow:hidden; height:100vh; }
-    #rm-lightbox{ overscroll-behavior: contain; }
-    #rm-lightbox, #rm-lightbox *{ touch-action: none; }
-    #rm-image{
-      -webkit-touch-callout:none; position:relative; max-width:100vw; max-height:100vh; transform-origin:center center;
-      touch-action:none; user-select:none; -webkit-user-drag:none; cursor:zoom-out;
-    }
+    footer{ text-align:center; padding:20px; background:#e4e6c5; color:#000 }
 
-    footer{ text-align:center; padding:20px; background:#e4e6c5; color:#000; }
-    footer a{ color:#fff; text-decoration:none; }
-    footer a:hover{ text-decoration:underline; }
-    footer.muted{ opacity:1; }
-
-    /* ========== MOBIL (<=900px) ========== */
-    @media (max-width: 900px){
-      :root{ --social-top: 116px; }
-
-      /* Skjul Øen */
-      .madagascar-container{ display:none; }
-
-      /* Skjul topbanner – vi bruger hero’ens egen ribbon på mobil */
-      .perk-banner{ display:none; }
-
-      /* Hero øverst */
+    /* ---- MOBIL TILPASNINGER ---- */
+    @media (max-width:900px){
+      :root{ --social-top:116px }
+      .madagascar-container{ display:none }              /* Skjul øen */
       .hero{
-        display:block; position: static; width: calc(100vw - 32px);
-        margin: 8px auto 10px;
+        display:block; position:static; width:calc(100vw - 32px);
+        margin:8px auto 10px;
+        /* Ekstra venstre-indrykning så tekst ikke rammer sociale ikoner */
+        padding-left: calc(16px + 76px);                 /* 16px base + ~76px ikonkolonne */
       }
+      /* Mindre typografi i hero */
+      .hero h1{ font-size:clamp(18px,6.2vw,22px) }
+      .hero .sub{ font-size:.95rem }
+      .hero .pt{ font-size:.85rem; padding:5px 8px }
+      .hero .btn{ padding:8px 12px; font-size:.95rem }
+      .hero .perks{ font-size:.85rem }
 
-      /* Mindre afstand før mønter */
-      .content-box{ margin: 12px auto 10px !important; padding: 12px; }
-
-      /* Formindsk mønter markant */
-      .coin-section{ gap:16px; padding-top:10px; margin-top:6px; }
-      .coin{ width:180px; padding:8px; border-radius:12px; }
-      .coin img{ width:160px; height:160px; margin-bottom:8px; }
-      .coin-description{ font-size:.85rem; }
+      .content-box{ margin:12px auto 10px!important; padding:12px }
+      .coin-section{ gap:16px; padding-top:10px; margin-top:6px }
+      .coin{ width:180px; padding:8px; border-radius:12px }
+      .coin img{ width:160px; height:160px; margin-bottom:8px }
+      .coin-description{ font-size:.85rem }
     }
   </style>
 </head>
 <body>
-
   <!-- NAV -->
   <header class="site-nav">
     <div class="nav-inner">
@@ -256,20 +169,10 @@
     </div>
   </header>
 
-  <!-- REKLAMEBANNER (desktop/tablet) -->
-  <div class="perk-banner">
-    <a href="/perks.html" aria-label="Se vilkår & partnere">
-      <span class="perk-pill mcd">MCD</span>
-      <span class="perk-pill mcn">MCN</span>
-      <span data-text="common:perks_ribbon_text">25% hotelrabat til MCD &amp; MCN holders</span>
-      <span class="perk-cta" data-text="common:perks_ribbon_link">Se vilkår &amp; partnere</span>
-    </a>
-  </div>
-
-  <!-- VENSTRE Social -->
+  <!-- Social -->
   <div class="social-menu" id="social-menu"></div>
 
-  <!-- HERO (desktop ved øen / mobil øverst) -->
+  <!-- HERO -->
   <section class="hero" id="home-hero">
     <div class="ribbon" data-text="home:hero_ribbon">NYHED: 25% hotelrabat til MCD &amp; MCN holders</div>
     <h1 data-text="home:hero_title">Donér. Byg. Forandr Madagaskar.</h1>
@@ -289,32 +192,31 @@
     </div>
   </section>
 
-  <!-- Ø-billedet (skjules på mobil) -->
+  <!-- Øen (desktop) -->
   <div class="madagascar-container">
-    <img src="https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/sign/backgrounds/ChatGPT%20Image%2026.%20jul.%202025,%2002.34.32.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8wZTcxMmNhYy0yZjA2LTQ2Y2YtYjRlMC1lOTcyZjJiNmQwNjEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJiYWNrZ3JvdW5kcy9DaGF0R1BUIEltYWdlIDI2LiBqdWwuIDIwMjUsIDAyLjM0LjMyLnBuZyIsImlhdCI6MTc1MzY0ODA0NCwiZXhwIjo4ODE1MzU2MTY0NH0.NgGHOp8k38S34w-iR6M3TCjEFJENQ1MRdjmpv4CLKRY"
-         alt="Madagaskar Ø" />
+    <img src="https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/sign/backgrounds/ChatGPT%20Image%2026.%20jul.%202025,%2002.34.32.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8wZTcxMmNhYy0yZjA2LTQ2Y2YtYjRlMC1lOTcyZjJiNmQwNjEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJiYWNrZ3JvdW5kcy9DaGF0R1BUIEltYWdlIDI2LiBqdWwuIDIwMjUsIDAyLjM0LjMyLnBuZyIsImlhdCI6MTc1MzY0ODA0NCwiZXhwIjo4ODE1MzU2MTY0NH0.NgGHOp8k38S34w-iR6M3TCjEFJENQ1MRdjmpv4CLKRY" alt="Madagaskar Ø" />
   </div>
 
-  <!-- MØNTSEKTION -->
+  <!-- Coins -->
   <div class="content-box">
     <section class="coin-section">
       <div class="coin">
         <img id="coinD" alt="MadaCoin Donation" />
         <p class="coin-description">Støt vores mission ved at købe MadaCoin Donation.</p>
-        <button class="button" onclick="openTransak('MCD', '0xa594586B04f1b6782EC906B49882EbD0E652a388')">Køb MadaCoin Donation</button>
+        <button class="button" onclick="openTransak('MCD','0xa594586B04f1b6782EC906B49882EbD0E652a388')">Køb MadaCoin Donation</button>
       </div>
       <div class="coin">
         <img id="coinC" alt="MadaCoin" />
         <p class="coin-description">Investér i MadaCoin – fremtidens valuta for Madagaskar.</p>
-        <button class="button" onclick="openTransak('MCN', 'DIN_MCN_KONTRAKT_ADRESSE')">Køb MadaCoin</button>
+        <button class="button" onclick="openTransak('MCN','DIN_MCN_KONTRAKT_ADRESSE')">Køb MadaCoin</button>
       </div>
     </section>
   </div>
 
-  <!-- ROADMAP -->
+  <!-- Roadmap -->
   <div class="roadmap" id="roadmap"></div>
 
-  <!-- YouTube (skjules automatisk hvis ingen data) -->
+  <!-- YouTube -->
   <section id="yt-section" style="margin:40px 0;">
     <div style="max-width:1000px;margin:0 auto;">
       <div id="yt-player" style="position:relative;padding-top:56.25%;border:2px solid #222;border-radius:14px;overflow:hidden;"></div>
@@ -323,289 +225,123 @@
   </section>
 
   <script>
-    /* Supabase klient */
-    const SUPABASE_URL = "https://byrlebjwknppjbtbkozt.supabase.co";
-    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
-    const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null;
+    const SUPABASE_URL="https://byrlebjwknppjbtbkozt.supabase.co";
+    const SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
+    const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON) : null;
     window.sb = sb;
 
-    /* Transak (placeholder) */
-    const TRANSAK_KEY = "DIN_API_KEY";
-    function openTransak(symbol, wallet) {
-      if (!TRANSAK_KEY || TRANSAK_KEY === "DIN_API_KEY" || (wallet && wallet.includes("DIN_MCN_KONTRAKT_ADRESSE"))) {
-        alert("Køb-funktionen bliver aktiveret, når nøgle og kontrakt er sat.");
-        return;
+    const TRANSAK_KEY="DIN_API_KEY";
+    function openTransak(symbol,wallet){
+      if(!TRANSAK_KEY||TRANSAK_KEY==="DIN_API_KEY"||(wallet&&wallet.includes("DIN_MCN_KONTRAKT_ADRESSE"))){
+        alert("Køb-funktionen bliver aktiveret, når nøgle og kontrakt er sat."); return;
       }
-      const url = `https://global.transak.com/?apiKey=${TRANSAK_KEY}&cryptoCurrencyCode=${symbol}&walletAddress=${wallet}&network=polygon&fiatCurrency=EUR&defaultPaymentMethod=credit_debit_card&themeColor=FFCC00`;
-      window.open(url, "_blank", "width=500,height=700");
+      const url=`https://global.transak.com/?apiKey=${TRANSAK_KEY}&cryptoCurrencyCode=${symbol}&walletAddress=${wallet}&network=polygon&fiatCurrency=EUR&defaultPaymentMethod=credit_debit_card&themeColor=FFCC00`;
+      window.open(url,"_blank","width=500,height=700");
     }
 
-    /* Site text loader (common + home) */
     async function loadSiteText(){
       if(!sb) return {};
       try{
         const { data, error } = await sb.from('site_text').select('page,key,value').in('page',['common','home']);
-        if(error){ console.warn('[site_text]', error); return {}; }
+        if(error) return {};
         const dict={}; (data||[]).forEach(r=>dict[`${r.page}:${r.key}`]=r.value);
         document.querySelectorAll('[data-text]').forEach(el=>{
           const k=el.getAttribute('data-text'); if(dict[k]!=null) el.innerHTML=dict[k];
         });
         return dict;
-      }catch(e){ console.warn('[site_text ex]', e); return {}; }
+      }catch{ return {}; }
     }
 
-    /* Social links */
-    function normalizeUrl(url) {
-      if (!url) return null;
-      const u = url.trim();
-      if (/^https?:\/\//i.test(u)) return u;
-      return 'https://' + u;
-    }
-    function iconUrlFor(platform) {
-      const formattedName = platform.charAt(0).toUpperCase() + platform.slice(1).toLowerCase();
-      const { data } = sb.storage.from('social.icons').getPublicUrl(`${formattedName}.svg`);
-      return data?.publicUrl || null;
-    }
-    function fallbackIconUrl() {
-      const { data } = sb.storage.from('social.icons').getPublicUrl('Globe.svg');
-      return data?.publicUrl || '';
-    }
-    async function renderSocialLinks() {
-      const el = document.getElementById('social-menu');
-      if(!el || !sb) return;
-      el.innerHTML = '';
-      const { data, error } = await sb
-        .from('social_links')
-        .select('platform,url,is_active,sort_order')
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true });
-      if (error) { console.error('Fejl ved hentning af social_links:', error); return; }
-      const globe = fallbackIconUrl();
-      (data || []).filter(r => r.url && r.url.trim() !== '').forEach(r => {
-        const platform = (r.platform || '').trim();
-        const href = normalizeUrl(r.url);
-        if (!href) return;
-        const a = document.createElement('a');
-        a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer';
-        a.title = platform; a.setAttribute('aria-label', platform);
-        const img = document.createElement('img');
-        img.src = iconUrlFor(platform) || globe;
-        img.onerror = () => { img.src = globe; };
-        a.appendChild(img);
-        el.appendChild(a);
+    function normalizeUrl(u){ if(!u) return null; const t=u.trim(); return /^https?:\/\//i.test(t)?t:'https://'+t }
+    function iconUrlFor(p){ const name=p.charAt(0).toUpperCase()+p.slice(1).toLowerCase(); const {data}=sb.storage.from('social.icons').getPublicUrl(`${name}.svg`); return data?.publicUrl||null }
+    function fallbackIconUrl(){ const {data}=sb.storage.from('social.icons').getPublicUrl('Globe.svg'); return data?.publicUrl||'' }
+    async function renderSocialLinks(){
+      const el=document.getElementById('social-menu'); if(!el||!sb) return;
+      el.innerHTML=''; const {data,error}=await sb.from('social_links').select('platform,url,is_active,sort_order').eq('is_active',true).order('sort_order',{ascending:true});
+      if(error) return; const globe=fallbackIconUrl();
+      (data||[]).filter(r=>r.url&&r.url.trim()!=='').forEach(r=>{
+        const a=document.createElement('a'); const href=normalizeUrl(r.url); if(!href) return;
+        a.href=href; a.target='_blank'; a.rel='noopener noreferrer'; a.title=r.platform; a.setAttribute('aria-label',r.platform);
+        const img=document.createElement('img'); img.src=iconUrlFor(r.platform)||globe; img.onerror=()=>{img.src=globe}; a.appendChild(img); el.appendChild(a);
       });
     }
 
-    /* Coins-billeder */
-    const base = "https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public";
-    const pub = (...p) => `${base}/${p.map(encodeURIComponent).join('/')}`;
-    function setCoinImages() {
-      const c = document.getElementById('coinC');
-      const d = document.getElementById('coinD');
-      if (c) c.src = pub('images','MadaCoin_C.png');
-      if (d) d.src = pub('images','MadaCoin_D.png');
-    }
+    const base="https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public";
+    const pub=(...p)=>`${base}/${p.map(encodeURIComponent).join('/')}`;
+    function setCoinImages(){ const c=document.getElementById('coinC'), d=document.getElementById('coinD'); if(c) c.src=pub('images','MadaCoin_C.png'); if(d) d.src=pub('images','MadaCoin_D.png') }
 
-    /* Roadmap-billeder + klik-binding */
-    const buckets = ["roadmap1", "roadmap2", "roadmap3", "roadmap4"];
-    const steps = [
-      { title: "Køb byggegrund - Opret projekt kontor", desc: "Når målet er opfyldt, køber vi byggegrund og opretter projektkontor." },
-      { title: "De første boliger bygges", desc: "Når minimum målet er opfyldt, sættes projektet i gang." },
-      { title: "Solcellepark og batterier", desc: "Når målet er opnået, installerer vi solceller og batterier." },
-      { title: "Byg en Skole", desc: "Byggeprojekt fra børnehave til gymnasium." }
+    const buckets=["roadmap1","roadmap2","roadmap3","roadmap4"];
+    const steps=[
+      {title:"Køb byggegrund - Opret projekt kontor",desc:"Når målet er opfyldt, køber vi byggegrund og opretter projektkontor."},
+      {title:"De første boliger bygges",desc:"Når minimum målet er opfyldt, sættes projektet i gang."},
+      {title:"Solcellepark og batterier",desc:"Når målet er opnået, installerer vi solceller og batterier."},
+      {title:"Byg en Skole",desc:"Byggeprojekt fra børnehave til gymnasium."}
     ];
-    function renderRoadmap() {
-      const root = document.getElementById('roadmap');
-      root.innerHTML = '';
-      buckets.forEach((bucket, idx) => {
-        const stepIndex = idx + 1;
-        const s = steps[idx] || { title: `Roadmap ${stepIndex}`, desc: '' };
-        const box = document.createElement('div');
-        box.className = 'roadmap-box';
-        box.innerHTML = `
-          <h2>${s.title}</h2>
-          <p class="description">${s.desc}</p>
-          <div class="step-images" id="imgs-${stepIndex}"></div>
-        `;
+    function renderRoadmap(){
+      const root=document.getElementById('roadmap'); root.innerHTML='';
+      buckets.forEach((bucket,idx)=>{
+        const i=idx+1, s=steps[idx]||{title:`Roadmap ${i}`,desc:''};
+        const box=document.createElement('div'); box.className='roadmap-box';
+        box.innerHTML=`<h2>${s.title}</h2><p class="description">${s.desc}</p><div class="step-images" id="imgs-${i}"></div>`;
         root.appendChild(box);
-        const wrap = document.getElementById(`imgs-${stepIndex}`);
-        for (let i = 1; i <= 10; i++) {
-          const url = `${base}/${bucket}/Roadmap_${stepIndex}_pic_${i}.png`;
-          const img = document.createElement('img');
-          img.alt = `Roadmap ${stepIndex} billede ${i}`;
-          img.src = url;
-          img.classList.add('roadmap-thumb');
-          img.onerror = () => img.remove();
-          if (!img.dataset.lbBound) {
-            img.dataset.lbBound = "1";
-            img.addEventListener('click', (e) => {
-              e.preventDefault();
-              const full = img.dataset.fullsrc || img.src;
-              if (typeof openLightbox === 'function') openLightbox(full);
-            }, { passive: false });
+        const wrap=document.getElementById(`imgs-${i}`);
+        for(let k=1;k<=10;k++){
+          const url=`${base}/${bucket}/Roadmap_${i}_pic_${k}.png`;
+          const img=document.createElement('img'); img.alt=`Roadmap ${i} billede ${k}`; img.src=url; img.classList.add('roadmap-thumb');
+          img.onerror=()=>img.remove();
+          if(!img.dataset.lbBound){
+            img.dataset.lbBound="1";
+            img.addEventListener('click',(e)=>{ e.preventDefault(); const full=img.dataset.fullsrc||img.src; if(typeof openLightbox==='function') openLightbox(full); },{passive:false});
           }
           wrap.appendChild(img);
         }
-        setTimeout(() => { if (!wrap.querySelector('img')) wrap.innerHTML = `<p style="color:#666;margin:6px 0;">Billeder kommer snart…</p>`; }, 500);
+        setTimeout(()=>{ if(!wrap.querySelector('img')) wrap.innerHTML=`<p style="color:#666;margin:6px 0;">Billeder kommer snart…</p>`; },500);
       });
     }
 
-    /* YouTube */
-    function getYouTubeId(url) {
-      if (!url) return null;
-      try {
-        const u = new URL(url);
-        if (u.hostname.includes("youtu.be")) return u.pathname.slice(1);
-        if (u.searchParams.get("v")) return u.searchParams.get("v");
-        const m = url.match(/(?:embed|shorts)\/([a-zA-Z0-9_-]{6,})/);
-        if (m) return m[1];
-        const seg = u.pathname.split("/").pop();
-        return seg && seg.length >= 6 ? seg : null;
-      } catch { return null; }
-    }
-    function thumbUrl(id) { return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`; }
-    function renderPlayer(id) {
-      const el = document.getElementById("yt-player");
-      el.innerHTML = `
-        <iframe
-          src="https://www.youtube.com/embed/${id}"
-          title="MadaCoin video"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowfullscreen
-          style="position:absolute;inset:0;width:100%;height:100%;"
-        ></iframe>`;
-    }
-    function renderThumbs(videos, activeId) {
-      const wrap = document.getElementById("yt-thumbs");
-      wrap.innerHTML = "";
-      videos.forEach(v => {
-        const id = v._id;
-        const btn = document.createElement("button");
-        btn.style.background = 'transparent';
-        btn.style.border = id === activeId ? "3px solid #f0b90b" : "2px solid #333";
-        btn.style.borderRadius = "12px";
-        btn.style.overflow = "hidden";
-        btn.style.cursor = "pointer";
-        btn.style.padding = "0";
-        btn.title = v.title || "Se video";
-        btn.innerHTML = `
-          <div style="display:flex;flex-direction:column;gap:6px">
-            <img src="${thumbUrl(id)}" alt="${v.title || "YouTube thumbnail"}"
-                 style="display:block;width:100%;height:100%;object-fit:cover;">
-            ${v.title ? `<div style="font-size:13px;line-height:1.3;color:#222;background:rgba(255,247,214,.95);padding:6px 8px;border-radius:8px;text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${v.title}</div>` : ``}
-          </div>`;
-        btn.onclick = () => {
-          renderPlayer(id);
-          [...wrap.children].forEach(c => c.style.border = "2px solid #333");
-          btn.style.border = "3px solid #f0b90b";
-        };
-        wrap.appendChild(btn);
-      });
-    }
-    async function initYouTube() {
-      const { data, error } = await sb
-        .from("youtube_videos")
-        .select("youtube_url,is_active,created_at,title,sort_order")
-        .eq("is_active", true)
-        .not("youtube_url", "is", null)
-        .neq("youtube_url", "")
-        .order("sort_order", { ascending: true, nullsFirst: false })
-        .order("created_at", { ascending: false });
-      if (error) { console.error(error); return; }
-      const videos = (data || []).map(v => ({ ...v, _id: getYouTubeId(v.youtube_url) })).filter(v => v._id);
-      if (!videos.length) { document.getElementById("yt-section").style.display = "none"; return; }
-      document.getElementById("yt-section").style.display = "";
-      renderPlayer(videos[0]._id);
-      renderThumbs(videos, videos[0]._id);
+    function getYouTubeId(url){ if(!url) return null; try{ const u=new URL(url); if(u.hostname.includes("youtu.be")) return u.pathname.slice(1); if(u.searchParams.get("v")) return u.searchParams.get("v"); const m=url.match(/(?:embed|shorts)\/([a-zA-Z0-9_-]{6,})/); if(m) return m[1]; const seg=u.pathname.split("/").pop(); return seg&&seg.length>=6?seg:null }catch{return null} }
+    function thumbUrl(id){ return `https://i.ytimg.com/vi/${id}/hqdefault.jpg` }
+    function renderPlayer(id){ const el=document.getElementById("yt-player"); el.innerHTML=`<iframe src="https://www.youtube.com/embed/${id}" title="MadaCoin video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;"></iframe>` }
+    function renderThumbs(videos,active){ const wrap=document.getElementById("yt-thumbs"); wrap.innerHTML=""; videos.forEach(v=>{ const id=v._id; const btn=document.createElement("button"); btn.style.background='transparent'; btn.style.border=id===active?"3px solid #f0b90b":"2px solid #333"; btn.style.borderRadius="12px"; btn.style.overflow="hidden"; btn.style.cursor="pointer"; btn.style.padding="0"; btn.title=v.title||"Se video"; btn.innerHTML=`<div style="display:flex;flex-direction:column;gap:6px"><img src="${thumbUrl(id)}" alt="${v.title||"YouTube thumbnail"}" style="display:block;width:100%;height:100%;object-fit:cover;">${v.title?`<div style="font-size:13px;line-height:1.3;color:#222;background:rgba(255,247,214,.95);padding:6px 8px;border-radius:8px;text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${v.title}</div>`:""}</div>`; btn.onclick=()=>{ renderPlayer(id); [...wrap.children].forEach(c=>c.style.border="2px solid #333"); btn.style.border="3px solid #f0b90b" }; wrap.appendChild(btn) }) }
+    async function initYouTube(){
+      const {data,error}=await sb.from("youtube_videos").select("youtube_url,is_active,created_at,title,sort_order").eq("is_active",true).not("youtube_url","is",null).neq("youtube_url","").order("sort_order",{ascending:true,nullsFirst:false}).order("created_at",{ascending:false});
+      if(error) return; const vids=(data||[]).map(v=>({...v,_id:getYouTubeId(v.youtube_url)})).filter(v=>v._id);
+      if(!vids.length){ document.getElementById("yt-section").style.display="none"; return; }
+      document.getElementById("yt-section").style.display=""; renderPlayer(vids[0]._id); renderThumbs(vids,vids[0]._id);
     }
 
-    /* Init */
-    function attachHeroActions(){
-      const btn = document.getElementById('hero-primary');
-      if(btn){ btn.addEventListener('click', ()=> openTransak('MCD', '0xa594586B04f1b6782EC906B49882EbD0E652a388')); }
-    }
+    function attachHeroActions(){ const btn=document.getElementById('hero-primary'); if(btn){ btn.addEventListener('click',()=>openTransak('MCD','0xa594586B04f1b6782EC906B49882EbD0E652a388')) } }
 
-    window.addEventListener('load', async () => {
-      await loadSiteText();      // henter (common + home) – inkl. banner-tekster
-      await renderSocialLinks(); // sociale
-      setCoinImages();
-      renderRoadmap();
-      initYouTube();
-      attachHeroActions();
+    window.addEventListener('load', async ()=>{
+      await loadSiteText(); await renderSocialLinks(); setCoinImages(); renderRoadmap(); initYouTube(); attachHeroActions();
     });
   </script>
 
   <script>
-    /* === ROADMAP LIGHTBOX — START === */
-    let rmBox, rmImg; let scale = 1, tx = 0, ty = 0; const MIN_SCALE = 1, MAX_SCALE = 4;
-    function applyTransform(){ if (!rmImg) return; rmImg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`; }
-    function centerReset(){ scale = 1; tx = 0; ty = 0; applyTransform(); }
-    function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
-    let touchMoved = false, pinchStartDist = 0, pinchStartScale = 1; let panStartX = 0, panStartY = 0, panning = false;
-
-    function openLightbox(src){
-      rmImg.src = src; centerReset();
-      document.body.classList.add('modal-open');
-      rmBox.classList.add('active'); rmBox.setAttribute('aria-hidden','false');
-    }
-    function closeLightbox(){
-      document.body.classList.remove('modal-open');
-      rmBox.classList.remove('active'); rmBox.setAttribute('aria-hidden','true');
-      rmImg.src = '';
-    }
-    function rmWheelHandler(e){
-      e.preventDefault();
-      const rect = rmImg.getBoundingClientRect();
-      const cx = e.clientX - (rect.left + rect.width/2) - tx;
-      const cy = e.clientY - (rect.top  + rect.height/2) - ty;
-      const old = scale; const factor = Math.exp(-e.deltaY * 0.0015);
-      scale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * factor));
-      const k = scale / old; tx -= cx * (k - 1); ty -= cy * (k - 1); applyTransform();
-    }
-    function rmTouchStart(e){
-      touchMoved=false;
-      if (e.touches.length===2){
-        const [a,b]=e.touches;
-        pinchStartDist=Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY);
-        pinchStartScale=scale;
-      } else if (e.touches.length===1 && scale>1){
-        const t=e.touches[0]; panning=true;
-        panStartX=t.clientX - tx; panStartY=t.clientY - ty;
-      }
-    }
-    function rmTouchMove(e){
-      if (e.touches.length===2){
-        e.preventDefault();
-        const [a,b]=e.touches;
-        const dist=Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY);
-        scale=Math.max(MIN_SCALE, Math.min(MAX_SCALE, pinchStartScale*(dist/pinchStartDist)));
-        applyTransform(); touchMoved=true;
-      } else if (e.touches.length===1 && panning){
-        e.preventDefault();
-        const t=e.touches[0]; tx=t.clientX - panStartX; ty=t.clientY - panStartY; applyTransform(); touchMoved=true;
-      }
-    }
-    function rmTouchEnd(){ panning=false; if (!touchMoved){ if (scale>1) centerReset(); else closeLightbox(); } }
-
-    window.addEventListener('load', () => {
-      rmBox=document.getElementById('rm-lightbox'); rmImg=document.getElementById('rm-image'); if (!rmBox || !rmImg) return;
-      rmBox.addEventListener('click', (e) => {
-        const clickedBackdrop = e.target===rmBox || e.target.classList.contains('rm-backdrop');
-        const clickedImage    = e.target===rmImg;
-        if (clickedBackdrop || clickedImage) closeLightbox();
-      }, { passive:true });
-      rmImg.addEventListener('wheel', rmWheelHandler, { passive:false });
-      rmImg.addEventListener('click', () => { if (scale>1) centerReset(); else closeLightbox(); });
-      rmImg.addEventListener('touchstart', rmTouchStart, { passive:true });
-      rmImg.addEventListener('touchmove',  rmTouchMove,  { passive:false });
-      rmImg.addEventListener('touchend',   rmTouchEnd,   { passive:true });
-      rmImg.addEventListener('contextmenu', (e)=>e.preventDefault());
+    /* Lightbox logic */
+    let rmBox, rmImg, scale=1, tx=0, ty=0; const MIN_SCALE=1, MAX_SCALE=4;
+    function applyTransform(){ if(!rmImg) return; rmImg.style.transform=`translate(${tx}px, ${ty}px) scale(${scale})` }
+    function centerReset(){ scale=1; tx=0; ty=0; applyTransform() }
+    function openLightbox(src){ rmImg.src=src; centerReset(); document.body.classList.add('modal-open'); rmBox.classList.add('active'); rmBox.setAttribute('aria-hidden','false') }
+    function closeLightbox(){ document.body.classList.remove('modal-open'); rmBox.classList.remove('active'); rmBox.setAttribute('aria-hidden','true'); rmImg.src='' }
+    function rmWheelHandler(e){ e.preventDefault(); const r=rmImg.getBoundingClientRect(); const cx=e.clientX-(r.left+r.width/2)-tx, cy=e.clientY-(r.top+r.height/2)-ty; const old=scale; const factor=Math.exp(-e.deltaY*0.0015); scale=Math.max(MIN_SCALE,Math.min(MAX_SCALE,scale*factor)); const k=scale/old; tx-=cx*(k-1); ty-=cy*(k-1); applyTransform() }
+    let touchMoved=false,pinchStartDist=0,pinchStartScale=1,panStartX=0,panStartY=0,panning=false;
+    function rmTouchStart(e){ touchMoved=false; if(e.touches.length===2){ const[a,b]=e.touches; pinchStartDist=Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY); pinchStartScale=scale; } else if(e.touches.length===1 && scale>1){ const t=e.touches[0]; panning=true; panStartX=t.clientX-tx; panStartY=t.clientY-ty; } }
+    function rmTouchMove(e){ if(e.touches.length===2){ e.preventDefault(); const[a,b]=e.touches; const d=Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY); scale=Math.max(MIN_SCALE,Math.min(MAX_SCALE,pinchStartScale*(d/pinchStartDist))); applyTransform(); touchMoved=true; } else if(e.touches.length===1 && panning){ e.preventDefault(); const t=e.touches[0]; tx=t.clientX-panStartX; ty=t.clientY-panStartY; applyTransform(); touchMoved=true; } }
+    function rmTouchEnd(){ panning=false; if(!touchMoved){ if(scale>1) centerReset(); else closeLightbox(); } }
+    window.addEventListener('load',()=>{
+      rmBox=document.getElementById('rm-lightbox'); rmImg=document.getElementById('rm-image'); if(!rmBox||!rmImg) return;
+      rmBox.addEventListener('click',(e)=>{ const backdrop=e.target===rmBox||e.target.classList.contains('rm-backdrop'); const img=e.target===rmImg; if(backdrop||img) closeLightbox(); },{passive:true});
+      rmImg.addEventListener('wheel',rmWheelHandler,{passive:false});
+      rmImg.addEventListener('click',()=>{ if(scale>1) centerReset(); else closeLightbox(); });
+      rmImg.addEventListener('touchstart',rmTouchStart,{passive:true});
+      rmImg.addEventListener('touchmove',rmTouchMove,{passive:false});
+      rmImg.addEventListener('touchend',rmTouchEnd,{passive:true});
+      rmImg.addEventListener('contextmenu',(e)=>e.preventDefault());
     });
-    /* === ROADMAP LIGHTBOX — SLUT === */
   </script>
 
-  <!-- Lightbox til roadmap -->
+  <!-- Lightbox -->
   <div id="rm-lightbox" aria-hidden="true">
     <div class="rm-backdrop"></div>
     <img id="rm-image" alt="Roadmap" />
