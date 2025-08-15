@@ -92,15 +92,26 @@
       display:flex; gap:12px; align-items:center; flex-wrap:wrap; justify-content:flex-start;
     }
     header.wrap nav a{
-      margin-right: 14px;
-      opacity: .96;
-      color: #fff;
-      text-decoration: none;
-      position: relative; z-index: 1; pointer-events: auto;
-      -webkit-tap-highlight-color: rgba(255,255,255,.15);
-      padding:8px 14px; border-radius:12px; background:#0d0d0f; border:1px solid #333;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-    }
+  margin-right: 14px;
+  /* valgfrit nudge af hele rækken via første link, se reglen nedenfor */
+  opacity: .96;
+  color: #fff;                   /* hvid tekst */
+  text-decoration: none;
+  position: relative; z-index: 1; pointer-events: auto;
+
+  /* SMÅ FLYT: venstre/højre + op/ned (negativ = venstre/op) */
+  left: 6px;                     /* fx -6px for lidt mod venstre */
+  top: -2px;                     /* lidt højere op */
+
+  -webkit-tap-highlight-color: rgba(255,255,255,.15);
+
+  /* HØJDE: giv mere vertikal padding (eller brug height + line-height) */
+  padding: 10px 16px;            /* var 8px 14px → lidt mere højde */
+
+  border-radius:12px; background:#0d0d0f; border:1px solid #333;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+
     header.wrap nav a:hover,
     header.wrap nav a[aria-current="page"]{ text-decoration: underline; }
 
@@ -629,6 +640,7 @@
   <footer><span id="footer-text">© 2025 MadaCoin. All rights reserved.</span></footer>
 </body>
 </html>
+
 
 
 
