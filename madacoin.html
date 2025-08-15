@@ -234,6 +234,24 @@
     @media (max-width:900px){
       :root{ --social-top: 116px; }
     }
+/* Mere luft i højre side for "Vores version" */
+:root{
+  --right-gutter: 36px; /* var 24px */
+}
+
+@media (min-width: 901px){
+  /* flyt hele layoutets højrekant ind */
+  .layout{
+    padding-right: calc(24px + var(--right-gutter));
+  }
+}
+
+/* sørg for at højre kolonne også har intern luft */
+.right-col{
+  padding-right: var(--right-gutter);
+}
+
+    
   </style>
 </head>
 <body>
@@ -541,3 +559,4 @@
   </script>
 </body>
 </html>
+
