@@ -9,6 +9,9 @@
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
   <style>
+    /* === Fix: sørg for at padding tæller inden i width === */
+    *,*::before,*::after{ box-sizing:border-box; }
+
     /* ===== Typografi (fælles på alle sider) ===== */
     html{ font-size:16px; }
     body{
@@ -29,24 +32,20 @@
 
     /* ===== Layout variabler ===== */
     :root{
-      /* Lærred og kolonner (Preset C) */
       --wrap: 1680px;
       --gap: 84px;
       --left-col: 520px;
       --center-col: 460px;
       --right-col: 720px;
       --right-offset: 36px;
-      --right-gutter: 36px;  /* ↑ mere luft i højre kant */
+      --right-gutter: 36px;  /* luft i højre side */
 
-      /* Offset for at skubbe pyramiden mod venstre (negativ værdi) */
       --center-offset: -36px;
 
-      /* Foto-størrelser (Preset C) */
-      --photo-top: 144px;   /* Julienne */
-      --photo-peer:108px;   /* Thomas + Revision */
-      --photo-sub: 102px;   /* underroller */
+      --photo-top: 144px;
+      --photo-peer:108px;
+      --photo-sub: 102px;
 
-      /* Farver/stil */
       --bg:#061a2b;
       --bg-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
       --text:#fff; --muted:#cfd3d7; --primary:#9ad4ff;
@@ -54,8 +53,8 @@
 
       /* === COMMON NAV (samme som side 1) === */
       --nav-gap:14px;
-      --nav-pad-x:14px;     /* boks som side 2 */
-      --nav-pad-y:8px;      /* boks som side 2 */
+      --nav-pad-x:14px;
+      --nav-pad-y:8px;
       --nav-shift-x:0px;
       --nav-shift-y:-2px;
 
@@ -84,12 +83,12 @@
     .site-nav .nav-inner{
       max-width:1100px;
       margin:0 auto;
-      padding:0 24px;       /* ens venstre/højre indryk for nav */
+      padding:0 24px;
     }
 
     .nav{
       display:flex; gap:var(--nav-gap); align-items:center; flex-wrap:wrap;
-      justify-content:flex-start;  /* venstrejusteret */
+      justify-content:flex-start;
       transform:translate(var(--nav-shift-x), var(--nav-shift-y));
     }
     .nav a{
@@ -112,7 +111,7 @@
     }
 
     /* Mobil: mindre indryk i header (nav) */
-    @media (max-width: 900px){
+    @media (max-width:900px){
       .site-nav .nav-inner{ padding-left:16px; padding-right:24px; }
     }
 
@@ -136,7 +135,10 @@
 
     /* ===== Tre kolonner ===== */
     .layout{
-      max-width:var(--wrap); margin:0 auto; padding:24px;
+      max-width:var(--wrap);
+      margin:0 auto;
+      padding:24px;
+      padding-right: calc(24px + var(--right-gutter)); /* ← altid ekstra højre luft */
       display:grid;
       grid-template-columns: var(--left-col) var(--center-col) var(--right-col);
       grid-template-rows: auto auto auto;
@@ -147,7 +149,11 @@
     }
 
     /* Kort */
-    .card{ background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius); box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,.06) }
+    .card{
+      background:var(--card); border:1px solid var(--card-border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,.06)
+    }
     .card.pad{ padding:18px }
     h2{ margin:0 0 10px; } /* størrelse styres globalt */
     .muted{ color:var(--muted) }
@@ -158,7 +164,10 @@
     #bio-thomas{ grid-column:1; grid-row:2; }
 
     /* Midterkolonnen (pyramiden) */
-    .center-col{ grid-column:2; display:flex; flex-direction:column; align-items:center; gap:32px; transform: translateX(var(--center-offset)); }
+    .center-col{
+      grid-column:2; display:flex; flex-direction:column; align-items:center; gap:32px;
+      transform: translateX(var(--center-offset));
+    }
     #pyr-top{ grid-row:1; }
     #pyr-mid{ grid-row:2; }
     #pyr-sub{ grid-row:3; }
@@ -199,7 +208,7 @@
       grid-column:3; grid-row:1 / span 3;
       margin-top:var(--right-offset);
       margin-left:8px;
-      padding-right: var(--right-gutter); /* luft til højre i selve kolonnen */
+      /* padding-right inde i kolonnen kan du beholde eller fjerne – jeg lader den være neutral */
       position: relative; z-index: 0;
     }
     .right-col .card{ width:100% }
@@ -233,13 +242,6 @@
     /* Mobil-tilpasning for social */
     @media (max-width:900px){
       :root{ --social-top: 116px; }
-    }
-
-    /* === NYT: Ekstra højre luft på desktop, så "Vores version" ikke klistrer === */
-    @media (min-width: 901px){
-      .layout{
-        padding-right: calc(24px + var(--right-gutter)); /* 24px baseline + ekstra gutter */
-      }
     }
   </style>
 </head>
@@ -405,10 +407,7 @@
 
     /* ========= People + Partners ========= */
     (async function(){
-      // Indlæs tekster først
       await loadSiteText();
-
-      // People / partners
       if(!sb) return;
 
       const STORAGE_BASE = SUPABASE_URL.replace(/\/+$/,'') + '/storage/v1/object/public';
