@@ -31,9 +31,8 @@
       background-repeat: no-repeat;
       background-position: center center;
       background-size: cover;
-      background-attachment: fixed; /* ser godt ud på desktop */
+      background-attachment: fixed; /* desktop */
     }
-    /* Slå 'fixed' fra på mobil for glattere scroll */
     @media (max-width: 800px){
       body{ background-attachment: scroll; }
     }
@@ -77,19 +76,17 @@
       background-color: rgba(0, 0, 0, 0.85);
       transform: translateY(-2px);
     }
-    .social-menu a img {
-      width: 22px;
-      height: 22px;
-    }
+    .social-menu a img { width: 22px; height: 22px; }
 
-    /* Øverste navigation */
+    /* Øverste navigation – gennemsigtig top (ingen bjælke) */
     header.wrap{
       padding: 14px 18px;
-      /* border-bottom: 1px solid #222;  <-- slået fra for at undgå “stregen” */
-      position: sticky;      /* mobil: klikbar og øverst */
+      position: sticky;   /* klikbar/øverst på mobil */
       top: 0;
       z-index: 9999;
-      background: rgba(0,0,0,.75);
+      background: transparent !important;  /* ← fjern bjælken */
+      box-shadow: none !important;
+      border-bottom: 0 !important;
     }
     header.wrap nav{
       display:flex; gap:12px; align-items:center; flex-wrap:wrap; justify-content:flex-start;
@@ -108,11 +105,7 @@
     header.wrap nav a[aria-current="page"]{ text-decoration: underline; }
 
     /* Beholderbredde */
-    .wrap{
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 24px;
-    }
+    .wrap{ max-width: 1100px; margin: 0 auto; padding: 24px; }
 
     .content-box {
       padding: 10px;
@@ -148,11 +141,7 @@
       margin-bottom: 10px;
       object-fit: cover;
     }
-    .coin-description {
-      font-size: 0.9rem;
-      margin-bottom: 10px;
-      color: #333;
-    }
+    .coin-description { font-size: 0.9rem; margin-bottom: 10px; color: #333; }
 
     .button {
       background: linear-gradient(135deg, #FFD700, #DAA520);
@@ -199,47 +188,30 @@
       width: 80px; height: 80px; object-fit: cover; cursor: pointer;
       margin: 5px; transition: transform 0.3s ease-in-out;
     }
-    /* .step-images img:hover { transform: scale(4); z-index: 2; } */
     .roadmap-thumb { cursor: zoom-in; }
 
     /* --- Roadmap Lightbox --- */
     #rm-lightbox {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
+      position: fixed; inset: 0;
+      display: none; align-items: center; justify-content: center;
       z-index: 9999;
     }
     #rm-lightbox.active { display: flex; }
-
-    #rm-lightbox .rm-backdrop {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,.85);
-    }
-
-    /* LIGHTBOX: blokér baggrundsscroll på mobil */
-    body.modal-open { 
-      overflow: hidden;
-      height: 100vh;
-    }
-    /* Undgå at swipe/overscroll bobler ud af overlayet */
+    #rm-lightbox .rm-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.85); }
+    body.modal-open { overflow: hidden; height: 100vh; }
     #rm-lightbox { overscroll-behavior: contain; }
-    /* Sørg for at berøringer ikke triggere side-gestus */
     #rm-lightbox, #rm-lightbox * { touch-action: none; }
 
-    /* Selve billedet i lightbox (FIX: samlet i ét selector-blok) */
     #rm-image{
       -webkit-touch-callout: none;
       position: relative;
       max-width: 100vw;
       max-height: 100vh;
       transform-origin: center center;
-      touch-action: none;       /* nødvendig for pinch/drag på mobil */
+      touch-action: none;
       user-select: none;
       -webkit-user-drag: none;
-      cursor: zoom-out;         /* klik/tap = luk ved 1× */
+      cursor: zoom-out;
     }
 
     footer {
@@ -248,10 +220,7 @@
       background: #e4e6c5;
       color: #000000;
     }
-    footer a {
-      color: #fff;
-      text-decoration: none;
-    }
+    footer a { color: #fff; text-decoration: none; }
     footer a:hover { text-decoration: underline; }
     footer.muted { opacity: 1; }
 
@@ -259,12 +228,11 @@
       .madagascar-container img { width: 92vw; max-width: 520px; }
       .content-box { margin-top: 240px; padding: 12px; }
       .coin-section { gap: 24px; }
-      /* Mobil: gør header-indryk behageligt */
+      /* Mobil: lidt behagelig indrykning i header */
       header.wrap { padding-left: 16px; padding-right: 24px; }
     }
   </style>
 
-  <!-- Supabase lib (du har også en senere – én er nok, men to gør ikke skade) -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -306,11 +274,9 @@
   <!-- ROADMAP -->
   <div class="roadmap" id="roadmap"></div>
 
-  <!-- Placeholder  for gammel youtube blok -->
-
   <script>
-    /* Transak (placeholder indtil nøgler er på plads) */
-    const TRANSAK_KEY = "DIN_API_KEY"; // TODO
+    /* Transak (placeholder) */
+    const TRANSAK_KEY = "DIN_API_KEY";
     function openTransak(symbol, wallet) {
       if (!TRANSAK_KEY || TRANSAK_KEY === "DIN_API_KEY" || (wallet && wallet.includes("DIN_MCN_KONTRAKT_ADRESSE"))) {
         alert("Køb-funktionen bliver aktiveret, når nøgle og kontrakt er sat.");
@@ -365,14 +331,11 @@
           const img = document.createElement('img');
           img.alt = `Roadmap ${stepIndex} billede ${i}`;
           img.src = url;
-
-          // Lightbox: klikbar thumbnail
           img.classList.add('roadmap-thumb');
           img.onerror = () => img.remove();
           wrap.appendChild(img);
         }
 
-        // Fallback-tekst hvis ingen billeder
         setTimeout(() => {
           if (!wrap.querySelector('img')) {
             wrap.innerHTML = `<p style="color:#666;margin:6px 0;">Billeder kommer snart…</p>`;
@@ -480,10 +443,9 @@
       renderPlayer(videos[0]._id);
       renderThumbs(videos, videos[0]._id);
     }
-
     initYouTube();
 
-    // --- Social links menu ---
+    // Social links
     function normalizeUrl(url) {
       if (!url) return null;
       const u = url.trim();
@@ -507,29 +469,21 @@
         .select('platform,url,is_active,sort_order')
         .eq('is_active', true)
         .order('sort_order', { ascending: true });
-      if (error) {
-        console.error('Fejl ved hentning af social_links:', error);
-        return;
-      }
+      if (error) { console.error('Fejl ved hentning af social_links:', error); return; }
       const globe = fallbackIconUrl();
-      (data || [])
-        .filter(r => r.url && r.url.trim() !== '')
-        .forEach(r => {
-          const platform = (r.platform || '').trim();
-          const href = normalizeUrl(r.url);
-          if (!href) return;
-          const a = document.createElement('a');
-          a.href = href;
-          a.target = '_blank';
-          a.rel = 'noopener noreferrer';
-          a.title = platform;
-          a.setAttribute('aria-label', platform);
-          const img = document.createElement('img');
-          img.src = iconUrlFor(platform) || globe;
-          img.onerror = () => { img.src = globe; };
-          a.appendChild(img);
-          el.appendChild(a);
-        });
+      (data || []).filter(r => r.url && r.url.trim() !== '').forEach(r => {
+        const platform = (r.platform || '').trim();
+        const href = normalizeUrl(r.url);
+        if (!href) return;
+        const a = document.createElement('a');
+        a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer';
+        a.title = platform; a.setAttribute('aria-label', platform);
+        const img = document.createElement('img');
+        img.src = iconUrlFor(platform) || globe;
+        img.onerror = () => { img.src = globe; };
+        a.appendChild(img);
+        el.appendChild(a);
+      });
     }
     window.addEventListener('load', () => {
       renderSocialLinks();
@@ -538,88 +492,61 @@
   </script>
 
   <script>
-    /* === ROADMAP LIGHTBOX — START (GENINDSAT) === */
-    /* STATE */
+    /* === ROADMAP LIGHTBOX — START === */
     let rmBox, rmImg;
     let scale = 1, tx = 0, ty = 0;
     const MIN_SCALE = 1, MAX_SCALE = 4;
 
-    /* OPEN GUARD */
     let justOpenedAt = 0;
     const OPEN_GUARD_MS = 350;
 
-    function applyTransform() {
-      if (!rmImg) return;
-      rmImg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
-    }
-    function centerReset() { scale = 1; tx = 0; ty = 0; applyTransform(); }
+    function applyTransform(){ if (!rmImg) return; rmImg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`; }
+    function centerReset(){ scale = 1; tx = 0; ty = 0; applyTransform(); }
     function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
 
-    /* TOUCH STATE */
-    let touchMoved = false;
-    let pinchStartDist = 0;
-    let pinchStartScale = 1;
-    let panStartX = 0, panStartY = 0;
-    let panning = false;
+    let touchMoved = false, pinchStartDist = 0, pinchStartScale = 1;
+    let panStartX = 0, panStartY = 0, panning = false;
 
-    /* OPEN/CLOSE */
-    function openLightbox(src) {
-      rmImg.src = src;
-      centerReset();
+    function openLightbox(src){
+      rmImg.src = src; centerReset();
       document.body.classList.add('modal-open');
-      rmBox.classList.add('active');
-      rmBox.setAttribute('aria-hidden', 'false');
+      rmBox.classList.add('active'); rmBox.setAttribute('aria-hidden','false');
       justOpenedAt = Date.now();
     }
-    function closeLightbox() {
+    function closeLightbox(){
       document.body.classList.remove('modal-open');
-      rmBox.classList.remove('active');
-      rmBox.setAttribute('aria-hidden', 'true');
+      rmBox.classList.remove('active'); rmBox.setAttribute('aria-hidden','true');
       rmImg.src = '';
     }
 
-    /* BIND THUMBS */
-    function initRoadmapLightboxPart1() {
+    function initRoadmapLightboxPart1(){
       const thumbs = Array.from(document.querySelectorAll('.roadmap-thumb'));
       thumbs.forEach((img) => {
         const full = img.dataset.fullsrc || img.src;
+        img.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); openLightbox(full); }, { passive:false });
 
-        img.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          openLightbox(full);
-        }, { passive: false });
-
-        let sx = 0, sy = 0, st = 0, moved = false;
+        let sx=0, sy=0, st=0, moved=false;
         img.addEventListener('touchstart', (e) => {
           if (e.touches.length !== 1) return;
-          const t = e.touches[0];
-          sx = t.clientX; sy = t.clientY; st = Date.now(); moved = false;
-        }, { passive: true });
+          const t=e.touches[0]; sx=t.clientX; sy=t.clientY; st=Date.now(); moved=false;
+        }, { passive:true });
         img.addEventListener('touchmove', (e) => {
           if (e.touches.length !== 1) return;
-          const t = e.touches[0];
-          if (Math.abs(t.clientX - sx) > 15 || Math.abs(t.clientY - sy) > 15) moved = true;
-        }, { passive: true });
+          const t=e.touches[0];
+          if (Math.abs(t.clientX-sx)>15 || Math.abs(t.clientY-sy)>15) moved=true;
+        }, { passive:true });
         img.addEventListener('touchend', (e) => {
-          const dt = Date.now() - st;
-          if (!moved && dt < 350) {
-            e.preventDefault();
-            e.stopPropagation();
-            openLightbox(full);
-          }
-        }, { passive: false });
+          const dt=Date.now()-st;
+          if (!moved && dt<350) { e.preventDefault(); e.stopPropagation(); openLightbox(full); }
+        }, { passive:false });
       });
     }
-
-    function markRoadmapImages() {
-      const imgs = [...document.querySelectorAll('img')];
-      const hits = imgs.filter(img => /roadmap/i.test(img.src));
-      hits.forEach(img => img.classList.add('roadmap-thumb'));
+    function markRoadmapImages(){
+      const imgs=[...document.querySelectorAll('img')];
+      imgs.filter(img=>/roadmap/i.test(img.src)).forEach(img=>img.classList.add('roadmap-thumb'));
     }
 
-    /* PC: wheel zoom */
-    function rmWheelHandler(e) {
+    function rmWheelHandler(e){
       e.preventDefault();
       const rect = rmImg.getBoundingClientRect();
       const cx = e.clientX - (rect.left + rect.width/2) - tx;
@@ -632,78 +559,63 @@
       const k = scale / old;
       tx -= cx * (k - 1);
       ty -= cy * (k - 1);
-
       applyTransform();
     }
 
-    /* Mobil: pinch + pan + tap */
-    function rmTouchStart(e) {
-      touchMoved = false;
-      if (e.touches.length === 2) {
-        const [a,b] = e.touches;
-        pinchStartDist  = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
-        pinchStartScale = scale;
-      } else if (e.touches.length === 1 && scale > 1) {
-        const t = e.touches[0];
-        panning = true;
-        panStartX = t.clientX - tx;
-        panStartY = t.clientY - ty;
+    function rmTouchStart(e){
+      touchMoved=false;
+      if (e.touches.length===2){
+        const [a,b]=e.touches;
+        pinchStartDist=Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY);
+        pinchStartScale=scale;
+      } else if (e.touches.length===1 && scale>1){
+        const t=e.touches[0]; panning=true;
+        panStartX=t.clientX - tx; panStartY=t.clientY - ty;
       }
     }
-    function rmTouchMove(e) {
-      if (e.touches.length === 2) {
+    function rmTouchMove(e){
+      if (e.touches.length===2){
         e.preventDefault();
-        const [a,b] = e.touches;
-        const dist = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
-        scale = clamp(pinchStartScale * (dist / pinchStartDist), MIN_SCALE, MAX_SCALE);
-        applyTransform();
-        touchMoved = true;
-      } else if (e.touches.length === 1 && panning) {
+        const [a,b]=e.touches;
+        const dist=Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY);
+        scale=clamp(pinchStartScale*(dist/pinchStartDist),MIN_SCALE,MAX_SCALE);
+        applyTransform(); touchMoved=true;
+      } else if (e.touches.length===1 && panning){
         e.preventDefault();
-        const t = e.touches[0];
-        tx = t.clientX - panStartX;
-        ty = t.clientY - panStartY;
-        applyTransform();
-        touchMoved = true;
+        const t=e.touches[0];
+        tx=t.clientX - panStartX; ty=t.clientY - panStartY;
+        applyTransform(); touchMoved=true;
       }
     }
-    function rmTouchEnd() {
-      panning = false;
-      if (!touchMoved) {
-        if (scale > 1) centerReset();
-        else closeLightbox();
-      }
+    function rmTouchEnd(){
+      panning=false;
+      if (!touchMoved){ if (scale>1) centerReset(); else closeLightbox(); }
     }
 
-    /* INIT */
     window.addEventListener('load', () => {
-      rmBox = document.getElementById('rm-lightbox');
-      rmImg = document.getElementById('rm-image');
-      if (!rmBox || !rmImg) { console.warn('[lightbox] elements missing'); return; }
+      rmBox=document.getElementById('rm-lightbox');
+      rmImg=document.getElementById('rm-image');
+      if (!rmBox || !rmImg) return;
 
-      markRoadmapImages();
-      initRoadmapLightboxPart1();
+      markRoadmapImages(); initRoadmapLightboxPart1();
 
       rmBox.addEventListener('click', (e) => {
-        if (Date.now() - justOpenedAt < OPEN_GUARD_MS) return;
-        const clickedBackdrop = e.target === rmBox || e.target.classList.contains('rm-backdrop');
-        const clickedImage    = e.target === rmImg;
+        if (Date.now()-justOpenedAt<350) return;
+        const clickedBackdrop = e.target===rmBox || e.target.classList.contains('rm-backdrop');
+        const clickedImage    = e.target===rmImg;
         if (clickedBackdrop || clickedImage) closeLightbox();
-      }, { passive: true });
-      rmBox.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+      }, { passive:true });
+      rmBox.addEventListener('touchmove', (e)=>e.preventDefault(), { passive:false });
 
-      rmImg.addEventListener('wheel', rmWheelHandler, { passive: false });
-      rmImg.addEventListener('click', () => { 
-        if (Date.now() - justOpenedAt < OPEN_GUARD_MS) return;
-        if (scale > 1) centerReset(); 
-        else closeLightbox(); 
+      rmImg.addEventListener('wheel', rmWheelHandler, { passive:false });
+      rmImg.addEventListener('click', () => {
+        if (Date.now()-justOpenedAt<350) return;
+        if (scale>1) centerReset(); else closeLightbox();
       });
-      rmImg.addEventListener('touchstart', rmTouchStart, { passive: true });
-      rmImg.addEventListener('touchmove',  rmTouchMove,  { passive: false });
-      rmImg.addEventListener('touchend',   rmTouchEnd,   { passive: true });
-      rmImg.addEventListener('contextmenu', (e) => e.preventDefault());
-
-      console.log('[lightbox] init done');
+      rmImg.addEventListener('touchstart', rmTouchStart, { passive:true });
+      rmImg.addEventListener('touchmove',  rmTouchMove,  { passive:false });
+      rmImg.addEventListener('touchend',   rmTouchEnd,   { passive:true });
+      rmImg.addEventListener('contextmenu', (e)=>e.preventDefault());
     });
     /* === ROADMAP LIGHTBOX — SLUT === */
   </script>
