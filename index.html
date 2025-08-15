@@ -37,6 +37,57 @@
       body{ background-attachment: scroll; }
     }
 
+    /* ===== FÆLLES NAV-VARIABLER & STIL ===== */
+    :root{
+      --nav-gap: 14px;
+      --nav-height: 44px;
+      --nav-pad-x: 16px;
+      --nav-pad-y: 10px;
+
+      --nav-shift-x: 0px;   /* venstre(-) / højre(+) – justér pr. side */
+      --nav-shift-y: -2px;  /* op(-) / ned(+) – justér pr. side */
+
+      --nav-text: #fff;
+      --nav-bg: #0d0d0f;
+      --nav-border: #333;
+      --nav-hover-bg: #151517;
+      --nav-hover-border: #444;
+      --nav-active: #5aa9ff;
+    }
+    .nav{
+      display:flex; align-items:center;
+      gap: var(--nav-gap);
+      transform: translate(var(--nav-shift-x), var(--nav-shift-y));
+      flex-wrap:wrap;
+      justify-content:flex-start; /* nav--left default */
+    }
+    .nav.nav--left{ justify-content:flex-start; }
+    .nav.nav--center{ justify-content:center; }
+    .nav.nav--right{ justify-content:flex-end; }
+    .nav a{
+      display:inline-flex; align-items:center; justify-content:center;
+      height: var(--nav-height);
+      padding: var(--nav-pad-y) var(--nav-pad-x);
+      color: var(--nav-text);
+      background: var(--nav-bg);
+      border:1px solid var(--nav-border);
+      border-radius:12px;
+      text-decoration:none; opacity:.96;
+      position:relative; z-index:1; pointer-events:auto;
+      -webkit-tap-highlight-color: rgba(255,255,255,.15);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .nav a:hover,
+    .nav a:focus-visible{
+      background: var(--nav-hover-bg);
+      border-color: var(--nav-hover-border);
+    }
+    .nav a[aria-current="page"],
+    .nav a.is-active{
+      border-color: var(--nav-active);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset;
+    }
+
     .madagascar-container {
       position: absolute;
       top: 0%;
@@ -88,30 +139,23 @@
       box-shadow: none !important;
       border-bottom: 0 !important;
     }
+
+    /* FALBACK til ældre side-1 selektor (lader den spille pænt med .nav) */
     header.wrap nav{
-      display:flex; gap:12px; align-items:center; flex-wrap:wrap; justify-content:flex-start;
+      display:flex; gap:var(--nav-gap); align-items:center; flex-wrap:wrap; justify-content:flex-start;
+      transform: translate(var(--nav-shift-x), var(--nav-shift-y));
     }
     header.wrap nav a{
-  margin-right: 14px;
-  /* valgfrit nudge af hele rækken via første link, se reglen nedenfor */
-  opacity: .96;
-  color: #fff;                   /* hvid tekst */
-  text-decoration: none;
-  position: relative; z-index: 1; pointer-events: auto;
-
-  /* SMÅ FLYT: venstre/højre + op/ned (negativ = venstre/op) */
-  left: 6px;                     /* fx -6px for lidt mod venstre */
-  top: -2px;                     /* lidt højere op */
-
-  -webkit-tap-highlight-color: rgba(255,255,255,.15);
-
-  /* HØJDE: giv mere vertikal padding (eller brug height + line-height) */
-  padding: 10px 16px;            /* var 8px 14px → lidt mere højde */
-
-  border-radius:12px; background:#0d0d0f; border:1px solid #333;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-}
-
+      /* ingen margin/left/top her – .nav håndterer spacing/position */
+      color: var(--nav-text);
+      text-decoration: none;
+      position: relative; z-index: 1; pointer-events: auto;
+      -webkit-tap-highlight-color: rgba(255,255,255,.15);
+      padding: var(--nav-pad-y) var(--nav-pad-x);
+      border-radius:12px; background: var(--nav-bg); border:1px solid var(--nav-border);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+      opacity:.96;
+    }
     header.wrap nav a:hover,
     header.wrap nav a[aria-current="page"]{ text-decoration: underline; }
 
@@ -250,7 +294,8 @@
 
   <!-- ØVERSTE MENU -->
   <header class="wrap">
-    <nav>
+    <!-- Bemærk: nu med fælles .nav og et lille nudge op -->
+    <nav class="nav nav--left" style="--nav-shift-x:0px; --nav-shift-y:-2px;">
       <a href="/index.html" aria-current="page">Home</a>
       <a href="/madacoin.html">Om MadaCoin</a>
       <a href="/rapporter.html">Rapporter</a>
@@ -640,7 +685,3 @@
   <footer><span id="footer-text">© 2025 MadaCoin. All rights reserved.</span></footer>
 </body>
 </html>
-
-
-
-
