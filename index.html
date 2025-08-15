@@ -19,11 +19,11 @@
   <meta name="twitter:title" content="MadaCoin — Donations for Madagascar">
   <meta name="twitter:description" content="Støt udvikling i Madagaskar gennem MadaCoin.">
 
-  <!-- Supabase -->
+  <!-- Supabase SDK -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
   <style>
-    /* ===== Base typografi (match Side 2) ===== */
+    /* ===== Typografi (fælles på alle sider) ===== */
     html{ font-size:16px; }
     body{
       font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
@@ -39,22 +39,20 @@
       background-size: cover;
       background-attachment: fixed; /* desktop */
     }
-    @media (max-width: 800px){
-      body{ background-attachment: scroll; }
-    }
+    @media (max-width: 800px){ body{ background-attachment: scroll; } }
     button, input, select, textarea { font: inherit; }
 
-    /* Globale overskrifter – fælles på alle sider */
+    /* Globale overskrifter – fælles */
     h1{ font-size: clamp(22px, 2.6vw, 26px); line-height: 1.25; margin: 0 0 .5em; }
     h2{ font-size: clamp(18px, 2.2vw, 22px); line-height: 1.3;  margin: 0 0 .5em; }
     h3{ font-size: clamp(16px, 1.8vw, 18px); line-height: 1.35; margin: 0 0 .5em; }
 
-    /* ===== Fælles header + nav (venstrejusteret) ===== */
+    /* ===== Common NAV (venstre) + Social (samme på alle sider) ===== */
     :root{
+      /* NAV-boks som på side 2 */
       --nav-gap:14px;
-      --nav-height:44px;
-      --nav-pad-x:16px;
-      --nav-pad-y:10px;
+      --nav-pad-x:14px;
+      --nav-pad-y:8px;
       --nav-shift-x:0px;
       --nav-shift-y:-2px;
 
@@ -65,8 +63,8 @@
       --nav-hover-border:#444;
       --nav-active:#5aa9ff;
 
-      /* Social menu offset (lige under header) */
-      --social-top: 110px;    /* tweak her hvis du vil have den tættere/fjernere */
+      /* Social menu placering lige under nav */
+      --social-top: 104px;   /* justér 96–120px efter smag */
     }
 
     .site-nav{
@@ -84,13 +82,13 @@
     .nav{
       display:flex; align-items:center; flex-wrap:wrap;
       gap:var(--nav-gap);
-      justify-content:flex-start;
+      justify-content:flex-start;                 /* venstre */
       transform:translate(var(--nav-shift-x), var(--nav-shift-y));
     }
     .nav a{
       display:inline-flex; align-items:center; justify-content:center;
-      height:var(--nav-height);
       padding:var(--nav-pad-y) var(--nav-pad-x);
+      height:auto;                                /* ingen fast højde */
       color:var(--nav-text);
       background:var(--nav-bg);
       border:1px solid var(--nav-border);
@@ -99,7 +97,7 @@
       position:relative; z-index:1; pointer-events:auto;
       -webkit-tap-highlight-color: rgba(255,255,255,.15);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-      font-size: 1rem; /* ens nav-tekst */
+      font-size: 1rem;                            /* ens nav-tekst */
     }
     .nav a:hover,
     .nav a:focus-visible{
@@ -113,11 +111,11 @@
       box-shadow: 0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset;
     }
 
-    /* ===== Social menu – rykket op under knapperne ===== */
+    /* Sociale links – fast position under nav */
     .social-menu {
       position: fixed;
-      top: var(--social-top);   /* låst lige under header */
-      left: 20px;
+      top: var(--social-top);
+      left: 24px;            /* matcher header-indryk */
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -134,13 +132,10 @@
       text-decoration: none;
       transition: background-color 0.2s ease, transform 0.15s ease;
     }
-    .social-menu a:hover {
-      background-color: rgba(0, 0, 0, 0.85);
-      transform: translateY(-2px);
-    }
+    .social-menu a:hover { background-color: rgba(0, 0, 0, 0.85); transform: translateY(-2px); }
     .social-menu a img { width: 22px; height: 22px; }
 
-    /* ===== Page-indhold (uændret) ===== */
+    /* ===== Page-indhold (som før) ===== */
     .madagascar-container {
       position: absolute;
       top: 0%;
@@ -226,7 +221,7 @@
       width: 100%;
       max-width: 700px;
     }
-    .roadmap-box h2 { margin: 0; color: #444; font-size: inherit; } /* ← arver global h2 */
+    .roadmap-box h2 { margin: 0; color: #444; font-size: inherit; } /* arver global h2 */
 
     .description { font-size: 0.8rem; margin: 0; color: #555; }
     .step-images {
@@ -273,10 +268,10 @@
     footer a:hover { text-decoration: underline; }
     footer.muted { opacity: 1; }
 
-    /* Mobil: lidt behagelig indrykning i header + social offset en smule lavere */
+    /* Mobil: header-indryk + social offset lidt lavere */
     @media (max-width:900px){
       .site-nav .nav-inner{ padding-left:16px; padding-right:24px; }
-      :root{ --social-top: 120px; }
+      :root{ --social-top: 116px; }
     }
     @media (max-width: 768px) {
       .madagascar-container img { width: 92vw; max-width: 520px; }
@@ -287,18 +282,18 @@
 </head>
 <body>
 
-  <!-- ØVERSTE MENU (ensret) -->
+  <!-- ØVERSTE MENU (fælles) -->
   <header class="site-nav">
     <div class="nav-inner">
       <nav class="nav" style="--nav-shift-y:-2px;">
-        <a href="/index.html" aria-current="page">Home</a>
-        <a href="/madacoin.html">Om MadaCoin</a>
-        <a href="/rapporter.html">Rapporter</a>
+        <a href="/index.html" aria-current="page" data-text="common:nav_home">Home</a>
+        <a href="/madacoin.html" data-text="common:nav_about">Om</a>
+        <a href="/rapporter.html" data-text="common:nav_reports">Rapporter</a>
       </nav>
     </div>
   </header>
 
-  <!-- VENSTREMENU SOCIAL – lige under knapperne -->
+  <!-- Sociale links (Supabase) -->
   <div class="social-menu" id="social-menu"></div>
 
   <!-- Ø-billedet -->
@@ -312,22 +307,43 @@
     <section class="coin-section">
       <div class="coin">
         <img id="coinD" alt="MadaCoin Donation" />
-        <p class="coin-description">Støt vores mission ved at købe MadaCoin Donation.</p>
-        <button class="button" onclick="openTransak('MCD', '0xa594586B04f1b6782EC906B49882EbD0E652a388')">Køb MadaCoin Donation</button>
+        <p class="coin-description" data-text="home:coin_d_desc">Støt vores mission ved at købe MadaCoin Donation.</p>
+        <button class="button" data-text="home:coin_d_btn" onclick="openTransak('MCD', '0xa594586B04f1b6782EC906B49882EbD0E652a388')">Køb MadaCoin Donation</button>
       </div>
       <div class="coin">
         <img id="coinC" alt="MadaCoin" />
-        <p class="coin-description">Investér i MadaCoin – fremtidens valuta for Madagaskar.</p>
-        <button class="button" onclick="openTransak('MCN', 'DIN_MCN_KONTRAKT_ADRESSE')">Køb MadaCoin</button>
+        <p class="coin-description" data-text="home:coin_c_desc">Investér i MadaCoin – fremtidens valuta for Madagaskar.</p>
+        <button class="button" data-text="home:coin_c_btn" onclick="openTransak('MCN', 'DIN_MCN_KONTRAKT_ADRESSE')">Køb MadaCoin</button>
       </div>
     </section>
   </div>
 
-  <!-- ROADMAP -->
+  <!-- ROADMAP (tekster fra Supabase) -->
   <div class="roadmap" id="roadmap"></div>
 
+  <!-- YouTube (skjules hvis ingen data) -->
+  <section id="yt-section" style="margin:40px 0;">
+    <div style="max-width:1000px;margin:0 auto;">
+      <div id="yt-player" style="position:relative;padding-top:56.25%;border:2px solid #222;border-radius:14px;overflow:hidden;"></div>
+      <div id="yt-thumbs" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px;margin-top:16px;"></div>
+    </div>
+  </section>
+
+  <!-- Lightbox til roadmap -->
+  <div id="rm-lightbox" aria-hidden="true" style="display:none;">
+    <div class="rm-backdrop"></div>
+    <img id="rm-image" alt="Roadmap" />
+  </div>
+
+  <footer><span id="footer-text" data-text="common:footer">© 2025 MadaCoin. All rights reserved.</span></footer>
+
   <script>
-    /* Transak (placeholder) */
+    /* ========= Supabase klient ========= */
+    const SUPABASE_URL  = "https://byrlebjwknppjbtbkozt.supabase.co";
+    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
+    const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null;
+
+    /* ========= Transak (placeholder) ========= */
     const TRANSAK_KEY = "DIN_API_KEY";
     function openTransak(symbol, wallet) {
       if (!TRANSAK_KEY || TRANSAK_KEY === "DIN_API_KEY" || (wallet && wallet.includes("DIN_MCN_KONTRAKT_ADRESSE"))) {
@@ -338,138 +354,162 @@
       window.open(url, "_blank", "width=500,height=700");
     }
 
-    /* Supabase public base */
-    const base = "https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public";
+    /* ========= Social links ========= */
+    function normalizeUrl(url){ if(!url) return null; const u=url.trim(); return /^https?:\/\//i.test(u)?u:('https://'+u); }
+    function iconUrlFor(platform){
+      const formatted = platform.charAt(0).toUpperCase()+platform.slice(1).toLowerCase();
+      const { data } = sb.storage.from('social.icons').getPublicUrl(`${formatted}.svg`);
+      return data?.publicUrl || null;
+    }
+    function fallbackIconUrl(){
+      const { data } = sb.storage.from('social.icons').getPublicUrl('Globe.svg');
+      return data?.publicUrl || '';
+    }
+    async function renderSocialLinks(){
+      const el = document.getElementById('social-menu');
+      if(!el || !sb) return;
+      el.innerHTML = '';
+      const { data, error } = await sb
+        .from('social_links')
+        .select('platform,url,is_active,sort_order')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+      if(error){ console.error('social_links:', error); return; }
+      const globe = fallbackIconUrl();
+      (data||[]).filter(r => r.url && r.url.trim()!=='').forEach(r=>{
+        const a=document.createElement('a');
+        a.href=normalizeUrl(r.url); a.target='_blank'; a.rel='noopener noreferrer'; a.title=r.platform;
+        const img=document.createElement('img');
+        img.src=iconUrlFor(r.platform)||globe; img.onerror=()=>{ img.src=globe; };
+        a.appendChild(img); el.appendChild(a);
+      });
+    }
 
-    /* Coins */
+    /* ========= Site text loader (common + home) ========= */
+    async function loadSiteText(){
+      if(!sb) return;
+      try{
+        const { data, error } = await sb
+          .from('site_text')
+          .select('page,key,value')
+          .in('page',['common','home']);
+        if(error){ console.warn('site_text:', error); return; }
+        const dict={}; (data||[]).forEach(r=>{ dict[`${r.page}:${r.key}`]=r.value; });
+        document.querySelectorAll('[data-text]').forEach(el=>{
+          const k=el.getAttribute('data-text');
+          if(dict[k]!=null) el.innerHTML = dict[k];
+        });
+        return dict;
+      }catch(e){ console.warn('site_text ex:', e); }
+    }
+
+    /* ========= Coins (billeder) ========= */
+    const base = "https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public";
     const pub = (...p) => `${base}/${p.map(encodeURIComponent).join('/')}`;
-    function setCoinImages() {
-      const c = document.getElementById('coinC');
-      const d = document.getElementById('coinD');
+    function setCoinImages(){
+      const c=document.getElementById('coinC');
+      const d=document.getElementById('coinD');
       if (c) c.src = pub('images','MadaCoin_C.png');
       if (d) d.src = pub('images','MadaCoin_D.png');
     }
 
-    /* Roadmap-billeder */
-    const buckets = ["roadmap1", "roadmap2", "roadmap3", "roadmap4"];
-    const steps = [
-      { title: "Køb byggegrund - Opret projekt kontor", desc: "Når målet er opfyldt, køber vi byggegrund og opretter projektkontor." },
-      { title: "De første boliger bygges", desc: "Når minimum målet er opfyldt, sættes projektet i gang." },
-      { title: "Solcellepark og batterier", desc: "Når målet er opnået, installerer vi solceller og batterier." },
-      { title: "Byg en Skole", desc: "Byggeprojekt fra børnehave til gymnasium." }
-    ];
+    /* ========= Roadmap – tekster fra site_text ========= */
+    function renderRoadmap(dict){
+      const root=document.getElementById('roadmap'); if(!root) return;
+      root.innerHTML='';
 
-    function renderRoadmap() {
-      const root = document.getElementById('roadmap');
-      root.innerHTML = '';
-
-      buckets.forEach((bucket, idx) => {
-        const stepIndex = idx + 1;
-        const s = steps[idx] || { title: `Roadmap ${stepIndex}`, desc: '' };
-
-        const box = document.createElement('div');
-        box.className = 'roadmap-box';
-        box.innerHTML = `
-          <h2>${s.title}</h2>
-          <p class="description">${s.desc}</p>
-          <div class="step-images" id="imgs-${stepIndex}"></div>
+      const buckets = ["roadmap1","roadmap2","roadmap3","roadmap4"];
+      for(let i=1;i<=4;i++){
+        const title = (dict && dict[`home:roadmap_${i}_title`]) || `Roadmap ${i}`;
+        const desc  = (dict && dict[`home:roadmap_${i}_desc`])  || '';
+        const box=document.createElement('div');
+        box.className='roadmap-box';
+        box.innerHTML=`
+          <h2>${title}</h2>
+          <p class="description">${desc}</p>
+          <div class="step-images" id="imgs-${i}"></div>
         `;
         root.appendChild(box);
 
-        const wrap = document.getElementById(`imgs-${stepIndex}`);
-
-        for (let i = 1; i <= 10; i++) {
-          const url = `${base}/${bucket}/Roadmap_${stepIndex}_pic_${i}.png`;
-          const img = document.createElement('img');
-          img.alt = `Roadmap ${stepIndex} billede ${i}`;
-          img.src = url;
-          img.classList.add('roadmap-thumb');
-          img.onerror = () => img.remove();
+        const wrap=document.getElementById(`imgs-${i}`);
+        for(let pic=1; pic<=10; pic++){
+          const url = `${base}/${buckets[i-1]}/Roadmap_${i}_pic_${pic}.png`;
+          const img=document.createElement('img');
+          img.alt=`Roadmap ${i} billede ${pic}`; img.src=url; img.classList.add('roadmap-thumb');
+          img.onerror=()=>img.remove();
           wrap.appendChild(img);
         }
-
-        setTimeout(() => {
-          if (!wrap.querySelector('img')) {
-            wrap.innerHTML = `<p style="color:#666;margin:6px 0;">Billeder kommer snart…</p>`;
-          }
-        }, 500);
-      });
+        setTimeout(()=>{ if(!wrap.querySelector('img')) wrap.innerHTML=`<p style="color:#666;margin:6px 0;">Billeder kommer snart…</p>`; }, 400);
+      }
     }
 
-    renderRoadmap();
-    setCoinImages();
-  </script>
+    /* ========= Roadmap Lightbox ========= */
+    (function initLightbox(){
+      let rmBox, rmImg, scale=1, tx=0, ty=0, justOpenedAt=0;
+      const MIN_SCALE=1, MAX_SCALE=4;
+      function apply(){ if(rmImg) rmImg.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`; }
+      function reset(){ scale=1; tx=0; ty=0; apply(); }
+      function open(src){ rmImg.src=src; reset(); document.body.classList.add('modal-open'); rmBox.classList.add('active'); rmBox.style.display='flex'; justOpenedAt=Date.now(); }
+      function close(){ document.body.classList.remove('modal-open'); rmBox.classList.remove('active'); rmBox.style.display='none'; rmImg.src=''; }
+      function mark(){ document.querySelectorAll('img').forEach(img=>{ if(/roadmap/i.test(img.src)) img.classList.add('roadmap-thumb'); }); }
+      function init(){
+        rmBox=document.getElementById('rm-lightbox');
+        rmImg=document.getElementById('rm-image');
+        if(!rmBox || !rmImg) return;
+        mark();
+        document.addEventListener('click', e=>{
+          const t=e.target;
+          if(t.classList.contains('roadmap-thumb')){ e.preventDefault(); open(t.dataset.fullsrc||t.src); }
+        }, { passive:false });
+        rmBox.addEventListener('click', (e)=>{ if(Date.now()-justOpenedAt<300) return; if(e.target===rmBox||e.target===rmImg||e.target.classList.contains('rm-backdrop')) close(); }, { passive:true });
+        rmImg.addEventListener('wheel', (e)=>{ e.preventDefault(); const rect=rmImg.getBoundingClientRect(); const cx=e.clientX-(rect.left+rect.width/2)-tx; const cy=e.clientY-(rect.top+rect.height/2)-ty; const old=scale; const factor=Math.exp(-e.deltaY*0.0015); scale=Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale*factor)); const k=scale/old; tx-=cx*(k-1); ty-=cy*(k-1); apply(); }, { passive:false });
+        rmImg.addEventListener('click', ()=>{ if(Date.now()-justOpenedAt<300) return; if(scale>1) reset(); else close(); });
+        rmImg.addEventListener('contextmenu', e=>e.preventDefault());
+      }
+      window.addEventListener('load', init);
+    })();
 
-  <!-- YouTube (skjules automatisk hvis ingen data) -->
-  <section id="yt-section" style="margin:40px 0;">
-    <div style="max-width:1000px;margin:0 auto;">
-      <div id="yt-player" style="position:relative;padding-top:56.25%;border:2px solid #222;border-radius:14px;overflow:hidden;"></div>
-      <div id="yt-thumbs" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px;margin-top:16px;"></div>
-    </div>
-  </section>
-
-  <script>
-    const SUPABASE_URL = "https://byrlebjwknppjbtbkozt.supabase.co";
-    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-    window.sb = sb;
-
-    function getYouTubeId(url) {
-      if (!url) return null;
-      try {
-        const u = new URL(url);
-        if (u.hostname.includes("youtu.be")) return u.pathname.slice(1);
-        if (u.searchParams.get("v")) return u.searchParams.get("v");
-        const m = url.match(/(?:embed|shorts)\/([a-zA-Z0-9_-]{6,})/);
-        if (m) return m[1];
-        const seg = u.pathname.split("/").pop();
-        return seg && seg.length >= 6 ? seg : null;
-      } catch { return null; }
+    /* ========= YouTube ========= */
+    function getYouTubeId(url){
+      if(!url) return null;
+      try{
+        const u=new URL(url);
+        if(u.hostname.includes("youtu.be")) return u.pathname.slice(1);
+        if(u.searchParams.get("v")) return u.searchParams.get("v");
+        const m=url.match(/(?:embed|shorts)\/([a-zA-Z0-9_-]{6,})/); if(m) return m[1];
+        const seg=u.pathname.split("/").pop(); return seg && seg.length>=6 ? seg : null;
+      }catch{ return null; }
     }
-    function thumbUrl(id) { return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`; }
-
-    function renderPlayer(id) {
-      const el = document.getElementById("yt-player");
-      el.innerHTML = `
-        <iframe
-          src="https://www.youtube.com/embed/${id}"
-          title="MadaCoin video"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowfullscreen
-          style="position:absolute;inset:0;width:100%;height:100%;"
-        ></iframe>`;
+    function thumbUrl(id){ return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`; }
+    function renderPlayer(id){
+      const el=document.getElementById("yt-player");
+      if(!el) return;
+      el.innerHTML=`<iframe src="https://www.youtube.com/embed/${id}" title="MadaCoin video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;"></iframe>`;
     }
-
-    function renderThumbs(videos, activeId) {
-      const wrap = document.getElementById("yt-thumbs");
-      wrap.innerHTML = "";
-      videos.forEach(v => {
-        const id = v._id;
-        const btn = document.createElement("button");
-        btn.style.background = 'transparent';
-        btn.style.border = id === activeId ? "3px solid #f0b90b" : "2px solid #333";
-        btn.style.borderRadius = "12px";
-        btn.style.overflow = "hidden";
-        btn.style.cursor = "pointer";
-        btn.style.padding = "0";
-        btn.title = v.title || "Se video";
-        btn.innerHTML = `
+    function renderThumbs(videos, activeId){
+      const wrap=document.getElementById("yt-thumbs"); if(!wrap) return;
+      wrap.innerHTML="";
+      videos.forEach(v=>{
+        const id=v._id;
+        const btn=document.createElement("button");
+        btn.style.background='transparent';
+        btn.style.border=id===activeId?"3px solid #f0b90b":"2px solid #333";
+        btn.style.borderRadius="12px";
+        btn.style.overflow="hidden";
+        btn.style.cursor="pointer";
+        btn.style.padding="0";
+        btn.title=v.title||"Se video";
+        btn.innerHTML=`
           <div style="display:flex;flex-direction:column;gap:6px">
-            <img src="${thumbUrl(id)}" alt="${v.title || "YouTube thumbnail"}"
-                 style="display:block;width:100%;height:100%;object-fit:cover;">
-            ${v.title ? `<div style="font-size:13px;line-height:1.3;color:#222;background:rgba(255,247,214,.95);padding:6px 8px;border-radius:8px;text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${v.title}</div>` : ``}
+            <img src="${thumbUrl(id)}" alt="${v.title||"YouTube thumbnail"}" style="display:block;width:100%;height:100%;object-fit:cover;">
+            ${v.title?`<div style="font-size:13px;line-height:1.3;color:#222;background:rgba(255,247,214,.95);padding:6px 8px;border-radius:8px;text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${v.title}</div>`:''}
           </div>`;
-        btn.onclick = () => {
-          renderPlayer(id);
-          [...wrap.children].forEach(c => c.style.border = "2px solid #333");
-          btn.style.border = "3px solid #f0b90b";
-        };
+        btn.onclick=()=>{ renderPlayer(id); [...wrap.children].forEach(c=>c.style.border="2px solid #333"); btn.style.border="3px solid #f0b90b"; };
         wrap.appendChild(btn);
       });
     }
-
-    async function initYouTube() {
+    async function initYouTube(){
+      if(!sb) return;
       const { data, error } = await sb
         .from("youtube_videos")
         .select("youtube_url,is_active,created_at,title,sort_order")
@@ -478,205 +518,25 @@
         .neq("youtube_url", "")
         .order("sort_order", { ascending: true, nullsFirst: false })
         .order("created_at", { ascending: false });
+      if(error){ console.error(error); return; }
+      const videos=(data||[]).map(v=>({ ...v, _id:getYouTubeId(v.youtube_url) })).filter(v=>v._id);
+      if(!videos.length){ const sec=document.getElementById("yt-section"); if(sec) sec.style.display="none"; return; }
+      renderPlayer(videos[0]._id); renderThumbs(videos, videos[0]._id);
+    }
 
-      if (error) { console.error(error); return; }
-
-      const videos = (data || [])
-        .map(v => ({ ...v, _id: getYouTubeId(v.youtube_url) }))
-        .filter(v => v._id);
-
-      if (!videos.length) {
-        document.getElementById("yt-section").style.display = "none";
-        return;
+    /* ========= Init ========= */
+    async function init(){
+      setCoinImages();
+      if(sb){
+        const dict = await loadSiteText();
+        renderRoadmap(dict);
+        await renderSocialLinks();
+        await initYouTube();
+      } else {
+        renderRoadmap(null);
       }
-
-      document.getElementById("yt-section").style.display = "";
-      renderPlayer(videos[0]._id);
-      renderThumbs(videos, videos[0]._id);
     }
-    initYouTube();
-
-    // Social links
-    function normalizeUrl(url) {
-      if (!url) return null;
-      const u = url.trim();
-      if (/^https?:\/\//i.test(u)) return u;
-      return 'https://' + u;
-    }
-    function iconUrlFor(platform) {
-      const formattedName = platform.charAt(0).toUpperCase() + platform.slice(1).toLowerCase();
-      const { data } = sb.storage.from('social.icons').getPublicUrl(`${formattedName}.svg`);
-      return data?.publicUrl || null;
-    }
-    function fallbackIconUrl() {
-      const { data } = sb.storage.from('social.icons').getPublicUrl('Globe.svg');
-      return data?.publicUrl || '';
-    }
-    async function renderSocialLinks() {
-      const el = document.getElementById('social-menu');
-      el.innerHTML = '';
-      const { data, error } = await sb
-        .from('social_links')
-        .select('platform,url,is_active,sort_order')
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true });
-      if (error) { console.error('Fejl ved hentning af social_links:', error); return; }
-      const globe = fallbackIconUrl();
-      (data || []).filter(r => r.url && r.url.trim() !== '').forEach(r => {
-        const platform = (r.platform || '').trim();
-        const href = normalizeUrl(r.url);
-        if (!href) return;
-        const a = document.createElement('a');
-        a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer';
-        a.title = platform; a.setAttribute('aria-label', platform);
-        const img = document.createElement('img');
-        img.src = iconUrlFor(platform) || globe;
-        img.onerror = () => { img.src = globe; };
-        a.appendChild(img);
-        el.appendChild(a);
-      });
-    }
-    window.addEventListener('load', () => {
-      renderSocialLinks();
-      setTimeout(renderSocialLinks, 500);
-    });
+    init();
   </script>
-
-  <script>
-    /* === ROADMAP LIGHTBOX — START === */
-    let rmBox, rmImg;
-    let scale = 1, tx = 0, ty = 0;
-    const MIN_SCALE = 1, MAX_SCALE = 4;
-
-    let justOpenedAt = 0;
-    const OPEN_GUARD_MS = 350;
-
-    function applyTransform(){ if (!rmImg) return; rmImg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`; }
-    function centerReset(){ scale = 1; tx = 0; ty = 0; applyTransform(); }
-    function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
-
-    let touchMoved = false, pinchStartDist = 0, pinchStartScale = 1;
-    let panStartX = 0, panStartY = 0, panning = false;
-
-    function openLightbox(src){
-      rmImg.src = src; centerReset();
-      document.body.classList.add('modal-open');
-      rmBox.classList.add('active'); rmBox.setAttribute('aria-hidden','false');
-      justOpenedAt = Date.now();
-    }
-    function closeLightbox(){
-      document.body.classList.remove('modal-open');
-      rmBox.classList.remove('active'); rmBox.setAttribute('aria-hidden','true');
-      rmImg.src = '';
-    }
-
-    function initRoadmapLightboxPart1(){
-      const thumbs = Array.from(document.querySelectorAll('.roadmap-thumb'));
-      thumbs.forEach((img) => {
-        const full = img.dataset.fullsrc || img.src;
-        img.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); openLightbox(full); }, { passive:false });
-
-        let sx=0, sy=0, st=0, moved=false;
-        img.addEventListener('touchstart', (e) => {
-          if (e.touches.length !== 1) return;
-          const t=e.touches[0]; sx=t.clientX; sy=t.clientY; st=Date.now(); moved=false;
-        }, { passive:true });
-        img.addEventListener('touchmove', (e) => {
-          if (e.touches.length !== 1) return;
-          const t=e.touches[0];
-          if (Math.abs(t.clientX-sx)>15 || Math.abs(t.clientY-sy)>15) moved=true;
-        }, { passive:true });
-        img.addEventListener('touchend', (e) => {
-          const dt=Date.now()-st;
-          if (!moved && dt<350) { e.preventDefault(); e.stopPropagation(); openLightbox(full); }
-        }, { passive:false });
-      });
-    }
-    function markRoadmapImages(){
-      const imgs=[...document.querySelectorAll('img')];
-      imgs.filter(img=>/roadmap/i.test(img.src)).forEach(img=>img.classList.add('roadmap-thumb'));
-    }
-
-    function rmWheelHandler(e){
-      e.preventDefault();
-      const rect = rmImg.getBoundingClientRect();
-      const cx = e.clientX - (rect.left + rect.width/2) - tx;
-      const cy = e.clientY - (rect.top  + rect.height/2) - ty;
-
-      const old = scale;
-      const factor = Math.exp(-e.deltaY * 0.0015);
-      scale = clamp(scale * factor, MIN_SCALE, MAX_SCALE);
-
-      const k = scale / old;
-      tx -= cx * (k - 1);
-      ty -= cy * (k - 1);
-      applyTransform();
-    }
-
-    function rmTouchStart(e){
-      touchMoved=false;
-      if (e.touches.length===2){
-        const [a,b]=e.touches;
-        pinchStartDist=Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY);
-        pinchStartScale=scale;
-      } else if (e.touches.length===1 && scale>1){
-        const t=e.touches[0]; panning=true;
-        panStartX=t.clientX - tx; panStartY=t.clientY - ty;
-      }
-    }
-    function rmTouchMove(e){
-      if (e.touches.length===2){
-        e.preventDefault();
-        const [a,b]=e.touches;
-        const dist=Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY);
-        scale=clamp(pinchStartScale*(dist/pinchStartDist),MIN_SCALE,MAX_SCALE);
-        applyTransform(); touchMoved=true;
-      } else if (e.touches.length===1 && panning){
-        e.preventDefault();
-        const t=e.touches[0];
-        tx=t.clientX - panStartX; ty=t.clientY - panStartY;
-        applyTransform(); touchMoved=true;
-      }
-    }
-    function rmTouchEnd(){
-      panning=false;
-      if (!touchMoved){ if (scale>1) centerReset(); else closeLightbox(); }
-    }
-
-    window.addEventListener('load', () => {
-      rmBox=document.getElementById('rm-lightbox');
-      rmImg=document.getElementById('rm-image');
-      if (!rmBox || !rmImg) return;
-
-      markRoadmapImages(); initRoadmapLightboxPart1();
-
-      rmBox.addEventListener('click', (e) => {
-        if (Date.now()-justOpenedAt<350) return;
-        const clickedBackdrop = e.target===rmBox || e.target.classList.contains('rm-backdrop');
-        const clickedImage    = e.target===rmImg;
-        if (clickedBackdrop || clickedImage) closeLightbox();
-      }, { passive:true });
-      rmBox.addEventListener('touchmove', (e)=>e.preventDefault(), { passive:false });
-
-      rmImg.addEventListener('wheel', rmWheelHandler, { passive:false });
-      rmImg.addEventListener('click', () => {
-        if (Date.now()-justOpenedAt<350) return;
-        if (scale>1) centerReset(); else closeLightbox();
-      });
-      rmImg.addEventListener('touchstart', rmTouchStart, { passive:true });
-      rmImg.addEventListener('touchmove',  rmTouchMove,  { passive:false });
-      rmImg.addEventListener('touchend',   rmTouchEnd,   { passive:true });
-      rmImg.addEventListener('contextmenu', (e)=>e.preventDefault());
-    });
-    /* === ROADMAP LIGHTBOX — SLUT === */
-  </script>
-
-  <!-- Lightbox til roadmap -->
-  <div id="rm-lightbox" aria-hidden="true">
-    <div class="rm-backdrop"></div>
-    <img id="rm-image" alt="Roadmap" />
-  </div>
-
-  <footer><span id="footer-text">© 2025 MadaCoin. All rights reserved.</span></footer>
 </body>
 </html>
