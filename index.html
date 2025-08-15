@@ -284,7 +284,7 @@
     #rm-lightbox {
       position: fixed; inset: 0;
       display: none; align-items: center; justify-content: center;
-      z-index: 9999;
+      z-index: 100000; /* ← HØJT lag så den altid er øverst */
     }
     #rm-lightbox.active { display: flex; }
     #rm-lightbox .rm-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.85); }
@@ -477,7 +477,7 @@
       if (d) d.src = pub('images','MadaCoin_D.png');
     }
 
-    /* Roadmap-billeder (som før) */
+    /* Roadmap-billeder + KLIK-binding (robust) */
     const buckets = ["roadmap1", "roadmap2", "roadmap3", "roadmap4"];
     const steps = [
       { title: "Køb byggegrund - Opret projekt kontor", desc: "Når målet er opfyldt, køber vi byggegrund og opretter projektkontor." },
@@ -488,9 +488,11 @@
     function renderRoadmap() {
       const root = document.getElementById('roadmap');
       root.innerHTML = '';
+
       buckets.forEach((bucket, idx) => {
         const stepIndex = idx + 1;
         const s = steps[idx] || { title: `Roadmap ${stepIndex}`, desc: '' };
+
         const box = document.createElement('div');
         box.className = 'roadmap-box';
         box.innerHTML = `
@@ -499,7 +501,9 @@
           <div class="step-images" id="imgs-${stepIndex}"></div>
         `;
         root.appendChild(box);
+
         const wrap = document.getElementById(`imgs-${stepIndex}`);
+
         for (let i = 1; i <= 10; i++) {
           const url = `${base}/${bucket}/Roadmap_${stepIndex}_pic_${i}.png`;
           const img = document.createElement('img');
@@ -507,8 +511,20 @@
           img.src = url;
           img.classList.add('roadmap-thumb');
           img.onerror = () => img.remove();
+
+          // ↓ Bind direkte til lightbox, én gang pr. billede
+          if (!img.dataset.lbBound) {
+            img.dataset.lbBound = "1";
+            img.addEventListener('click', (e) => {
+              e.preventDefault();
+              const full = img.dataset.fullsrc || img.src;
+              if (typeof openLightbox === 'function') openLightbox(full);
+            }, { passive: false });
+          }
+
           wrap.appendChild(img);
         }
+
         setTimeout(() => {
           if (!wrap.querySelector('img')) {
             wrap.innerHTML = `<p style="color:#666;margin:6px 0;">Billeder kommer snart…</p>`;
@@ -604,20 +620,19 @@
       await loadSiteText();          // ← henter hero-tekster m.m. fra Supabase
       await renderSocialLinks();     // sociale links fra Supabase
       setCoinImages();
-      renderRoadmapLight();
+      renderRoadmapLight();          // ← opretter billeder + klik-handler
       initYouTube();
       attachHeroActions();
     });
   </script>
 
   <script>
-    /* === ROADMAP LIGHTBOX — START (urørt) === */
+    /* === ROADMAP LIGHTBOX — START === */
     let rmBox, rmImg;
     let scale = 1, tx = 0, ty = 0;
     const MIN_SCALE = 1, MAX_SCALE = 4;
 
     let justOpenedAt = 0;
-    const OPEN_GUARD_MS = 350;
 
     function applyTransform(){ if (!rmImg) return; rmImg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`; }
     function centerReset(){ scale = 1; tx = 0; ty = 0; applyTransform(); }
@@ -636,33 +651,6 @@
       document.body.classList.remove('modal-open');
       rmBox.classList.remove('active'); rmBox.setAttribute('aria-hidden','true');
       rmImg.src = '';
-    }
-
-    function initRoadmapLightboxPart1(){
-      const thumbs = Array.from(document.querySelectorAll('.roadmap-thumb'));
-      thumbs.forEach((img) => {
-        const full = img.dataset.fullsrc || img.src;
-        img.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); openLightbox(full); }, { passive:false });
-
-        let sx=0, sy=0, st=0, moved=false;
-        img.addEventListener('touchstart', (e) => {
-          if (e.touches.length !== 1) return;
-          const t=e.touches[0]; sx=t.clientX; sy=t.clientY; st=Date.now(); moved=false;
-        }, { passive:true });
-        img.addEventListener('touchmove', (e) => {
-          if (e.touches.length !== 1) return;
-          const t=e.touches[0];
-          if (Math.abs(t.clientX-sx)>15 || Math.abs(t.clientY-sy)>15) moved=true;
-        }, { passive:true });
-        img.addEventListener('touchend', (e) => {
-          const dt=Date.now()-st;
-          if (!moved && dt<350) { e.preventDefault(); e.stopPropagation(); openLightbox(full); }
-        }, { passive:false });
-      });
-    }
-    function markRoadmapImages(){
-      const imgs=[...document.querySelectorAll('img')];
-      imgs.filter(img=>/roadmap/i.test(img.src)).forEach(img=>img.classList.add('roadmap-thumb'));
     }
 
     function rmWheelHandler(e){
@@ -716,19 +704,15 @@
       rmImg=document.getElementById('rm-image');
       if (!rmBox || !rmImg) return;
 
-      markRoadmapImages(); initRoadmapLightboxPart1();
-
+      // Ikke længere behov for at auto-binde her – renderRoadmap binder klik på hvert billede.
       rmBox.addEventListener('click', (e) => {
-        if (Date.now()-justOpenedAt<350) return;
         const clickedBackdrop = e.target===rmBox || e.target.classList.contains('rm-backdrop');
         const clickedImage    = e.target===rmImg;
         if (clickedBackdrop || clickedImage) closeLightbox();
       }, { passive:true });
-      rmBox.addEventListener('touchmove', (e)=>e.preventDefault(), { passive:false });
 
       rmImg.addEventListener('wheel', rmWheelHandler, { passive:false });
       rmImg.addEventListener('click', () => {
-        if (Date.now()-justOpenedAt<350) return;
         if (scale>1) centerReset(); else closeLightbox();
       });
       rmImg.addEventListener('touchstart', rmTouchStart, { passive:true });
