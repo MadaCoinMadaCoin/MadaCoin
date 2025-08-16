@@ -34,11 +34,10 @@
       --gap:88px;
 
       /* Sociale venstre-rail reference */
-      --social-top:106px;      /* top for sociale ikoner (øverste ikon) */
+      --social-top:106px;      
 
       /* FINJUSTERING af vertikal placering ift. sociale knapper */
-      /* Var -8px; nu -40px ≈ 50% mindre afstand (rykker Hero+Graf op) */
-      --left-rail-nudge:-100px;
+      --left-rail-nudge:-100px; /* <- dit ønskede løft */
 
       /* Usynlig boks: placering af Hero+Graf (alignet til social-top + nudge) */
       --left-rail-top: calc(var(--social-top) + var(--left-rail-nudge));
@@ -74,7 +73,7 @@
     /* === USYNLIG BOKS OM HERO+GRAF (uafhængig placering) === */
     .left-rail-box{
       position:absolute;
-      top:var(--left-rail-top);   /* <- justeret via --left-rail-nudge */
+      top:var(--left-rail-top);
       left:var(--left-rail-left);
       width:var(--left-col);
       background:transparent;
@@ -161,9 +160,10 @@
   <!-- NAV -->
   <header class="site-nav">
     <nav class="nav">
-      <a href="/index.html" aria-current="page">Home</a>
-      <a href="/madacoin.html">Om</a>
-      <a href="/rapporter.html">Rapporter</a>
+      <a href="/index.html" aria-current="page" data-text="common:nav_home">Home</a>
+      <a href="/madacoin.html" data-text="common:nav_about">Om</a>
+      <a href="/roadmap.html" data-text="common:nav_roadmap">Roadmap</a>
+      <a href="/rapporter.html" data-text="common:nav_reports">Rapporter</a>
     </nav>
   </header>
 
@@ -176,17 +176,17 @@
       <!-- Usynlig boks: KUN Hero + Graf (flyttes uafhængigt) -->
       <div class="left-rail-box">
         <section class="hero" id="home-hero">
-          <div class="ribbon">NYHED: 25% hotelrabat til MCD &amp; MCN holders</div>
-          <h1>Donér. Byg. Forandr Madagaskar.</h1>
-          <p class="sub">MadaCoin gør donationer til skoler, solenergi og lokale jobs — med fuld gennemsigtighed.</p>
+          <div class="ribbon" data-text="home:hero_ribbon">NYHED: 25% hotelrabat til MCD &amp; MCN holders</div>
+          <h1 data-text="home:hero_title">Donér. Byg. Forandr Madagaskar.</h1>
+          <p class="sub" data-text="home:hero_sub">MadaCoin gør donationer til skoler, solenergi og lokale jobs — med fuld gennemsigtighed.</p>
           <div class="points">
-            <span class="pt">Skolebyggeri</span>
-            <span class="pt">Solceller &amp; batterier</span>
-            <span class="pt">Åbne rapporter</span>
+            <span class="pt" data-text="home:hero_point1">Skolebyggeri</span>
+            <span class="pt" data-text="home:hero_point2">Solceller &amp; batterier</span>
+            <span class="pt" data-text="home:hero_point3">Åbne rapporter</span>
           </div>
           <div class="btns">
-            <button class="btn primary" id="hero-primary">Støt med MadaCoin</button>
-            <a class="btn" href="/rapporter.html">Se rapporter</a>
+            <button class="btn primary" id="hero-primary" data-text="home:hero_cta_primary">Støt med MadaCoin</button>
+            <a class="btn" href="/rapporter.html" data-text="home:hero_cta_secondary">Se rapporter</a>
           </div>
         </section>
 
@@ -338,5 +338,3 @@
   </script>
 </body>
 </html>
-
-
