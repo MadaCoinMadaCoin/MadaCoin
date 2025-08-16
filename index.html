@@ -3,293 +3,769 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MadaCoin</title>
+  <title>MadaCoin – Admin</title>
   <link rel="preconnect" href="https://unpkg.com" />
-  <script src="https://unpkg.com/@supabase/supabase-js@2" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
     :root{
-      --wrap:1280px; --gap:24px;
-      --rail-w: 260px;       /* venstre rail bredde */
-      --panel:#0f1217; --ink:#e9e9ef; --muted:#9aa0a6; --line:#1f2735; --accent:#3aa0ff;
+      --bg:#0b0b0c; --panel:#151518; --accent:#3aa0ff; --text:#e9e9ef; --muted:#9aa0a6; --danger:#ff6363; --ok:#4ade80;
+      --br:14px;
     }
     *{ box-sizing:border-box; }
-    html,body{ height:100%; margin:0; background:#0b0b0c; color:var(--ink); font:14px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial; }
+    html,body{ height:100%; background:var(--bg); color:var(--text); margin:0; font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial; }
     a{ color:var(--accent); text-decoration:none; }
-    .wrap{ max-width:var(--wrap); margin:0 auto; padding:0 16px; }
-
-    /* NAV */
-    .nav{ position:sticky; top:0; z-index:10; backdrop-filter:saturate(140%) blur(4px); background:rgba(11,11,12,.65); border-bottom:1px solid var(--line); }
-    .nav-inner{ display:flex; align-items:center; gap:18px; padding:12px 0; }
-    .nav a{ color:#cfe3ff; font-weight:600; }
-    .nav a:hover{ text-decoration:underline; }
-
-    /* VENSTRE SOCIAL RAIL */
-    .social-rail{ position:fixed; left:0; top:76px; width:var(--rail-w); padding:10px 10px 10px 14px; }
-    .social{ display:flex; flex-direction:column; gap:8px; }
-    .social a{ display:flex; align-items:center; gap:8px; color:var(--muted); padding:6px 8px; border:1px dashed transparent; border-radius:10px; }
-    .social a:hover{ border-color:var(--line); color:#cbd5e1; }
-
-    /* LAYOUT GRID */
-    .main{ display:grid; grid-template-columns: minmax(0,1fr); gap:var(--gap); margin:16px 0 80px; }
-    .content{ margin-left: calc(var(--rail-w) + 8px); } /* plads til venstre rail */
-
-    /* TOP: Mønter + YouTube centreret */
-    .top{ display:grid; grid-template-columns: 1fr 1fr; gap:var(--gap); align-items:start; }
-    .panel{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:14px; }
-    .coins{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
-    .coin{ background:#0b0d12; border:1px solid #1a2330; border-radius:14px; padding:12px; }
-    .coin h3{ margin:0 0 6px; font-size:16px; }
-    .coin p{ margin:6px 0 0; color:#cbd5e1; }
-
-    .yt{ }
-    .yt-main{ aspect-ratio:16/9; width:100%; border:0; border-radius:12px; background:#000; display:block; }
-    .yt-thumbs{ display:flex; gap:10px; margin-top:10px; overflow:auto; padding-bottom:2px; }
-    .yt-thumb{ width:120px; height:68px; border-radius:8px; border:1px solid #202a3a; object-fit:cover; cursor:pointer; }
-
-    /* “VENSTRE RAIL” FOR HERO + GRAF (placeret i indholdets venstre side) */
-    .rail{ display:grid; grid-template-columns: 1fr 1fr; gap:var(--gap); align-items:start; }
-    .hero h2{ margin:0 0 6px; font-size:20px; }
-    .hero p{ margin:8px 0 0; color:#cbd5e1; white-space:pre-wrap; }
-    .graph{ min-height:180px; display:grid; place-items:center; color:#acb4bf; border:1px dashed #243044; border-radius:12px; }
-
-    /* FOOTER sticky */
-    footer{ position:sticky; bottom:0; background:rgba(11,11,12,.65); border-top:1px solid var(--line); padding:10px 0; color:#9aa0a6; }
-
-    /* Responsiv */
-    @media (max-width:1100px){
-      :root{ --rail-w: 0px; }
-      .content{ margin-left: 0; }
-      .social-rail{ position:static; width:auto; padding:0; margin:8px 0 -6px; }
-      .social{ flex-direction:row; flex-wrap:wrap; }
+    .wrap{ max-width:1200px; margin:24px auto; padding:0 16px; }
+    .topbar{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+    .topbar h1{ font-size:20px; margin:0; }
+    .badge{ padding:4px 10px; background:#1f2937; border-radius:999px; border:1px solid #2a3342; color:#cbd5e1; font-size:12px; }
+    .row{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    button, .btn{
+      background:#1f2937; border:1px solid #2a3342; color:#e5e7eb; padding:8px 12px; border-radius:10px; cursor:pointer;
     }
-    @media (max-width:860px){
-      .top{ grid-template-columns: 1fr; }
-      .coins{ grid-template-columns: 1fr; }
-      .rail{ grid-template-columns: 1fr; }
+    button:hover{ border-color:#39485f; }
+    .btn.danger{ border-color:#5b2830; background:#2a0f12; color:#ffb4b4; }
+    .btn.ok{ border-color:#214d34; background:#0f261a; color:#9ef0c0; }
+    input,select,textarea{
+      background:#0f1217; border:1px solid #2a3342; color:#e5e7eb; padding:8px 10px; border-radius:10px; width:100%;
     }
+    textarea{ min-height:120px; white-space:pre-wrap; }
+    .panel{ background:var(--panel); border:1px solid #22242b; border-radius:var(--br); padding:14px; }
+    .tabs{ display:flex; gap:8px; margin:10px 0 14px; flex-wrap:wrap; }
+    .tab-btn{ padding:8px 12px; border:1px solid #2a3342; background:#14161b; color:#cbd5e1; border-radius:10px; cursor:pointer; }
+    .tab-btn.active{ background:#0f1217; border-color:#3aa0ff; color:#e9f2ff; }
+    .tab{ display:none; }
+    .tab.active{ display:block; }
+    table{ width:100%; border-collapse:separate; border-spacing:0 8px; }
+    th,td{ text-align:left; padding:6px; }
+    th{ color:#b8c0cc; font-weight:600; }
+    tr{ background:#101217; }
+    tr td:first-child, tr th:first-child{ border-top-left-radius:10px; border-bottom-left-radius:10px; }
+    tr td:last-child, tr th:last-child{ border-top-right-radius:10px; border-bottom-right-radius:10px; }
+    .status{ margin:12px 0; font-size:13px; color:#cbd5e1; }
+    .status .ok{ color:var(--ok); }
+    .status .err{ color:var(--danger); }
+    .grid{ display:grid; gap:10px; grid-template-columns:repeat(12,1fr); }
+    .g6{ grid-column:span 6; } .g4{ grid-column:span 4; } .g3{ grid-column:span 3; } .g12{ grid-column:span 12; }
+    @media (max-width:960px){ .g6,.g4,.g3{ grid-column:span 12; } }
+
+    /* Login modal */
+    .modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; z-index:99; }
+    .modal{ width:min(480px, 92vw); background:#0e1116; border:1px solid #2a3342; border-radius:16px; padding:18px; }
+    .modal h2{ margin:0 0 10px; }
+    .modal .hint{ color:#9aa0a6; font-size:12px; margin-top:6px; }
+    .modal-backdrop.show{ display:flex; }
+    .pill{ display:inline-block; padding:4px 8px; border:1px solid #2a3342; border-radius:999px; color:#aab4c0; font-size:12px; }
+    .muted{ color:#a3aab4; }
+    .sr{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+    .thumb{ width:64px; height:64px; object-fit:cover; border-radius:10px; border:1px solid #2a3342; }
+    .mono{ font-family: ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12px; color:#c7ced8; }
   </style>
 </head>
 <body>
-  <!-- NAV -->
-  <div class="nav">
-    <div class="wrap nav-inner">
-      <a href="/">Home</a>
-      <a href="/madacoin.html">Om</a>
-      <a href="/roadmap.html">Roadmap</a>
-      <a href="/rapporter.html">Rapporter</a>
+  <div class="wrap">
+    <div class="topbar">
+      <h1>MadaCoin – Admin</h1>
+      <div class="row">
+        <span id="who" class="badge">Ikke logget ind</span>
+        <button id="btnSignIn">Log ind</button>
+        <button id="btnSignOut" style="display:none">Log ud</button>
+      </div>
+    </div>
+
+    <div id="gate" class="panel">
+      <div class="status" id="gateMsg">Tjekker adgang…</div>
+    </div>
+
+    <div id="app" style="display:none">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="tab-bg">Baggrunde</button>
+        <button class="tab-btn" data-tab="tab-social">Sociale links</button>
+        <button class="tab-btn" data-tab="tab-text">Tekster</button>
+        <button class="tab-btn" data-tab="tab-yt">YouTube</button>
+        <button class="tab-btn" data-tab="tab-team">Team</button>
+        <button class="tab-btn" data-tab="tab-partners">Partnere</button>
+        <button class="tab-btn" data-tab="tab-translate">ChatGPT oversætter</button>
+      </div>
+
+      <!-- BAGGRUNDE -->
+      <div id="tab-bg" class="tab active">
+        <div class="panel">
+          <h3>Baggrunde (upload til <code>backgrounds</code>-bucket)</h3>
+          <p class="muted">Vælg side + 1×/2×. Upload skriver ind i <code>site_settings</code> (nøgler: <code>home_bg_1x</code>, <code>home_bg_2x</code> osv.).</p>
+          <div class="grid">
+            <div class="g3">
+              <label>Side</label>
+              <select id="bgPage">
+                <option value="home">home</option>
+                <option value="om">om</option>
+                <option value="roadmap">roadmap</option>
+                <option value="rapporter">rapporter</option>
+              </select>
+            </div>
+            <div class="g3">
+              <label>Tæthed</label>
+              <select id="bgDensity">
+                <option value="1x">1x</option>
+                <option value="2x">2x</option>
+              </select>
+            </div>
+            <div class="g6">
+              <label>Fil</label>
+              <input type="file" id="bgFile" accept="image/*" />
+            </div>
+            <div class="g12">
+              <button id="btnUploadBg">Upload & gem</button>
+              <span id="bgStatus" class="status"></span>
+            </div>
+          </div>
+          <div class="grid" style="margin-top:12px">
+            <div class="g6">
+              <label>Aktuel 1× URL</label>
+              <div class="mono" id="curBg1x">–</div>
+            </div>
+            <div class="g6">
+              <label>Aktuel 2× URL</label>
+              <div class="mono" id="curBg2x">–</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SOCIALE LINKS -->
+      <div id="tab-social" class="tab">
+        <div class="panel">
+          <div class="row" style="justify-content:space-between">
+            <h3>Sociale links</h3>
+            <button id="btnAddSocial">+ Tilføj</button>
+          </div>
+          <table id="tblSocial">
+            <thead>
+              <tr><th>Platform</th><th>URL</th><th>Aktiv</th><th>Sort</th><th>Handling</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div id="socialStatus" class="status"></div>
+        </div>
+      </div>
+
+      <!-- TEKSTER -->
+      <div id="tab-text" class="tab">
+        <div class="panel">
+          <h3>Tekster (site_text)</h3>
+          <div class="grid">
+            <div class="g3">
+              <label>Side</label>
+              <select id="txtPage">
+                <option value="home">home</option>
+                <option value="om">om</option>
+                <option value="roadmap">roadmap</option>
+                <option value="rapporter">rapporter</option>
+              </select>
+            </div>
+            <div class="g3">
+              <label>Sprog</label>
+              <select id="txtLang">
+                <option value="da">da</option>
+                <option value="en">en</option>
+                <option value="fr">fr</option>
+                <option value="mg">mg</option>
+              </select>
+            </div>
+            <div class="g6" style="align-self:end">
+              <button id="btnLoadTexts">Hent</button>
+              <button id="btnAddText">+ Tilføj</button>
+            </div>
+          </div>
+          <table id="tblText" style="margin-top:10px">
+            <thead>
+              <tr><th>Sektion</th><th>Nøgle</th><th>Indhold</th><th>Handling</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div id="textStatus" class="status"></div>
+        </div>
+      </div>
+
+      <!-- YOUTUBE -->
+      <div id="tab-yt" class="tab">
+        <div class="panel">
+          <div class="row" style="justify-content:space-between">
+            <h3>YouTube (liste)</h3>
+            <button id="btnAddYt">+ Tilføj</button>
+          </div>
+          <table id="tblYt">
+            <thead>
+            <tr><th>Video ID</th><th>Titel</th><th>Aktiv</th><th>Sort</th><th>Handling</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div id="ytStatus" class="status"></div>
+        </div>
+      </div>
+
+      <!-- TEAM -->
+      <div id="tab-team" class="tab">
+        <div class="panel">
+          <div class="row" style="justify-content:space-between">
+            <h3>Team (org_people)</h3>
+            <button id="btnAddPerson">+ Tilføj</button>
+          </div>
+          <table id="tblPeople">
+            <thead>
+              <tr><th>Foto</th><th>Navn</th><th>Rolle</th><th>Bio</th><th>Aktiv</th><th>Sort</th><th>Handling</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div id="peopleStatus" class="status"></div>
+        </div>
+      </div>
+
+      <!-- PARTNERE -->
+      <div id="tab-partners" class="tab">
+        <div class="panel">
+          <div class="row" style="justify-content:space-between">
+            <h3>Partnere</h3>
+            <button id="btnAddPartner">+ Tilføj</button>
+          </div>
+          <table id="tblPartners">
+            <thead>
+              <tr><th>Logo</th><th>Navn</th><th>URL</th><th>Aktiv</th><th>Sort</th><th>Handling</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div id="partnersStatus" class="status"></div>
+        </div>
+      </div>
+
+      <!-- CHATGPT OVERSÆTTER -->
+      <div id="tab-translate" class="tab">
+        <div class="panel">
+          <h3>ChatGPT oversætter</h3>
+          <div class="grid">
+            <div class="g12">
+              <label for="trSrc">Kildetekst</label>
+              <textarea id="trSrc" placeholder="Sæt tekst ind, der skal oversættes…"></textarea>
+            </div>
+            <div class="g4">
+              <label for="trFrom">Fra sprog (valgfri)</label>
+              <select id="trFrom">
+                <option value="">Auto-detect</option>
+                <option>da</option><option>en</option><option>fr</option><option>mg</option>
+              </select>
+            </div>
+            <div class="g4">
+              <label for="trTo">Til sprog</label>
+              <select id="trTo">
+                <option>da</option><option selected>en</option><option>fr</option><option>mg</option>
+              </select>
+            </div>
+            <div class="g4" style="align-self:end">
+              <button id="btnTranslate">Oversæt</button>
+            </div>
+            <div class="g12">
+              <label for="trOut">Resultat</label>
+              <textarea id="trOut" readonly></textarea>
+              <div id="trStatus" class="status"></div>
+            </div>
+          </div>
+          <p class="hint">Kræver Edge Function <code>/functions/v1/translate</code>. Hvis du får 404, mangler den at blive deployet.</p>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- VENSTRE SOCIAL RAIL -->
-  <aside class="social-rail">
-    <div class="social" id="social-menu">
-      <!-- Fyldes fra Supabase: social_links -->
+  <!-- Login modal -->
+  <div id="loginModal" class="modal-backdrop">
+    <div class="modal">
+      <h2>Log ind</h2>
+      <div class="grid">
+        <div class="g12"><label class="sr" for="email">Email</label><input id="email" type="email" placeholder="din@email.com" /></div>
+        <div class="g12"><label class="sr" for="password">Password</label><input id="password" type="password" placeholder="Password" /></div>
+        <div class="g12 row" style="justify-content:space-between">
+          <button id="doLogin" class="btn ok">Log ind</button>
+          <button id="closeLogin" class="btn">Luk</button>
+        </div>
+        <div class="g12 status" id="loginStatus"></div>
+      </div>
+      <p class="hint">Kun brugere i tabellen <code>admins</code> får adgang.</p>
     </div>
-  </aside>
-
-  <!-- INDHOLD -->
-  <main class="wrap main">
-    <section class="content">
-      <!-- TOP: Mønter + YouTube (centreret i indholdet) -->
-      <div class="top">
-        <div class="panel">
-          <h2 style="margin:0 0 10px">Mønter</h2>
-          <div class="coins">
-            <div class="coin">
-              <h3 id="mcd-title">MCD</h3>
-              <p id="mcd-body">Tekst fra <code>site_text</code> (page=home, section=mcd)</p>
-            </div>
-            <div class="coin">
-              <h3 id="mcn-title">MCN</h3>
-              <p id="mcn-body">Tekst fra <code>site_text</code> (page=home, section=mcn)</p>
-            </div>
-          </div>
-        </div>
-        <div class="panel yt">
-          <h2 style="margin:0 0 10px">YouTube</h2>
-          <iframe id="yt-main" class="yt-main" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-          <div class="yt-thumbs" id="yt-thumbs">
-            <!-- Fyldes fra Supabase: youtube_videos -->
-          </div>
-        </div>
-      </div>
-
-      <!-- “VENSTRE RAIL” (hero + graf) -->
-      <div class="rail" style="margin-top:16px">
-        <div class="panel hero">
-          <h2 id="hero-title">Hero-titel</h2>
-          <p id="hero-body">Hero-tekst fra <code>site_text</code> (page=home, section=hero)</p>
-        </div>
-        <div class="panel graph" id="graph-box">
-          <div>Graf (placeholder)</div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- FOOTER -->
-  <footer>
-    <div class="wrap">© MadaCoin</div>
-  </footer>
+  </div>
 
   <script>
-    // ===== Supabase klient =====
-    const SUPABASE_URL = "https://byrlebjwknppjbtbkozt.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
+    // 1) Supabase client
+    const SUPABASE_URL = '<<<SUPABASE_URL>>>';
+    const SUPABASE_ANON_KEY = '<<<SUPABASE_ANON_KEY>>>';
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // ===== Hjælpere =====
+    // Helpers
     const $ = s => document.querySelector(s);
+    const $$ = s => Array.from(document.querySelectorAll(s));
+    const status = (el, msg, ok=false) => el.innerHTML = msg ? (ok ? `<span class="ok">${msg}</span>` : `<span class="err">${msg}</span>`) : '';
+
+    // UI: Tabs
+    $$(".tab-btn").forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        $$(".tab-btn").forEach(b=>b.classList.remove('active'));
+        $$(".tab").forEach(t=>t.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+      });
+    });
+
+    // Login modal controls
+    const modal = $("#loginModal");
+    const openLogin = ()=> modal.classList.add('show');
+    const closeLogin = ()=> modal.classList.remove('show');
+
+    $("#btnSignIn").addEventListener('click', openLogin);
+    $("#closeLogin").addEventListener('click', closeLogin);
+    $("#doLogin").addEventListener('click', async ()=>{
+      const email = $("#email").value.trim();
+      const password = $("#password").value;
+      try{
+        status($("#loginStatus"), "Logger ind…", true);
+        const { data, error } = await sb.auth.signInWithPassword({ email, password });
+        if(error) throw error;
+        closeLogin();
+        await gateAdmin(true);
+      }catch(e){
+        status($("#loginStatus"), e.message || String(e));
+      }
+    });
+    $("#btnSignOut").addEventListener('click', async ()=>{
+      await sb.auth.signOut();
+      $("#who").textContent = 'Ikke logget ind';
+      document.getElementById('app').style.display = 'none';
+      document.getElementById('gate').style.display = 'block';
+      $("#btnSignOut").style.display = 'none';
+      $("#btnSignIn").style.display = 'inline-block';
+      $("#gateMsg").innerHTML = 'Log venligst ind for adgang.';
+    });
+
+    // 2) Gate: kræver login + membership i `admins`
+    async function gateAdmin(refresh){
+      const gate = $("#gate"), app = $("#app");
+      const who = $("#who"), msg = $("#gateMsg");
+      try{
+        const { data: { user }, error } = await sb.auth.getUser();
+        if(error) throw error;
+        if(!user){
+          who.textContent = 'Ikke logget ind';
+          app.style.display = 'none';
+          gate.style.display = 'block';
+          msg.innerHTML = 'Ingen session. <button class="btn" onclick="document.getElementById(\'loginModal\').classList.add(\'show\')">Log ind</button>';
+          return;
+        }
+        who.textContent = user.email || user.id;
+        $("#btnSignOut").style.display = 'inline-block';
+        $("#btnSignIn").style.display = 'none';
+
+        const { data: adminRow, error: e2 } = await sb
+          .from('admins')
+          .select('user_id,email')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        if(e2) throw e2;
+        if(!adminRow){
+          app.style.display = 'none';
+          gate.style.display = 'block';
+          msg.innerHTML = `<span class="err">Du er logget ind, men ikke admin.</span>`;
+          return;
+        }
+        // OK: vis app
+        gate.style.display = 'none';
+        app.style.display = 'block';
+        if(refresh){
+          await Promise.all([
+            loadBgPreview(),
+            loadSocial(),
+            loadTexts(),
+            loadYt(),
+            loadPeople(),
+            loadPartners()
+          ]).catch(console.error);
+        }else{
+          // første load
+          await Promise.all([
+            loadBgPreview(),
+            loadSocial(),
+            loadTexts(true),
+            loadYt(),
+            loadPeople(),
+            loadPartners()
+          ]).catch(console.error);
+        }
+      }catch(e){
+        msg.innerHTML = `<span class="err">${e.message || e}</span>`;
+        app.style.display = 'none';
+        gate.style.display = 'block';
+      }
+    }
+
+    // 3) BAGGRUNDE
+    async function loadBgPreview(){
+      const page = $("#bgPage").value;
+      // Hent settings (1x/2x)
+      const { data } = await sb.from('site_settings').select('key,value').in('key',[`${page}_bg_1x`, `${page}_bg_2x`]);
+      const m = Object.fromEntries((data||[]).map(r=>[r.key,r.value]));
+      const one = m[`${page}_bg_1x`], two = m[`${page}_bg_2x`];
+      $("#curBg1x").textContent = one ? publicUrl(one.bucket, one.path) : '–';
+      $("#curBg2x").textContent = two ? publicUrl(two.bucket, two.path) : '–';
+    }
+    $("#bgPage").addEventListener('change', loadBgPreview);
+
     function publicUrl(bucket, path){
       const { data } = sb.storage.from(bucket).getPublicUrl(path);
       return data?.publicUrl || '';
     }
 
-    // ===== Social links (venstre rail) =====
-    async function loadSocial(){
-      const { data, error } = await sb.from('social_links').select('*').eq('active', true).order('sort', {ascending:true});
-      const box = $('#social-menu'); box.innerHTML = '';
-      if(error){ box.innerHTML = `<div style="color:#ff6363">Social fejl: ${error.message}</div>`; return; }
-      (data||[]).forEach(row=>{
-        const a = document.createElement('a');
-        a.href = row.url; a.target = "_blank"; a.rel = "nofollow noopener";
-        a.textContent = row.platform;
-        box.appendChild(a);
-      });
-    }
-
-    // ===== Tekster (hero + mcd/mcn) =====
-    async function loadTexts(){
-      const { data, error } = await sb.from('site_text').select('section,tkey,content').eq('page','home');
-      if(error){ console.warn('site_text error:', error); return; }
-      const lookup = {};
-      (data||[]).forEach(r=>{ lookup[`${r.section}:${r.tkey}`] = r.content; });
-      $('#hero-title').textContent = lookup['hero:title'] || 'Hero-titel';
-      $('#hero-body').textContent  = lookup['hero:body']  || 'Hero-tekst…';
-      $('#mcd-title').textContent  = lookup['mcd:title']  || 'MCD';
-      $('#mcd-body').textContent   = lookup['mcd:body']   || 'Donation token…';
-      $('#mcn-title').textContent  = lookup['mcn:title']  || 'MCN';
-      $('#mcn-body').textContent   = lookup['mcn:body']   || 'Crypto token…';
-    }
-
-    // ===== YouTube (hoved + thumbs) =====
-    function setMainVideo(id){
-      const src = id ? `https://www.youtube-nocookie.com/embed/${id}` : '';
-      $('#yt-main').src = src;
-    }
-    async function loadYouTube(){
-      const { data, error } = await sb.from('youtube_videos').select('*').eq('active', true).order('sort', {ascending:true});
-      const thumbs = $('#yt-thumbs'); thumbs.innerHTML = '';
-      if(error){ console.warn('youtube error:', error); return; }
-      const list = data || [];
-      if(list.length === 0){ setMainVideo(''); return; }
-      setMainVideo(list[0].video_id);
-      list.forEach(v=>{
-        const img = new Image();
-        img.src = `https://i.ytimg.com/vi/${v.video_id}/hqdefault.jpg`;
-        img.alt = v.title || v.video_id;
-        img.className = 'yt-thumb';
-        img.addEventListener('click', ()=> setMainVideo(v.video_id));
-        thumbs.appendChild(img);
-      });
-    }
-
-    // ===== Baggrund fra site_settings (home_bg_1x/2x) =====
-    async function applyBackground(){
-      const { data, error } = await sb.from('site_settings').select('key,value').in('key',['home_bg_1x','home_bg_2x']);
-      if(error){ console.warn('site_settings error:', error); return; }
-      const map = Object.fromEntries((data||[]).map(r=>[r.key,r.value]));
-      const one = map['home_bg_1x'], two = map['home_bg_2x'];
-      if(one || two){
-        const url1 = one ? `url("${publicUrl(one.bucket, one.path)}") 1x` : null;
-        const url2 = two ? `url("${publicUrl(two.bucket, two.path)}") 2x` : null;
-        const imageSet = [url1,url2].filter(Boolean).join(', ');
-        document.body.style.backgroundImage = two ? `image-set(${imageSet})` : (one ? `url("${publicUrl(one.bucket, one.path)}")` : '');
-        document.body.style.backgroundAttachment = 'fixed';
-        document.body.style.backgroundSize = 'cover';
-        document.body.style.backgroundPosition = 'center';
+    $("#btnUploadBg").addEventListener('click', async ()=>{
+      const page = $("#bgPage").value;
+      const density = $("#bgDensity").value; // '1x' | '2x'
+      const file = $("#bgFile").files[0];
+      if(!file){ status($("#bgStatus"), "Vælg en fil."); return; }
+      try{
+        status($("#bgStatus"), "Uploader…", true);
+        const path = `${page}/bg@${density}${file.name.toLowerCase().endsWith('.webp')?'.webp':'.jpg'}`; // ens navn
+        const { error: upErr } = await sb.storage.from('backgrounds').upload(path, file, { upsert:true });
+        if(upErr) throw upErr;
+        const value = { bucket:'backgrounds', path };
+        const key = `${page}_bg_${density}`;
+        const { error: setErr } = await sb.from('site_settings').upsert({ key, value });
+        if(setErr) throw setErr;
+        status($("#bgStatus"), "Gemt ✔", true);
+        await loadBgPreview();
+      }catch(e){
+        status($("#bgStatus"), e.message || String(e));
       }
+    });
+
+    // 4) SOCIALE LINKS
+    async function loadSocial(){
+      const { data, error } = await sb.from('social_links').select('*').order('sort', {ascending:true});
+      if(error){ status($("#socialStatus"), error.message); return; }
+      const tbody = $("#tblSocial tbody");
+      tbody.innerHTML = '';
+      (data||[]).forEach(row => addSocialRow(row));
     }
-
-    // ===== Init =====
-    (async ()=>{
-      await Promise.all([loadSocial(), loadTexts(), loadYouTube(), applyBackground()]);
-    })();
-  </script>
-
-  <!-- Password reset handler (Supabase) -->
-  <script>
-    // Lille overlay-UI til at sætte nyt password (vises når reset-link åbnes)
-    const resetCss = `
-      .reset-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:9999}
-      .reset-card{width:min(480px,92vw);background:#0e1116;color:#e9e9ef;border:1px solid #2a3342;border-radius:14px;padding:18px;font:14px system-ui}
-      .reset-card h2{margin:0 0 10px}
-      .reset-card input{width:100%;margin:8px 0;padding:10px;border-radius:10px;border:1px solid #2a3342;background:#0f1217;color:#e5e7eb}
-      .reset-row{display:flex;gap:10px;justify-content:flex-end}
-      .reset-btn{background:#1f2937;border:1px solid #2a3342;color:#e5e7eb;padding:8px 12px;border-radius:10px;cursor:pointer}
-      .reset-btn.ok{border-color:#214d34;background:#0f261a;color:#9ef0c0}
-      .reset-status{margin-top:8px;color:#cbd5e1}
-      .reset-status.err{color:#ff6363}
-    `;
-    (function injectStyle(css){ const s=document.createElement('style'); s.textContent=css; document.head.appendChild(s); })(resetCss);
-
-    function showResetModal(){
-      const wrap = document.createElement('div');
-      wrap.className = 'reset-backdrop';
-      wrap.innerHTML = `
-        <div class="reset-card">
-          <h2>Sæt nyt password</h2>
-          <p>Indtast et nyt password til din konto.</p>
-          <input id="rp1" type="password" placeholder="Nyt password" />
-          <input id="rp2" type="password" placeholder="Gentag password" />
-          <div class="reset-row">
-            <button class="reset-btn" id="rp-cancel">Luk</button>
-            <button class="reset-btn ok" id="rp-save">Gem</button>
-          </div>
-          <div class="reset-status" id="rp-status"></div>
-        </div>
+    function addSocialRow(row={}){
+      const tbody = $("#tblSocial tbody");
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input value="${row.platform||''}" data-k="platform" placeholder="youtube/x/facebook/…" /></td>
+        <td><input value="${row.url||''}" data-k="url" placeholder="https://…" /></td>
+        <td><input type="checkbox" data-k="active" ${row.active?'checked':''}></td>
+        <td><input type="number" data-k="sort" value="${row.sort??0}" style="max-width:90px"></td>
+        <td class="row">
+          <button class="btn ok">Gem</button>
+          <button class="btn danger">Slet</button>
+        </td>
       `;
-      document.body.appendChild(wrap);
-
-      const $w = sel => wrap.querySelector(sel);
-      $w('#rp-cancel').onclick = () => wrap.remove();
-      $w('#rp-save').onclick = async () => {
-        const p1 = $w('#rp1').value, p2 = $w('#rp2').value;
-        const st = $w('#rp-status');
-        if(!p1 || p1.length < 8){ st.textContent = "Password skal være mindst 8 tegn."; st.className='reset-status err'; return; }
-        if(p1 !== p2){ st.textContent = "Passwords matcher ikke."; st.className='reset-status err'; return; }
+      tbody.appendChild(tr);
+      tr.querySelector('.ok').addEventListener('click', async ()=>{
+        const payload = readRow(tr, row.id);
         try{
-          st.textContent = "Opdaterer…"; st.className='reset-status';
-          const { error } = await sb.auth.updateUser({ password: p1 });
+          const { error } = await sb.from('social_links').upsert(payload);
           if(error) throw error;
-          st.textContent = "Færdig! Du kan nu logge ind i admin med dit nye password.";
-          st.className='reset-status';
-          setTimeout(()=> wrap.remove(), 1400);
-        }catch(e){
-          st.textContent = e.message || String(e);
-          st.className='reset-status err';
-        }
+          status($("#socialStatus"), "Gemt ✔", true);
+          await loadSocial();
+        }catch(e){ status($("#socialStatus"), e.message || String(e)); }
+      });
+      tr.querySelector('.danger').addEventListener('click', async ()=>{
+        if(!row.id){ tr.remove(); return; }
+        if(!confirm('Slet dette link?')) return;
+        try{
+          const { error } = await sb.from('social_links').delete().eq('id', row.id);
+          if(error) throw error;
+          await loadSocial();
+        }catch(e){ status($("#socialStatus"), e.message || String(e)); }
+      });
+    }
+    function readRow(tr, id){
+      const get = k => tr.querySelector(`[data-k="${k}"]`);
+      return {
+        id,
+        platform: get('platform').value.trim(),
+        url: get('url').value.trim(),
+        active: get('active').checked,
+        sort: parseInt(get('sort').value || '0',10)
       };
     }
+    $("#btnAddSocial").addEventListener('click', ()=> addSocialRow({active:true, sort:0}));
 
-    // FANG reset-token fra Supabase: #access_token=…&refresh_token=…&type=recovery
-    (async ()=>{
-      const hash = window.location.hash || "";
-      const params = new URLSearchParams(hash.startsWith('#') ? hash.slice(1) : hash);
-      const type = params.get('type');
-      const access_token = params.get('access_token');
-      const refresh_token = params.get('refresh_token');
-
-      if (type === 'recovery' && access_token) {
+    // 5) TEKSTER
+    async function loadTexts(skipFetch){
+      if(skipFetch!==true){} // placeholder
+      const page = $("#txtPage").value, lang=$("#txtLang").value;
+      const { data, error } = await sb.from('site_text').select('*')
+        .eq('page', page).eq('lang', lang)
+        .order('section').order('tkey');
+      if(error){ status($("#textStatus"), error.message); return; }
+      const tbody = $("#tblText tbody");
+      tbody.innerHTML = '';
+      (data||[]).forEach(r=> addTextRow(r));
+    }
+    function addTextRow(row={}){
+      const tbody = $("#tblText tbody");
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="min-width:140px"><input value="${row.section||''}" data-k="section" placeholder="fx hero" /></td>
+        <td style="min-width:120px"><input value="${row.tkey||''}" data-k="tkey" placeholder="fx title/body" /></td>
+        <td><textarea data-k="content" placeholder="Tekst…">${row.content||''}</textarea></td>
+        <td class="row">
+          <button class="btn ok">Gem</button>
+          <button class="btn danger">Slet</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+      tr.querySelector('.ok').addEventListener('click', async ()=>{
+        const payload = {
+          id: row.id,
+          page: $("#txtPage").value,
+          lang: $("#txtLang").value,
+          section: tr.querySelector('[data-k="section"]').value.trim(),
+          tkey: tr.querySelector('[data-k="tkey"]').value.trim(),
+          content: tr.querySelector('[data-k="content"]').value
+        };
         try{
-          // Etabler session ud fra token i URL (krævet før updateUser)
-          await sb.auth.setSession({ access_token, refresh_token });
-        }catch(e){ console.warn("setSession fejl:", e); }
-        // Ryd hash for pæn URL
-        try{ window.history.replaceState({}, document.title, window.location.pathname + window.location.search); }catch(_){}
-        // Vis modal
-        showResetModal();
+          const { error } = await sb.from('site_text').upsert(payload, { onConflict:'page,section,tkey,lang' });
+          if(error) throw error;
+          status($("#textStatus"), "Gemt ✔", true);
+          await loadTexts();
+        }catch(e){ status($("#textStatus"), e.message || String(e)); }
+      });
+      tr.querySelector('.danger').addEventListener('click', async ()=>{
+        if(!row.id){ tr.remove(); return; }
+        if(!confirm('Slet denne tekst?')) return;
+        try{
+          const { error } = await sb.from('site_text').delete().eq('id', row.id);
+          if(error) throw error;
+          await loadTexts();
+        }catch(e){ status($("#textStatus"), e.message || String(e)); }
+      });
+    }
+    $("#btnLoadTexts").addEventListener('click', loadTexts);
+    $("#btnAddText").addEventListener('click', ()=> addTextRow({}));
+
+    // 6) YOUTUBE
+    async function loadYt(){
+      const { data, error } = await sb.from('youtube_videos').select('*').order('sort',{ascending:true});
+      if(error){ status($("#ytStatus"), error.message); return; }
+      const tbody = $("#tblYt tbody"); tbody.innerHTML='';
+      (data||[]).forEach(r=> addYtRow(r));
+    }
+    function addYtRow(row={}){
+      const tbody = $("#tblYt tbody");
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input value="${row.video_id||''}" data-k="video_id" placeholder="YouTube ID" /></td>
+        <td><input value="${row.title||''}" data-k="title" placeholder="Titel" /></td>
+        <td><input type="checkbox" data-k="active" ${row.active?'checked':''}></td>
+        <td><input type="number" data-k="sort" value="${row.sort??0}" style="max-width:90px"></td>
+        <td class="row">
+          <button class="btn ok">Gem</button>
+          <button class="btn danger">Slet</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+      tr.querySelector('.ok').addEventListener('click', async ()=>{
+        const p = {
+          id: row.id,
+          video_id: tr.querySelector('[data-k="video_id"]').value.trim(),
+          title: tr.querySelector('[data-k="title"]').value.trim(),
+          active: tr.querySelector('[data-k="active"]').checked,
+          sort: parseInt(tr.querySelector('[data-k="sort"]').value || '0',10)
+        };
+        try{
+          const { error } = await sb.from('youtube_videos').upsert(p);
+          if(error) throw error;
+          status($("#ytStatus"), "Gemt ✔", true);
+          await loadYt();
+        }catch(e){ status($("#ytStatus"), e.message || String(e)); }
+      });
+      tr.querySelector('.danger').addEventListener('click', async ()=>{
+        if(!row.id){ tr.remove(); return; }
+        if(!confirm('Slet denne video?')) return;
+        try{
+          const { error } = await sb.from('youtube_videos').delete().eq('id', row.id);
+          if(error) throw error;
+          await loadYt();
+        }catch(e){ status($("#ytStatus"), e.message || String(e)); }
+      });
+    }
+    $("#btnAddYt").addEventListener('click', ()=> addYtRow({active:true, sort:0}));
+
+    // 7) TEAM (org_people)
+    async function loadPeople(){
+      const { data, error } = await sb.from('org_people').select('*').order('sort',{ascending:true});
+      if(error){ status($("#peopleStatus"), error.message); return; }
+      const tbody = $("#tblPeople tbody"); tbody.innerHTML='';
+      (data||[]).forEach(r=> addPersonRow(r));
+    }
+    function addPersonRow(row={}){
+      const tbody = $("#tblPeople tbody");
+      const tr = document.createElement('tr');
+      const publicPhoto = row.photo_path ? publicUrl('people', row.photo_path) : '';
+      tr.innerHTML = `
+        <td>${publicPhoto?`<img class="thumb" src="${publicPhoto}" alt="">`:'-'}</td>
+        <td><input value="${row.name||''}" data-k="name" placeholder="Navn" /></td>
+        <td><input value="${row.role||''}" data-k="role" placeholder="Rolle" /></td>
+        <td><textarea data-k="bio" placeholder="Kort bio…">${row.bio||''}</textarea></td>
+        <td><input type="checkbox" data-k="active" ${row.active?'checked':''}></td>
+        <td><input type="number" data-k="sort" value="${row.sort??0}" style="max-width:90px"></td>
+        <td class="row">
+          <label class="btn">Upload foto<input type="file" accept="image/*" style="display:none" data-k="file"></label>
+          <button class="btn ok">Gem</button>
+          <button class="btn danger">Slet</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+
+      async function savePerson(){
+        // upload hvis valgt
+        let photo_path = row.photo_path || null;
+        const f = tr.querySelector('[data-k="file"]').files[0];
+        if(f){
+          const path = `p_${Date.now()}_${(f.name||'').replaceAll(' ','_')}`;
+          const { error: upErr } = await sb.storage.from('people').upload(path, f, { upsert:true });
+          if(upErr) throw upErr;
+          photo_path = path;
+        }
+        const p = {
+          id: row.id,
+          name: tr.querySelector('[data-k="name"]').value.trim(),
+          role: tr.querySelector('[data-k="role"]').value.trim(),
+          bio: tr.querySelector('[data-k="bio"]').value,
+          active: tr.querySelector('[data-k="active"]').checked,
+          sort: parseInt(tr.querySelector('[data-k="sort"]').value || '0',10),
+          photo_path
+        };
+        const { error } = await sb.from('org_people').upsert(p);
+        if(error) throw error;
       }
+
+      tr.querySelector('.ok').addEventListener('click', async ()=>{
+        try{
+          await savePerson();
+          status($("#peopleStatus"), "Gemt ✔", true);
+          await loadPeople();
+        }catch(e){ status($("#peopleStatus"), e.message || String(e)); }
+      });
+      tr.querySelector('.danger').addEventListener('click', async ()=>{
+        if(!row.id){ tr.remove(); return; }
+        if(!confirm('Slet denne person?')) return;
+        try{
+          const { error } = await sb.from('org_people').delete().eq('id', row.id);
+          if(error) throw error;
+          await loadPeople();
+        }catch(e){ status($("#peopleStatus"), e.message || String(e)); }
+      });
+    }
+    $("#btnAddPerson").addEventListener('click', ()=> addPersonRow({active:true, sort:0}));
+
+    // 8) PARTNERE
+    async function loadPartners(){
+      const { data, error } = await sb.from('partners').select('*').order('sort',{ascending:true});
+      if(error){ status($("#partnersStatus"), error.message); return; }
+      const tbody = $("#tblPartners tbody"); tbody.innerHTML='';
+      (data||[]).forEach(r=> addPartnerRow(r));
+    }
+    function addPartnerRow(row={}){
+      const tbody = $("#tblPartners tbody");
+      const tr = document.createElement('tr');
+      const logo = row.logo_path ? publicUrl('partners', row.logo_path) : '';
+      tr.innerHTML = `
+        <td>${logo?`<img class="thumb" src="${logo}" alt="">`:'-'}</td>
+        <td><input value="${row.name||''}" data-k="name" placeholder="Navn" /></td>
+        <td><input value="${row.url||''}" data-k="url" placeholder="https://…" /></td>
+        <td><input type="checkbox" data-k="active" ${row.active?'checked':''}></td>
+        <td><input type="number" data-k="sort" value="${row.sort??0}" style="max-width:90px"></td>
+        <td class="row">
+          <label class="btn">Upload logo<input type="file" accept="image/*" style="display:none" data-k="file"></label>
+          <button class="btn ok">Gem</button>
+          <button class="btn danger">Slet</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+
+      async function savePartner(){
+        let logo_path = row.logo_path || null;
+        const f = tr.querySelector('[data-k="file"]').files[0];
+        if(f){
+          const path = `l_${Date.now()}_${(f.name||'').replaceAll(' ','_')}`;
+          const { error: upErr } = await sb.storage.from('partners').upload(path, f, { upsert:true });
+          if(upErr) throw upErr;
+          logo_path = path;
+        }
+        const p = {
+          id: row.id,
+          name: tr.querySelector('[data-k="name"]').value.trim(),
+          url: tr.querySelector('[data-k="url"]').value.trim(),
+          active: tr.querySelector('[data-k="active"]').checked,
+          sort: parseInt(tr.querySelector('[data-k="sort"]').value || '0',10),
+          logo_path
+        };
+        const { error } = await sb.from('partners').upsert(p);
+        if(error) throw error;
+      }
+
+      tr.querySelector('.ok').addEventListener('click', async ()=>{
+        try{
+          await savePartner();
+          status($("#partnersStatus"), "Gemt ✔", true);
+          await loadPartners();
+        }catch(e){ status($("#partnersStatus"), e.message || String(e)); }
+      });
+      tr.querySelector('.danger').addEventListener('click', async ()=>{
+        if(!row.id){ tr.remove(); return; }
+        if(!confirm('Slet denne partner?')) return;
+        try{
+          const { error } = await sb.from('partners').delete().eq('id', row.id);
+          if(error) throw error;
+          await loadPartners();
+        }catch(e){ status($("#partnersStatus"), e.message || String(e)); }
+      });
+    }
+    $("#btnAddPartner").addEventListener('click', ()=> addPartnerRow({active:true, sort:0}));
+
+    // 9) ChatGPT oversætter (Edge Function)
+    async function translateText(text, targetLang, sourceLang){
+      const { data: { session } } = await sb.auth.getSession();
+      if(!session) throw new Error('Login kræves.');
+      const url = `${SUPABASE_URL}/functions/v1/translate`;
+      const res = await fetch(url, {
+        method:'POST',
+        headers:{
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ text, targetLang, sourceLang })
+      });
+      if(!res.ok){
+        const t = await res.text();
+        throw new Error(`Translate fejlede (${res.status}): ${t}`);
+      }
+      const json = await res.json();
+      return json.translation || '';
+    }
+    $("#btnTranslate").addEventListener('click', async ()=>{
+      const src = $("#trSrc").value, to = $("#trTo").value, from = $("#trFrom").value || undefined;
+      try{
+        status($("#trStatus"), "Oversætter…", true);
+        const out = await translateText(src, to, from);
+        $("#trOut").value = out;
+        status($("#trStatus"), "Færdig ✔", true);
+      }catch(e){
+        status($("#trStatus"), e.message || String(e));
+      }
+    });
+
+    // 10) Første load
+    (async ()=>{
+      // Autoåbn login hvis ingen session
+      const { data: { user } } = await sb.auth.getUser();
+      if(!user) openLogin();
+      await gateAdmin(true);
     })();
   </script>
 </body>
