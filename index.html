@@ -1,104 +1,178 @@
 <!DOCTYPE html>
 <html lang="da">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MadaCoin – Layout Udkast</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>MadaCoin</title>
+  <meta name="description" content="MadaCoin støtter udvikling i Madagaskar gennem donationer og gennemsigtighed.">
+  <link rel="icon" href="/favicon_boosted.ico?v=1" type="image/x-icon">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="MadaCoin — Donations for Madagascar">
+  <meta property="og:description" content="Støt udvikling i Madagaskar gennem MadaCoin.">
+  <meta property="og:url" content="https://madacoin.pro">
+  <meta property="og:type" content="website">
+
+  <!-- Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
   <style>
-    body {
-      margin:0;
-      font-family: system-ui, sans-serif;
-      background:#061a2b;
+    *,*::before,*::after{ box-sizing:border-box }
+    html{ font-size:16px }
+    :root{
+      --edge-pad:24px;
+      --gap-lg: clamp(12px, 2vw, 28px);
+      --gold-1:#FFD700; --gold-2:#DAA520;
+      --panel-bg: rgba(11,11,12,0.92);
+      --panel-border: #2a2a2a;
+    }
+    body{
+      margin:0; color:#fff;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+      background:#061a2b no-repeat center/cover fixed;
+      background-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
+      min-height:100svh; display:flex; flex-direction:column;
+    }
+    @media (max-width:800px){ body{ background-attachment:scroll } }
+
+    /* NAV */
+    .site-nav{ position:sticky; top:0; z-index:9999; padding:20px var(--edge-pad); background:transparent }
+    .nav{ display:flex; gap:12px }
+    .nav a{ padding:8px 14px; background:#0d0d0f; border-radius:10px; color:#fff; text-decoration:none }
+
+    /* HERO */
+    .hero{
+      margin: var(--gap-lg) auto 0;
+      max-width: 900px;
+      background:var(--panel-bg);
+      border:1px solid var(--panel-border);
+      border-radius:16px;
+      padding:20px;
+      text-align:left;
+    }
+    .hero h1{ margin-top:0; font-size:1.6rem }
+    .hero .sub{ margin:.4rem 0 1rem; color:#cfd3d7 }
+    .hero .btns{ display:flex; gap:12px; flex-wrap:wrap }
+    .hero .btn{
+      padding:9px 14px;
+      border-radius:12px;
+      text-decoration:none;
+      background:#0d0d0f;
+      border:1px solid #333;
       color:#fff;
+      cursor:pointer;
     }
+    .hero .btn.primary{ background:linear-gradient(135deg,var(--gold-1),var(--gold-2)); color:#1c2630 }
 
-    /* --- Mønter øverst --- */
-    .coins-wrap {
-      display:flex;
-      justify-content:center;
-      gap:30px;
-      padding:20px;
+    /* MØNTER */
+    .coins-wrap{
+      margin: var(--gap-lg) auto;
+      display:flex; justify-content:center;
+      gap: clamp(16px, 6vw, 40px);
+      flex-wrap:wrap;
+      max-width:900px;
     }
-    .coin {
+    .coin{
       background:rgba(255,248,220,.95);
-      border:2px solid #e5c100;
-      border-radius:12px;
       padding:10px;
-      width:180px; /* ca. 50% af tidligere */
+      border-radius:15px;
+      width:180px;
       text-align:center;
+      border:2px solid #e5c100;
     }
-    .coin img { width:150px; height:150px; object-fit:cover; }
+    .coin img{
+      width:150px; height:150px;
+      object-fit:cover;
+      border-radius:10px;
+    }
+    .button{
+      background:linear-gradient(135deg,var(--gold-1),var(--gold-2));
+      color:#004d73;
+      padding:8px 14px;
+      border:none;
+      margin-top:8px;
+      border-radius:6px;
+      font-weight:bold;
+      cursor:pointer;
+    }
 
-    /* --- Grid nedenunder --- */
-    .below-grid {
+    /* GRID: YT + CHART */
+    .below-grid{
       display:grid;
+      gap: var(--gap-lg);
       grid-template-columns: 1fr 1fr;
-      gap:20px;
-      padding:20px;
-      max-width:1200px;
-      margin:auto;
-    }
-
-    .hero {
-      grid-column:1 / 2;
-      background:rgba(0,0,0,.6);
-      border-radius:12px;
-      padding:16px;
-    }
-
-    .yt {
-      grid-column:1 / 2;
-      background:rgba(0,0,0,.6);
-      border-radius:12px;
-      padding:10px;
-      margin-top:20px;
-    }
-    .yt iframe {
+      max-width: 1100px;
       width:100%;
-      height:180px; /* ca. 50% af normal højde */
-      border:0;
-      border-radius:8px;
+      margin: 0 auto var(--gap-lg);
+      padding: 0 var(--edge-pad);
     }
-
-    .chart {
-      grid-column:2 / 3;
-      grid-row: span 2; /* fylder samme højde som hero+yt */
-      background:rgba(0,0,0,.6);
-      border-radius:12px;
-      padding:20px;
+    .yt,.chart{
+      background:var(--panel-bg);
+      border:1px solid var(--panel-border);
+      border-radius:16px;
+      padding:10px;
     }
+    .yt .player{ position:relative; padding-top:56.25%; border-radius:12px; overflow:hidden }
+    .yt iframe{ position:absolute; inset:0; width:100%; height:100%; border:0 }
+    .chart{ display:flex; align-items:center; justify-content:center; min-height:220px }
 
-    /* Responsivt */
-    @media(max-width:900px){
-      .below-grid { grid-template-columns:1fr; }
-      .chart { grid-row:auto; }
+    footer{ text-align:center; padding:16px; background:#e4e6c5; color:#000 }
+
+    @media (max-width:900px){
+      .below-grid{ grid-template-columns:1fr }
     }
   </style>
 </head>
 <body>
 
-  <!-- Mønter -->
+  <!-- NAV -->
+  <header class="site-nav">
+    <nav class="nav">
+      <a href="/index.html" aria-current="page">Home</a>
+      <a href="/madacoin.html">Om</a>
+      <a href="/rapporter.html">Rapporter</a>
+      <a href="/roadmap.html">Roadmap</a>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1>Hero Titel</h1>
+    <p class="sub">Her står hero-teksten.</p>
+    <div class="btns">
+      <a class="btn primary" href="#">Støt med MadaCoin</a>
+      <a class="btn" href="/rapporter.html">Se rapporter</a>
+    </div>
+  </section>
+
+  <!-- MØNTER -->
   <div class="coins-wrap">
-    <div class="coin"><img src="https://via.placeholder.com/150"><p>MCD</p></div>
-    <div class="coin"><img src="https://via.placeholder.com/150"><p>MCN</p></div>
+    <div class="coin">
+      <img id="coinD" alt="MCD" />
+      <p>MCD</p>
+      <button class="button">Køb MCD</button>
+    </div>
+    <div class="coin">
+      <img id="coinC" alt="MCN" />
+      <p>MCN</p>
+      <button class="button">Køb MCN</button>
+    </div>
   </div>
 
-  <!-- Hero + YouTube (venstre) / Graf (højre) -->
-  <div class="below-grid">
-    <div class="hero">
-      <h1>Hero Titel</h1>
-      <p>Her står hero-teksten.</p>
-    </div>
-
+  <!-- YT + CHART -->
+  <main class="below-grid">
     <div class="yt">
-      <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe>
+      <div class="player">
+        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe>
+      </div>
     </div>
-
     <div class="chart">
-      <h2>Graf</h2>
-      <p>(placeholder)</p>
+      <span>(placeholder graf)</span>
     </div>
-  </div>
+  </main>
+
+  <footer>© 2025 MadaCoin. All rights reserved.</footer>
 
 </body>
 </html>
