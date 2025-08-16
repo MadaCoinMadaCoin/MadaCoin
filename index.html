@@ -1,340 +1,296 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="da">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
   <title>MadaCoin</title>
-  <meta name="description" content="MadaCoin støtter udvikling i Madagaskar gennem donationer og gennemsigtighed.">
-  <link rel="icon" href="/favicon_boosted.ico?v=1" type="image/x-icon">
-
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-
+  <link rel="preconnect" href="https://unpkg.com" />
+  <script src="https://unpkg.com/@supabase/supabase-js@2" crossorigin="anonymous"></script>
   <style>
-    *,*::before,*::after{ box-sizing:border-box }
-    html,body{ height:100% }
-    body{
-      display:flex; flex-direction:column; margin:0; color:#fff;
-      font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
-      background:#061a2b no-repeat center/cover fixed;
-      background-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
-      overflow-x:hidden;
-    }
-    main{ flex:1 }
-
     :root{
-      --edge:24px;
-      --nav-gap:14px; --nav-px:14px; --nav-py:8px;
-      --nav-bg:#0d0d0f; --nav-b:#333; --nav-hover:#151517; --nav-active:#5aa9ff;
-
-      --container:1200px;
-
-      /* PRO-PLADS (venstre kolonne udvidet) */
-      --left-col:520px;        /* Hero+Graf bredde */
-      --gap:88px;
-
-      /* Sociale venstre-rail reference */
-      --social-top:106px;      
-
-      /* FINJUSTERING af vertikal placering ift. sociale knapper */
-      --left-rail-nudge:-100px; /* <- dit ønskede løft */
-
-      /* Usynlig boks: placering af Hero+Graf (alignet til social-top + nudge) */
-      --left-rail-top: calc(var(--social-top) + var(--left-rail-nudge));
-      --left-rail-left: -260px;    /* stor afstand til mønter (vandret) */
-
-      /* LÅS højre kolonne (Mønter+YouTube) – urørlig */
-      --right-rail-left: 538px;
+      --wrap:1280px; --gap:24px;
+      --rail-w: 260px;       /* venstre rail bredde */
+      --panel:#0f1217; --ink:#e9e9ef; --muted:#9aa0a6; --line:#1f2735; --accent:#3aa0ff;
     }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; margin:0; background:#0b0b0c; color:var(--ink); font:14px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial; }
+    a{ color:var(--accent); text-decoration:none; }
+    .wrap{ max-width:var(--wrap); margin:0 auto; padding:0 16px; }
 
     /* NAV */
-    .site-nav{ position:sticky; top:0; z-index:1000; padding:20px 0 }
-    .nav{ display:flex; gap:var(--nav-gap); padding-left:var(--edge) }
-    .nav a{
-      padding:var(--nav-py) var(--nav-px); border-radius:12px; text-decoration:none;
-      background:var(--nav-bg); border:1px solid var(--nav-b); color:#fff
+    .nav{ position:sticky; top:0; z-index:10; backdrop-filter:saturate(140%) blur(4px); background:rgba(11,11,12,.65); border-bottom:1px solid var(--line); }
+    .nav-inner{ display:flex; align-items:center; gap:18px; padding:12px 0; }
+    .nav a{ color:#cfe3ff; font-weight:600; }
+    .nav a:hover{ text-decoration:underline; }
+
+    /* VENSTRE SOCIAL RAIL */
+    .social-rail{ position:fixed; left:0; top:76px; width:var(--rail-w); padding:10px 10px 10px 14px; }
+    .social{ display:flex; flex-direction:column; gap:8px; }
+    .social a{ display:flex; align-items:center; gap:8px; color:var(--muted); padding:6px 8px; border:1px dashed transparent; border-radius:10px; }
+    .social a:hover{ border-color:var(--line); color:#cbd5e1; }
+
+    /* LAYOUT GRID */
+    .main{ display:grid; grid-template-columns: minmax(0,1fr); gap:var(--gap); margin:16px 0 80px; }
+    .content{ margin-left: calc(var(--rail-w) + 8px); } /* plads til venstre rail */
+
+    /* TOP: Mønter + YouTube centreret */
+    .top{ display:grid; grid-template-columns: 1fr 1fr; gap:var(--gap); align-items:start; }
+    .panel{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:14px; }
+    .coins{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+    .coin{ background:#0b0d12; border:1px solid #1a2330; border-radius:14px; padding:12px; }
+    .coin h3{ margin:0 0 6px; font-size:16px; }
+    .coin p{ margin:6px 0 0; color:#cbd5e1; }
+
+    .yt{ }
+    .yt-main{ aspect-ratio:16/9; width:100%; border:0; border-radius:12px; background:#000; display:block; }
+    .yt-thumbs{ display:flex; gap:10px; margin-top:10px; overflow:auto; padding-bottom:2px; }
+    .yt-thumb{ width:120px; height:68px; border-radius:8px; border:1px solid #202a3a; object-fit:cover; cursor:pointer; }
+
+    /* “VENSTRE RAIL” FOR HERO + GRAF (placeret i indholdets venstre side) */
+    .rail{ display:grid; grid-template-columns: 1fr 1fr; gap:var(--gap); align-items:start; }
+    .hero h2{ margin:0 0 6px; font-size:20px; }
+    .hero p{ margin:8px 0 0; color:#cbd5e1; white-space:pre-wrap; }
+    .graph{ min-height:180px; display:grid; place-items:center; color:#acb4bf; border:1px dashed #243044; border-radius:12px; }
+
+    /* FOOTER sticky */
+    footer{ position:sticky; bottom:0; background:rgba(11,11,12,.65); border-top:1px solid var(--line); padding:10px 0; color:#9aa0a6; }
+
+    /* Responsiv */
+    @media (max-width:1100px){
+      :root{ --rail-w: 0px; }
+      .content{ margin-left: 0; }
+      .social-rail{ position:static; width:auto; padding:0; margin:8px 0 -6px; }
+      .social{ flex-direction:row; flex-wrap:wrap; }
     }
-    .nav a:hover{ background:var(--nav-hover) }
-    .nav a[aria-current="page"]{ border-color:var(--nav-active) }
-
-    /* Sociale links (fast venstre) */
-    .social-menu{ position:fixed; top:var(--social-top); left:var(--edge); display:flex; flex-direction:column; gap:10px; z-index:999 }
-    .social-menu a{ width:42px; height:42px; display:grid; place-items:center; background:rgba(0,0,0,.7); border-radius:8px; text-decoration:none }
-    .social-menu a img{ width:22px; height:22px }
-
-    /* SCENE */
-    .stage{
-      position:relative;
-      max-width:var(--container);
-      margin:18px auto 26px;
-      padding:0 16px;
-    }
-
-    /* === USYNLIG BOKS OM HERO+GRAF (uafhængig placering) === */
-    .left-rail-box{
-      position:absolute;
-      top:var(--left-rail-top);
-      left:var(--left-rail-left);
-      width:var(--left-col);
-      background:transparent;
-      pointer-events:none;
-      z-index:1;
-    }
-    .left-rail-box > *{ pointer-events:auto }
-
-    /* Højre kolonne (Mønt + YouTube) — LÅST position */
-    .right-rail{
-      margin-left: var(--right-rail-left);
-      position:relative;
-      z-index:2;
-    }
-
-    /* Wrapper der låser YouTube til mønternes bredde */
-    .right-stack{
-      display:inline-block;       /* shrink-to-fit indholdets bredde (sat af .coins) */
-      vertical-align:top;
-    }
-
-    /* COINS: inline-flex uden wrap, så bredden = 2 * coin + gap */
-    .coins{
-      display:inline-flex;
-      flex-wrap:nowrap;
-      gap:24px;
-      align-items:flex-start;
-    }
-    .coin{
-      background:rgba(255,248,220,.95); padding:10px; border-radius:15px; width:240px;
-      text-align:center; box-shadow:0 0 12px rgba(0,0,0,.1); border:2px solid #e5c100
-    }
-    .coin img{ width:200px; height:200px; border-radius:10px; margin-bottom:8px; object-fit:cover }
-    .coin-description{ font-size:.9rem; color:#333; margin:0 0 8px }
-    .button{ background:linear-gradient(135deg,#FFD700,#DAA520); color:#004d73!important; padding:9px 14px; border:none; border-radius:6px; font-weight:700; cursor:pointer }
-    .button:hover{ background:linear-gradient(135deg,#FFC107,#B8860B) }
-
-    /* YOUTUBE følger bredden af .coins via .right-stack */
-    .yt-wrap{ width:100%; margin:22px 0 0 0 }
-    #yt-player{ position:relative; padding-top:56.25%; border:2px solid #222; border-radius:14px; overflow:hidden }
-    #yt-thumbs{ display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:12px; margin-top:12px }
-
-    /* HERO */
-    .hero{
-      background:#0b0b0c; border:1px solid #2a2a2a; border-radius:16px;
-      box-shadow:0 12px 26px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06);
-      padding:16px 18px;
-    }
-    .hero .ribbon{ display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; background:#102414; border:1px solid #1d3d22; color:#baf7c9; margin-bottom:6px }
-    .hero h1{ font-size:clamp(22px,2.6vw,26px); margin:0 0 .5rem }
-    .hero .sub{ color:#cfd3d7; margin:.25rem 0 .5rem }
-    .hero .points{ display:flex; flex-wrap:wrap; gap:6px 8px; margin:.5rem 0 .75rem }
-    .hero .pt{ padding:6px 10px; border-radius:999px; background:#0d0d0f; border:1px solid #333; font-size:.9rem }
-    .hero .btns{ display:flex; gap:10px; flex-wrap:wrap; margin-top:6px }
-    .hero .btn{ padding:9px 14px; border-radius:12px; text-decoration:none; background:#0d0d0f; border:1px solid #333; color:#fff }
-    .hero .btn.primary{ background:linear-gradient(135deg,#FFD700,#DAA520); color:#1c2630 }
-
-    /* GRAF-BOKS — PRO-PLADS */
-    .mcn-panel{
-      margin-top:22px;
-      background:rgba(0,0,0,.85); border:1px solid #2a2a2a; border-radius:16px;
-      padding:16px 18px; min-height:400px;
-      box-shadow:0 12px 26px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06);
-    }
-
-    footer{ margin-top:auto; text-align:center; padding:16px; background:#e4e6c5; color:#000 }
-
-    /* RESPONSIV */
-    @media (max-width:1150px){
-      .left-rail-box{ position:static; width:auto; pointer-events:auto }
-      .right-rail{ margin-left:0 }
-      .right-stack{ display:block }
-      .coins{ display:flex; flex-wrap:wrap; justify-content:center }
-      .stage{ padding:0 16px }
-      .yt-wrap{ width:100%; margin:22px auto 0 auto }
-    }
-    @media (max-width:760px){
-      .coin{ width:200px }
-      .coin img{ width:170px; height:170px }
+    @media (max-width:860px){
+      .top{ grid-template-columns: 1fr; }
+      .coins{ grid-template-columns: 1fr; }
+      .rail{ grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
   <!-- NAV -->
-  <header class="site-nav">
-    <nav class="nav">
-      <a href="/index.html" aria-current="page" data-text="common:nav_home">Home</a>
-      <a href="/madacoin.html" data-text="common:nav_about">Om</a>
-      <a href="/roadmap.html" data-text="common:nav_roadmap">Roadmap</a>
-      <a href="/rapporter.html" data-text="common:nav_reports">Rapporter</a>
-    </nav>
-  </header>
+  <div class="nav">
+    <div class="wrap nav-inner">
+      <a href="/">Home</a>
+      <a href="/madacoin.html">Om</a>
+      <a href="/roadmap.html">Roadmap</a>
+      <a href="/rapporter.html">Rapporter</a>
+    </div>
+  </div>
 
-  <main>
-    <!-- Sociale links -->
-    <div class="social-menu" id="social-menu"></div>
+  <!-- VENSTRE SOCIAL RAIL -->
+  <aside class="social-rail">
+    <div class="social" id="social-menu">
+      <!-- Fyldes fra Supabase: social_links -->
+    </div>
+  </aside>
 
-    <!-- Scene -->
-    <section class="stage">
-      <!-- Usynlig boks: KUN Hero + Graf (flyttes uafhængigt) -->
-      <div class="left-rail-box">
-        <section class="hero" id="home-hero">
-          <div class="ribbon" data-text="home:hero_ribbon">NYHED: 25% hotelrabat til MCD &amp; MCN holders</div>
-          <h1 data-text="home:hero_title">Donér. Byg. Forandr Madagaskar.</h1>
-          <p class="sub" data-text="home:hero_sub">MadaCoin gør donationer til skoler, solenergi og lokale jobs — med fuld gennemsigtighed.</p>
-          <div class="points">
-            <span class="pt" data-text="home:hero_point1">Skolebyggeri</span>
-            <span class="pt" data-text="home:hero_point2">Solceller &amp; batterier</span>
-            <span class="pt" data-text="home:hero_point3">Åbne rapporter</span>
+  <!-- INDHOLD -->
+  <main class="wrap main">
+    <section class="content">
+      <!-- TOP: Mønter + YouTube (centreret i indholdet) -->
+      <div class="top">
+        <div class="panel">
+          <h2 style="margin:0 0 10px">Mønter</h2>
+          <div class="coins">
+            <div class="coin">
+              <h3 id="mcd-title">MCD</h3>
+              <p id="mcd-body">Tekst fra <code>site_text</code> (page=home, section=mcd)</p>
+            </div>
+            <div class="coin">
+              <h3 id="mcn-title">MCN</h3>
+              <p id="mcn-body">Tekst fra <code>site_text</code> (page=home, section=mcn)</p>
+            </div>
           </div>
-          <div class="btns">
-            <button class="btn primary" id="hero-primary" data-text="home:hero_cta_primary">Støt med MadaCoin</button>
-            <a class="btn" href="/rapporter.html" data-text="home:hero_cta_secondary">Se rapporter</a>
+        </div>
+        <div class="panel yt">
+          <h2 style="margin:0 0 10px">YouTube</h2>
+          <iframe id="yt-main" class="yt-main" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          <div class="yt-thumbs" id="yt-thumbs">
+            <!-- Fyldes fra Supabase: youtube_videos -->
           </div>
-        </section>
-
-        <aside class="mcn-panel" id="mcn-panel">
-          <h3>Diverse grafer om MCN / Polygon</h3>
-          <p>Alt der påvirker vores egen mønts værdi.</p>
-          <p style="opacity:.9">Live visning, så vidt muligt.</p>
-          <p style="opacity:.85">Boksen kan udvides nedad ved behov.</p>
-        </aside>
+        </div>
       </div>
 
-      <!-- Højre side: Mønter + YouTube (låst position og bredde) -->
-      <div class="right-rail">
-        <div class="right-stack">
-          <section class="coins">
-            <div class="coin">
-              <img id="coinD" alt="MadaCoin Donation" />
-              <p class="coin-description">Støt vores mission ved at købe MadaCoin Donation.</p>
-              <button class="button" onclick="openTransak('MCD','0xa594586B04f1b6782EC906B49882EbD0E652a388')">Køb MadaCoin Donation</button>
-            </div>
-            <div class="coin">
-              <img id="coinC" alt="MadaCoin" />
-              <p class="coin-description">Investér i MadaCoin – fremtidens valuta for Madagaskar.</p>
-              <button class="button" onclick="openTransak('MCN','DIN_MCN_KONTRAKT_ADRESSE')">Køb MadaCoin</button>
-            </div>
-          </section>
-
-          <section id="yt-section" class="yt-wrap">
-            <div id="yt-player"></div>
-            <div id="yt-thumbs"></div>
-          </section>
+      <!-- “VENSTRE RAIL” (hero + graf) -->
+      <div class="rail" style="margin-top:16px">
+        <div class="panel hero">
+          <h2 id="hero-title">Hero-titel</h2>
+          <p id="hero-body">Hero-tekst fra <code>site_text</code> (page=home, section=hero)</p>
+        </div>
+        <div class="panel graph" id="graph-box">
+          <div>Graf (placeholder)</div>
         </div>
       </div>
     </section>
   </main>
 
-  <footer>© 2025 MadaCoin. All rights reserved.</footer>
+  <!-- FOOTER -->
+  <footer>
+    <div class="wrap">© MadaCoin</div>
+  </footer>
 
   <script>
-    const SUPABASE_URL="https://byrlebjwknppjbtbkozt.supabase.co";
-    const SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
-    const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON) : null;
+    // ===== Supabase klient =====
+    const SUPABASE_URL = "https://byrlebjwknppjbtbkozt.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const TRANSAK_KEY="DIN_API_KEY";
-    function openTransak(symbol,wallet){
-      if(!TRANSAK_KEY||TRANSAK_KEY==="DIN_API_KEY"||(wallet&&wallet.includes("DIN_MCN_KONTRAKT_ADRESSE"))){
-        alert("Køb-funktionen bliver aktiveret, når nøgle og kontrakt er sat."); return;
+    // ===== Hjælpere =====
+    const $ = s => document.querySelector(s);
+    function publicUrl(bucket, path){
+      const { data } = sb.storage.from(bucket).getPublicUrl(path);
+      return data?.publicUrl || '';
+    }
+
+    // ===== Social links (venstre rail) =====
+    async function loadSocial(){
+      const { data, error } = await sb.from('social_links').select('*').eq('active', true).order('sort', {ascending:true});
+      const box = $('#social-menu'); box.innerHTML = '';
+      if(error){ box.innerHTML = `<div style="color:#ff6363">Social fejl: ${error.message}</div>`; return; }
+      (data||[]).forEach(row=>{
+        const a = document.createElement('a');
+        a.href = row.url; a.target = "_blank"; a.rel = "nofollow noopener";
+        a.textContent = row.platform;
+        box.appendChild(a);
+      });
+    }
+
+    // ===== Tekster (hero + mcd/mcn) =====
+    async function loadTexts(){
+      const { data, error } = await sb.from('site_text').select('section,tkey,content').eq('page','home');
+      if(error){ console.warn('site_text error:', error); return; }
+      const lookup = {};
+      (data||[]).forEach(r=>{ lookup[`${r.section}:${r.tkey}`] = r.content; });
+      $('#hero-title').textContent = lookup['hero:title'] || 'Hero-titel';
+      $('#hero-body').textContent  = lookup['hero:body']  || 'Hero-tekst…';
+      $('#mcd-title').textContent  = lookup['mcd:title']  || 'MCD';
+      $('#mcd-body').textContent   = lookup['mcd:body']   || 'Donation token…';
+      $('#mcn-title').textContent  = lookup['mcn:title']  || 'MCN';
+      $('#mcn-body').textContent   = lookup['mcn:body']   || 'Crypto token…';
+    }
+
+    // ===== YouTube (hoved + thumbs) =====
+    function setMainVideo(id){
+      const src = id ? `https://www.youtube-nocookie.com/embed/${id}` : '';
+      $('#yt-main').src = src;
+    }
+    async function loadYouTube(){
+      const { data, error } = await sb.from('youtube_videos').select('*').eq('active', true).order('sort', {ascending:true});
+      const thumbs = $('#yt-thumbs'); thumbs.innerHTML = '';
+      if(error){ console.warn('youtube error:', error); return; }
+      const list = data || [];
+      if(list.length === 0){ setMainVideo(''); return; }
+      setMainVideo(list[0].video_id);
+      list.forEach(v=>{
+        const img = new Image();
+        img.src = `https://i.ytimg.com/vi/${v.video_id}/hqdefault.jpg`;
+        img.alt = v.title || v.video_id;
+        img.className = 'yt-thumb';
+        img.addEventListener('click', ()=> setMainVideo(v.video_id));
+        thumbs.appendChild(img);
+      });
+    }
+
+    // ===== Baggrund fra site_settings (home_bg_1x/2x) =====
+    async function applyBackground(){
+      const { data, error } = await sb.from('site_settings').select('key,value').in('key',['home_bg_1x','home_bg_2x']);
+      if(error){ console.warn('site_settings error:', error); return; }
+      const map = Object.fromEntries((data||[]).map(r=>[r.key,r.value]));
+      const one = map['home_bg_1x'], two = map['home_bg_2x'];
+      if(one || two){
+        const url1 = one ? `url("${publicUrl(one.bucket, one.path)}") 1x` : null;
+        const url2 = two ? `url("${publicUrl(two.bucket, two.path)}") 2x` : null;
+        const imageSet = [url1,url2].filter(Boolean).join(', ');
+        document.body.style.backgroundImage = two ? `image-set(${imageSet})` : (one ? `url("${publicUrl(one.bucket, one.path)}")` : '');
+        document.body.style.backgroundAttachment = 'fixed';
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center';
       }
-      const url=`https://global.transak.com/?apiKey=${TRANSAK_KEY}&cryptoCurrencyCode=${symbol}&walletAddress=${wallet}&network=polygon&fiatCurrency=EUR&defaultPaymentMethod=credit_debit_card&themeColor=FFCC00`;
-      window.open(url,"_blank","width=500,height=700");
     }
 
-    async function loadSiteText(){
-      if(!sb) return {};
-      try{
-        const { data, error } = await sb.from('site_text').select('page,key,value').in('page',['common','home']);
-        if(error) return {};
-        const dict={}; (data||[]).forEach(r=>dict[`${r.page}:${r.key}`]=r.value);
-        document.querySelectorAll('[data-text]').forEach(el=>{
-          const k=el.getAttribute('data-text'); if(dict[k]!=null) el.innerHTML=dict[k];
-        });
-        return dict;
-      }catch{ return {}; }
+    // ===== Init =====
+    (async ()=>{
+      await Promise.all([loadSocial(), loadTexts(), loadYouTube(), applyBackground()]);
+    })();
+  </script>
+
+  <!-- Password reset handler (Supabase) -->
+  <script>
+    // Lille overlay-UI til at sætte nyt password (vises når reset-link åbnes)
+    const resetCss = `
+      .reset-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:9999}
+      .reset-card{width:min(480px,92vw);background:#0e1116;color:#e9e9ef;border:1px solid #2a3342;border-radius:14px;padding:18px;font:14px system-ui}
+      .reset-card h2{margin:0 0 10px}
+      .reset-card input{width:100%;margin:8px 0;padding:10px;border-radius:10px;border:1px solid #2a3342;background:#0f1217;color:#e5e7eb}
+      .reset-row{display:flex;gap:10px;justify-content:flex-end}
+      .reset-btn{background:#1f2937;border:1px solid #2a3342;color:#e5e7eb;padding:8px 12px;border-radius:10px;cursor:pointer}
+      .reset-btn.ok{border-color:#214d34;background:#0f261a;color:#9ef0c0}
+      .reset-status{margin-top:8px;color:#cbd5e1}
+      .reset-status.err{color:#ff6363}
+    `;
+    (function injectStyle(css){ const s=document.createElement('style'); s.textContent=css; document.head.appendChild(s); })(resetCss);
+
+    function showResetModal(){
+      const wrap = document.createElement('div');
+      wrap.className = 'reset-backdrop';
+      wrap.innerHTML = `
+        <div class="reset-card">
+          <h2>Sæt nyt password</h2>
+          <p>Indtast et nyt password til din konto.</p>
+          <input id="rp1" type="password" placeholder="Nyt password" />
+          <input id="rp2" type="password" placeholder="Gentag password" />
+          <div class="reset-row">
+            <button class="reset-btn" id="rp-cancel">Luk</button>
+            <button class="reset-btn ok" id="rp-save">Gem</button>
+          </div>
+          <div class="reset-status" id="rp-status"></div>
+        </div>
+      `;
+      document.body.appendChild(wrap);
+
+      const $w = sel => wrap.querySelector(sel);
+      $w('#rp-cancel').onclick = () => wrap.remove();
+      $w('#rp-save').onclick = async () => {
+        const p1 = $w('#rp1').value, p2 = $w('#rp2').value;
+        const st = $w('#rp-status');
+        if(!p1 || p1.length < 8){ st.textContent = "Password skal være mindst 8 tegn."; st.className='reset-status err'; return; }
+        if(p1 !== p2){ st.textContent = "Passwords matcher ikke."; st.className='reset-status err'; return; }
+        try{
+          st.textContent = "Opdaterer…"; st.className='reset-status';
+          const { error } = await sb.auth.updateUser({ password: p1 });
+          if(error) throw error;
+          st.textContent = "Færdig! Du kan nu logge ind i admin med dit nye password.";
+          st.className='reset-status';
+          setTimeout(()=> wrap.remove(), 1400);
+        }catch(e){
+          st.textContent = e.message || String(e);
+          st.className='reset-status err';
+        }
+      };
     }
 
-    /* Sociale links (original loader) */
-    function normalizeUrl(u){ if(!u) return null; const t=u.trim(); return /^https?:\/\//i.test(t)?t:'https://'+t }
-    function iconUrlFor(p){ const name=p.charAt(0).toUpperCase()+p.slice(1).toLowerCase(); const {data}=sb.storage.from('social.icons').getPublicUrl(`${name}.svg`); return data?.publicUrl||null }
-    function fallbackIconUrl(){ const {data}=sb.storage.from('social.icons').getPublicUrl('Globe.svg'); return data?.publicUrl||'' }
-    async function renderSocialLinks(){
-      const el=document.getElementById('social-menu'); if(!el||!sb) return;
-      el.innerHTML='';
-      const {data,error}=await sb.from('social_links').select('platform,url,is_active,sort_order')
-        .eq('is_active',true).order('sort_order',{ascending:true});
-      if(error) return;
-      const globe=fallbackIconUrl();
-      (data||[]).filter(r=>r.url&&r.url.trim()!=='').forEach(r=>{
-        const a=document.createElement('a'); const href=normalizeUrl(r.url); if(!href) return;
-        a.href=href; a.target='_blank'; a.rel='noopener noreferrer'; a.title=r.platform; a.setAttribute('aria-label',r.platform);
-        const img=document.createElement('img'); img.src=iconUrlFor(r.platform)||globe; img.onerror=()=>{img.src=globe};
-        a.appendChild(img); el.appendChild(a);
-      });
-    }
+    // FANG reset-token fra Supabase: #access_token=…&refresh_token=…&type=recovery
+    (async ()=>{
+      const hash = window.location.hash || "";
+      const params = new URLSearchParams(hash.startsWith('#') ? hash.slice(1) : hash);
+      const type = params.get('type');
+      const access_token = params.get('access_token');
+      const refresh_token = params.get('refresh_token');
 
-    /* Coin-billeder */
-    const storeBase="https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public";
-    const pub=(...p)=>`${storeBase}/${p.map(encodeURIComponent).join('/')}`;
-    function setCoinImages(){
-      const c=document.getElementById('coinC'), d=document.getElementById('coinD');
-      if(c) c.src=pub('images','MadaCoin_C.png');
-      if(d) d.src=pub('images','MadaCoin_D.png');
-    }
-
-    /* YouTube */
-    function getYouTubeId(url){ if(!url) return null; try{ const u=new URL(url); if(u.hostname.includes("youtu.be")) return u.pathname.slice(1); if(u.searchParams.get("v")) return u.searchParams.get("v"); const m=url.match(/(?:embed|shorts)\/([a-zA-Z0-9_-]{6,})/); if(m) return m[1]; const seg=u.pathname.split("/").pop(); return seg&&seg.length>=6?seg:null }catch{return null} }
-    function thumbUrl(id){ return `https://i.ytimg.com/vi/${id}/hqdefault.jpg` }
-    function renderPlayer(id){
-      const el=document.getElementById("yt-player");
-      el.innerHTML=`<iframe src="https://www.youtube.com/embed/${id}" title="MadaCoin video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;"></iframe>`;
-    }
-    function renderThumbs(videos,active){
-      const wrap=document.getElementById("yt-thumbs"); wrap.innerHTML="";
-      videos.forEach(v=>{
-        const id=v._id;
-        const btn=document.createElement("button");
-        btn.style.background='transparent';
-        btn.style.border=id===active?"3px solid #f0b90b":"2px solid #333";
-        btn.style.borderRadius="12px";
-        btn.style.overflow="hidden";
-        btn.style.cursor="pointer";
-        btn.style.padding="0";
-        btn.title=v.title||"Se video";
-        btn.innerHTML=`<img src="${thumbUrl(id)}" alt="${v.title||"YouTube thumbnail"}" style="display:block;width:100%;height:100%;object-fit:cover;">`;
-        btn.onclick=()=>{
-          renderPlayer(id);
-          [...wrap.children].forEach(c=>c.style.border="2px solid #333");
-          btn.style.border="3px solid #f0b90b";
-        };
-        wrap.appendChild(btn);
-      });
-    }
-    async function initYouTube(){
-      if(!sb){ document.getElementById("yt-section").style.display="none"; return; }
-      const {data,error}=await sb.from("youtube_videos")
-        .select("youtube_url,is_active,created_at,title,sort_order")
-        .eq("is_active",true)
-        .not("youtube_url","is",null).neq("youtube_url","")
-        .order("sort_order",{ascending:true,nullsFirst:false})
-        .order("created_at",{ascending:false});
-      if(error) return;
-      const vids=(data||[]).map(v=>({...v,_id:getYouTubeId(v.youtube_url)})).filter(v=>v._id);
-      if(!vids.length){ document.getElementById("yt-section").style.display="none"; return; }
-      document.getElementById("yt-section").style.display="";
-      renderPlayer(vids[0]._id); renderThumbs(vids,vids[0]._id);
-    }
-
-    function attachHeroActions(){
-      const btn=document.getElementById('hero-primary');
-      if(btn){ btn.addEventListener('click',()=>openTransak('MCD','0xa594586B04f1b6782EC906B49882EbD0E652a388')) }
-    }
-
-    window.addEventListener('load', async ()=>{
-      await loadSiteText();
-      await renderSocialLinks();
-      setCoinImages();
-      initYouTube();
-      attachHeroActions();
-    });
+      if (type === 'recovery' && access_token) {
+        try{
+          // Etabler session ud fra token i URL (krævet før updateUser)
+          await sb.auth.setSession({ access_token, refresh_token });
+        }catch(e){ console.warn("setSession fejl:", e); }
+        // Ryd hash for pæn URL
+        try{ window.history.replaceState({}, document.title, window.location.pathname + window.location.search); }catch(_){}
+        // Vis modal
+        showResetModal();
+      }
+    })();
   </script>
 </body>
 </html>
