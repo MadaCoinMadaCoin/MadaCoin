@@ -21,7 +21,6 @@
     *,*::before,*::after{ box-sizing:border-box }
     html{ font-size:16px }
     :root{
-      /* auto-mode typografi og afstande */
       --fs-h1: clamp(20px, 2.6vw, 28px);
       --fs-sub: clamp(14px, 1.6vw, 16px);
       --fs-base: clamp(13px, 1.2vw, 16px);
@@ -46,7 +45,7 @@
     }
     @media (max-width:800px){ body{ background-attachment:scroll } }
 
-    /* NAV (4 sider inkl. Roadmap) */
+    /* NAV */
     .site-nav{ position:sticky; top:0; z-index:9999; padding:24px 0; background:transparent }
     .site-nav .nav-inner{ padding:0 var(--edge-pad) }
     .nav{ display:flex; gap:var(--nav-gap); align-items:center; flex-wrap:wrap; justify-content:flex-start; transform:translateY(-2px) }
@@ -59,109 +58,79 @@
     .nav a:hover{ background:var(--nav-hover-bg); border-color:var(--nav-hover-border) }
     .nav a[aria-current="page"]{ border-color:var(--nav-active); box-shadow:0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset }
 
-    /* SOCIAL venstre */
+    /* SOCIAL */
     .social-menu{ position:fixed; top:104px; left:var(--edge-pad); display:flex; flex-direction:column; gap:10px; z-index:1000 }
     .social-menu a{ display:flex; align-items:center; justify-content:center; width:42px; height:42px; background:rgba(0,0,0,.7); border-radius:8px; text-decoration:none; transition:background-color .2s, transform .15s }
     .social-menu a:hover{ background:rgba(0,0,0,.85); transform:translateY(-2px) }
     .social-menu a img{ width:22px; height:22px }
 
-    /* SIDE-OPSÆTNING */
-    .page{ flex:1; display:grid; grid-template-rows:auto auto 1fr auto; /* nav, coins, main, footer */ }
+    /* PAGE GRID */
+    .page{ flex:1; display:grid; grid-template-rows:auto auto 1fr auto }
 
-    /* MØNTER øverst (50% mindre) */
-    .coins-wrap{
-      padding: 6px var(--edge-pad) 0;
-      display:flex; justify-content:center;
-    }
+    /* MØNTER (50% mindre) */
+    .coins-wrap{ padding: 6px var(--edge-pad) 0; display:flex; justify-content:center }
     .coin-section{
-      display:flex; flex-wrap:wrap; justify-content:center; gap: clamp(16px, 6vw, 40px);
-      width: min(1100px, 100%); margin: 8px auto 0;
+      display:flex; flex-wrap:wrap; justify-content:center; gap: clamp(12px, 4vw, 24px);
+      width: min(900px, 100%); margin: 4px auto 0;
     }
     .coin{
-      background:rgba(255,248,220,.95); margin:0; padding:10px; border-radius:15px;
-      width: clamp(180px, 26vw, 320px); text-align:center;
+      background:rgba(255,248,220,.95); padding:8px; border-radius:12px;
+      width: clamp(140px, 20vw, 200px); text-align:center;
       box-shadow:0 0 12px rgba(0,0,0,.1); border:2px solid #e5c100;
     }
     .coin img{
-      width: clamp(150px, 22vw, 300px); height: clamp(150px, 22vw, 300px);
-      border-radius:10px; margin-bottom:10px; object-fit:cover;
+      width: clamp(100px, 18vw, 160px); height: clamp(100px, 18vw, 160px);
+      border-radius:8px; margin-bottom:8px; object-fit:cover;
     }
-    .coin-description{ font-size:.9rem; margin-bottom:10px; color:#333 }
+    .coin-description{ font-size:.85rem; margin-bottom:8px; color:#333 }
     .button{
       background:linear-gradient(135deg,var(--gold-1),var(--gold-2)); color:#004d73!important;
-      padding:10px 20px; border:none; margin-top:10px; cursor:pointer; border-radius:5px; font-weight:bold;
+      padding:8px 16px; border:none; margin-top:6px; cursor:pointer; border-radius:5px; font-weight:bold;
       box-shadow:0 4px 8px rgba(0,0,0,.2); transition:all .3s
     }
     .button:hover{ background:linear-gradient(135deg,#FFC107,#B8860B); transform:scale(1.05) }
 
-    /* HOVEDGRID: hero + youtube (venstre) / graf (højre) */
+    /* HOVEDGRID */
     .below-grid{
       padding: var(--gap-lg) var(--edge-pad) var(--gap-lg);
       display:grid; gap: var(--gap-lg);
       grid-template-columns: 1.15fr 0.85fr;
       align-items:start; max-width: 1200px; width:100%; margin: 0 auto;
     }
-    .left-col{ display:grid; grid-template-rows:auto auto; gap: var(--gap-lg); min-width:0; }
+    .left-col{ display:grid; grid-template-rows:auto auto; gap: var(--gap-lg); min-width:0 }
+
+    /* HERO */
     .hero{
       background:var(--panel-bg); border:1px solid var(--panel-border); border-radius:16px;
       box-shadow:0 12px 26px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
       padding:16px 18px;
     }
-    .hero .ribbon{
-      display:inline-block; margin:-2px 0 8px; padding:4px 10px; border-radius:999px; font-size:12px; letter-spacing:.2px;
-      background:#102414; border:1px solid #1d3d22; color:#baf7c9; box-shadow:inset 0 1px 0 rgba(255,255,255,.06)
-    }
     .hero h1{ font-size:var(--fs-h1); margin:0 0 .4rem }
-    .hero .sub{ color:#cfd3d7; margin:.25rem 0 .5rem; font-size:var(--fs-sub) }
-    .hero .points{ display:flex; flex-wrap:wrap; gap:6px 8px; margin:.5rem 0 .75rem }
-    .hero .pt{ padding:6px 10px; border-radius:999px; background:#0d0d0f; border:1px solid #333; box-shadow:inset 0 1px 0 rgba(255,255,255,.06); font-size:.92rem; opacity:.96 }
-    .hero .btns{ display:flex; gap:10px; flex-wrap:wrap }
-    .hero .btn{
-      display:inline-flex; align-items:center; justify-content:center; gap:8px;
-      padding:9px 14px; border-radius:12px; text-decoration:none; cursor:pointer;
-      background:#0d0d0f; border:1px solid #333; color:#fff; box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
-      transition:filter .15s, transform .15s
-    }
-    .hero .btn:hover{ filter:brightness(1.08); transform:translateY(-1px) }
-    .hero .btn.primary{ background:linear-gradient(135deg,var(--gold-1),var(--gold-2)); color:#1c2630; border-color:#865c10 }
-    .hero .perks{ margin-top:.6rem; font-size:.9rem; color:#cfd3d7 }
-    .hero .perks a{ color:#9ad4ff; text-decoration:none }
-    .hero .perks a:hover{ text-decoration:underline }
 
+    /* YOUTUBE (50% mindre) */
     .yt{
-      background:var(--panel-bg); border:1px solid var(--panel-border); border-radius:16px; padding:10px;
+      background:var(--panel-bg); border:1px solid var(--panel-border); border-radius:16px; padding:8px;
     }
     .yt .player{
-      position:relative; padding-top:56.25%; border-radius:12px; overflow:hidden; border:2px solid #222;
-      /* “50%” oplevelse: indlejret i venstre kolonne under hero, med kompakt padding */
+      position:relative; padding-top:28%; border-radius:12px; overflow:hidden; border:2px solid #222;
     }
     .yt iframe{ position:absolute; inset:0; width:100%; height:100%; border:0 }
 
-    .right-col{
-      min-width:0;
-      display:flex; align-items:flex-end; justify-content:stretch;
-    }
+    /* GRAF */
+    .right-col{ min-width:0; display:flex; align-items:flex-start; justify-content:stretch }
     .chart{
       background:var(--panel-bg); border:1px solid var(--panel-border); border-radius:16px; padding:10px;
       width:100%; min-height:220px; display:flex; align-items:center; justify-content:center;
     }
-    .chart .placeholder{
-      opacity:.8; font-size:.95rem; text-align:center;
-    }
+    .chart .placeholder{ opacity:.8; font-size:.95rem; text-align:center }
 
     /* FOOTER */
     footer{ text-align:center; padding:16px 20px; background:#e4e6c5; color:#000 }
 
-    /* AUTO-MODE small screens */
+    /* RESPONSIVE */
     @media (max-width:1100px){
-      .below-grid{ grid-template-columns: 1fr; }
-      .right-col{ order: 3; }
-    }
-    @media (max-width:900px){
-      .social-menu{ top:116px }
-      .hero .pt{ font-size:.85rem; padding:5px 8px }
-      .hero .btn{ padding:8px 12px; font-size:.95rem }
-      .hero .perks{ font-size:.85rem }
+      .below-grid{ grid-template-columns: 1fr }
+      .right-col{ order:3 }
     }
   </style>
 </head>
@@ -171,9 +140,9 @@
   <header class="site-nav">
     <div class="nav-inner">
       <nav class="nav">
-        <a href="/index.html" aria-current="page" data-text="common:nav_home">Home</a>
-        <a href="/madacoin.html" data-text="common:nav_about">Om</a>
-        <a href="/rapporter.html" data-text="common:nav_reports">Rapporter</a>
+        <a href="/index.html" aria-current="page">Home</a>
+        <a href="/madacoin.html">Om</a>
+        <a href="/rapporter.html">Rapporter</a>
         <a href="/roadmap.html">Roadmap</a>
       </nav>
     </div>
@@ -182,150 +151,44 @@
   <!-- Social -->
   <div class="social-menu" id="social-menu"></div>
 
-  <!-- MØNTER ØVERST -->
+  <!-- MØNTER -->
   <div class="coins-wrap">
     <section class="coin-section">
       <div class="coin">
         <img id="coinD" alt="MadaCoin Donation" />
         <p class="coin-description">Støt vores mission ved at købe MadaCoin Donation.</p>
-        <button class="button" onclick="openTransak('MCD','0xa594586B04f1b6782EC906B49882EbD0E652a388')">Køb MadaCoin Donation</button>
+        <button class="button">Køb MadaCoin Donation</button>
       </div>
       <div class="coin">
         <img id="coinC" alt="MadaCoin" />
         <p class="coin-description">Investér i MadaCoin – fremtidens valuta for Madagaskar.</p>
-        <button class="button" onclick="openTransak('MCN','DIN_MCN_KONTRAKT_ADRESSE')">Køb MadaCoin</button>
+        <button class="button">Køb MadaCoin</button>
       </div>
     </section>
   </div>
 
-  <!-- HOVEDGRID: HERO + YT (VENSTRE) / GRAF (HØJRE) -->
+  <!-- HOVEDGRID -->
   <main class="below-grid">
     <section class="left-col">
-      <div class="hero" id="home-hero">
-        <div class="ribbon" data-text="home:hero_ribbon">NYHED: 25% hotelrabat til MCD &amp; MCN holders</div>
-        <h1 data-text="home:hero_title">Donér. Byg. Forandr Madagaskar.</h1>
-        <p class="sub" data-text="home:hero_sub">MadaCoin gør donationer til skoler, solenergi og lokale jobs — med fuld gennemsigtighed.</p>
-        <div class="points">
-          <span class="pt" data-text="home:hero_point1">Skolebyggeri</span>
-          <span class="pt" data-text="home:hero_point2">Solceller &amp; batterier</span>
-          <span class="pt" data-text="home:hero_point3">Åbne rapporter</span>
-        </div>
-        <div class="btns">
-          <button class="btn primary" id="hero-primary" data-text="home:hero_cta_primary">Støt med MadaCoin</button>
-          <a class="btn" href="/rapporter.html" data-text="home:hero_cta_secondary">Se rapporter</a>
-        </div>
-        <div class="perks">
-          <span data-text="home:hero_perks_blurb">Kvalificér med <strong>≥ 5.000 MCD</strong> eller samlet <strong>≥ 5.000 USD</strong> i MCD/MCN. 1 kode pr. 60. dag. Gælder udvalgte hoteller &amp; ferieboliger i Madagaskar.</span>
-          &nbsp; <a href="/perks.html" data-text="home:hero_perks_link">Se vilkår &amp; partnere</a>
-        </div>
+      <div class="hero">
+        <h1>Donér. Byg. Forandr Madagaskar.</h1>
+        <p class="sub">MadaCoin gør donationer til skoler, solenergi og lokale jobs.</p>
       </div>
 
       <div class="yt">
         <div class="player" id="yt-player"></div>
-        <div id="yt-thumbs" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px;margin-top:12px;"></div>
+        <div id="yt-thumbs" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:10px;margin-top:10px;"></div>
       </div>
     </section>
 
     <aside class="right-col">
       <div class="chart">
-        <!-- Graf placeholder – klar til vores Supabase/Chart.js drop-in -->
-        <div class="placeholder">
-          <div style="font-weight:600;margin-bottom:6px;">Live MCN/MCD</div>
-          <div>Graf kommer her (klar til Chart.js)</div>
-        </div>
+        <div class="placeholder">Live MCN/MCD<br>Graf kommer her</div>
         <canvas id="mcmChart" style="display:none;"></canvas>
       </div>
     </aside>
   </main>
 
-  <footer><span id="footer-text" data-text="common:footer">© 2025 MadaCoin. All rights reserved.</span></footer>
-
-  <script>
-    // === Supabase init ===
-    const SUPABASE_URL="https://byrlebjwknppjbtbkozt.supabase.co";
-    const SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
-    const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON) : null;
-
-    // === Transak placeholder (vi skifter til Ramp senere ift. jeres plan) ===
-    const TRANSAK_KEY="DIN_API_KEY";
-    function openTransak(symbol,wallet){
-      if(!TRANSAK_KEY||TRANSAK_KEY==="DIN_API_KEY"||(wallet&&wallet.includes("DIN_MCN_KONTRAKT_ADRESSE"))){
-        alert("Køb-funktionen bliver aktiveret, når nøgle og kontrakt er sat."); return;
-      }
-      const url=`https://global.transak.com/?apiKey=${TRANSAK_KEY}&cryptoCurrencyCode=${symbol}&walletAddress=${wallet}&network=polygon&fiatCurrency=EUR&defaultPaymentMethod=credit_debit_card&themeColor=FFCC00`;
-      window.open(url,"_blank","width=500,height=700");
-    }
-
-    // === Tekster (site_text) ===
-    async function loadSiteText(){
-      if(!sb) return {};
-      try{
-        const { data, error } = await sb.from('site_text').select('page,key,value').in('page',['common','home']);
-        if(error) return {};
-        const dict={}; (data||[]).forEach(r=>dict[`${r.page}:${r.key}`]=r.value);
-        document.querySelectorAll('[data-text]').forEach(el=>{
-          const k=el.getAttribute('data-text'); if(dict[k]!=null) el.innerHTML=dict[k];
-        });
-        return dict;
-      }catch{ return {}; }
-    }
-
-    // === Sociale ikoner ===
-    function normalizeUrl(u){ if(!u) return null; const t=u.trim(); return /^https?:\/\//i.test(t)?t:'https://'+t }
-    function iconUrlFor(p){ const name=p.charAt(0).toUpperCase()+p.slice(1).toLowerCase(); const {data}=sb.storage.from('social.icons').getPublicUrl(`${name}.svg`); return data?.publicUrl||null }
-    function fallbackIconUrl(){ const {data}=sb.storage.from('social.icons').getPublicUrl('Globe.svg'); return data?.publicUrl||'' }
-    async function renderSocialLinks(){
-      const el=document.getElementById('social-menu'); if(!el||!sb) return;
-      el.innerHTML=''; const {data,error}=await sb.from('social_links').select('platform,url,is_active,sort_order').eq('is_active',true).order('sort_order',{ascending:true});
-      if(error) return; const globe=fallbackIconUrl();
-      (data||[]).filter(r=>r.url&&r.url.trim()!=='').forEach(r=>{
-        const a=document.createElement('a'); const href=normalizeUrl(r.url); if(!href) return;
-        a.href=href; a.target='_blank'; a.rel='noopener noreferrer'; a.title=r.platform; a.setAttribute('aria-label',r.platform);
-        const img=document.createElement('img'); img.src=iconUrlFor(r.platform)||globe; img.onerror=()=>{img.src=globe}; a.appendChild(img); el.appendChild(a);
-      });
-    }
-
-    // === Møntbilleder ===
-    const base="https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public";
-    const pub=(...p)=>`${base}/${p.map(encodeURIComponent).join('/')}`;
-    function setCoinImages(){ const c=document.getElementById('coinC'), d=document.getElementById('coinD'); if(c) c.src=pub('images','MadaCoin_C.png'); if(d) d.src=pub('images','MadaCoin_D.png') }
-
-    // === YouTube ===
-    function getYouTubeId(url){ if(!url) return null; try{ const u=new URL(url); if(u.hostname.includes("youtu.be")) return u.pathname.slice(1); if(u.searchParams.get("v")) return u.searchParams.get("v"); const m=url.match(/(?:embed|shorts)\/([a-zA-Z0-9_-]{6,})/); if(m) return m[1]; const seg=u.pathname.split("/").pop(); return seg&&seg.length>=6?seg:null }catch{return null} }
-    function thumbUrl(id){ return `https://i.ytimg.com/vi/${id}/hqdefault.jpg` }
-    function renderPlayer(id){ const el=document.getElementById("yt-player"); el.innerHTML=`<iframe src="https://www.youtube.com/embed/${id}" title="MadaCoin video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>` }
-    function renderThumbs(videos,active){
-      const wrap=document.getElementById("yt-thumbs"); wrap.innerHTML="";
-      videos.forEach(v=>{
-        const id=v._id; const btn=document.createElement("button");
-        btn.style.background='transparent'; btn.style.border=id===active?"3px solid #f0b90b":"2px solid #333";
-        btn.style.borderRadius="12px"; btn.style.overflow="hidden"; btn.style.cursor="pointer"; btn.style.padding="0"; btn.title=v.title||"Se video";
-        btn.innerHTML=`<div style="display:flex;flex-direction:column;gap:6px"><img src="${thumbUrl(id)}" alt="${v.title||"YouTube thumbnail"}" style="display:block;width:100%;height:100%;object-fit:cover;">${v.title?`<div style="font-size:13px;line-height:1.3;color:#222;background:rgba(255,247,214,.95);padding:6px 8px;border-radius:8px;text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${v.title}</div>`:""}</div>`;
-        btn.onclick=()=>{ renderPlayer(id); [...wrap.children].forEach(c=>c.style.border="2px solid #333"); btn.style.border="3px solid #f0b90b" };
-        wrap.appendChild(btn)
-      })
-    }
-    async function initYouTube(){
-      if(!sb) return;
-      const {data,error}=await sb.from("youtube_videos").select("youtube_url,is_active,created_at,title,sort_order").eq("is_active",true).not("youtube_url","is",null).neq("youtube_url","").order("sort_order",{ascending:true,nullsFirst:false}).order("created_at",{ascending:false});
-      if(error) return; const vids=(data||[]).map(v=>({...v,_id:getYouTubeId(v.youtube_url)})).filter(v=>v._id);
-      if(!vids.length){ document.getElementById("yt-player").innerHTML = `<div style="opacity:.7;text-align:center;padding:16px;">Ingen videoer endnu</div>`; return; }
-      renderPlayer(vids[0]._id); renderThumbs(vids,vids[0]._id);
-    }
-
-    function attachHeroActions(){
-      const btn=document.getElementById('hero-primary');
-      if(btn){ btn.addEventListener('click',()=>openTransak('MCD','0xa594586B04f1b6782EC906B49882EbD0E652a388')) }
-    }
-
-    // Init
-    window.addEventListener('load', async ()=>{
-      await loadSiteText();
-      await renderSocialLinks();
-      setCoinImages();
-      await initYouTube();
-      attachHeroActions();
-    });
-  </script>
+  <footer><span>© 2025 MadaCoin. All rights reserved.</span></footer>
 </body>
 </html>
