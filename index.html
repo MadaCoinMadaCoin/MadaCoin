@@ -1,178 +1,158 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="da">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <title>MadaCoin</title>
-  <meta name="description" content="MadaCoin støtter udvikling i Madagaskar gennem donationer og gennemsigtighed.">
-  <link rel="icon" href="/favicon_boosted.ico?v=1" type="image/x-icon">
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="MadaCoin — Donations for Madagascar">
-  <meta property="og:description" content="Støt udvikling i Madagaskar gennem MadaCoin.">
-  <meta property="og:url" content="https://madacoin.pro">
-  <meta property="og:type" content="website">
-
-  <!-- Supabase -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-
+  <title>MadaCoin – Forside</title>
   <style>
-    *,*::before,*::after{ box-sizing:border-box }
-    html{ font-size:16px }
-    :root{
-      --edge-pad:24px;
-      --gap-lg: clamp(12px, 2vw, 28px);
-      --gold-1:#FFD700; --gold-2:#DAA520;
-      --panel-bg: rgba(11,11,12,0.92);
-      --panel-border: #2a2a2a;
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #062640 url('background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
     }
-    body{
-      margin:0; color:#fff;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
-      background:#061a2b no-repeat center/cover fixed;
-      background-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
-      min-height:100svh; display:flex; flex-direction:column;
+    header {
+      display: flex;
+      gap: 10px;
+      padding: 12px;
+      background: transparent;
     }
-    @media (max-width:800px){ body{ background-attachment:scroll } }
-
-    /* NAV */
-    .site-nav{ position:sticky; top:0; z-index:9999; padding:20px var(--edge-pad); background:transparent }
-    .nav{ display:flex; gap:12px }
-    .nav a{ padding:8px 14px; background:#0d0d0f; border-radius:10px; color:#fff; text-decoration:none }
-
-    /* HERO */
-    .hero{
-      margin: var(--gap-lg) auto 0;
-      max-width: 900px;
-      background:var(--panel-bg);
-      border:1px solid var(--panel-border);
-      border-radius:16px;
-      padding:20px;
-      text-align:left;
+    header a {
+      text-decoration: none;
+      background: #000;
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 8px;
     }
-    .hero h1{ margin-top:0; font-size:1.6rem }
-    .hero .sub{ margin:.4rem 0 1rem; color:#cfd3d7 }
-    .hero .btns{ display:flex; gap:12px; flex-wrap:wrap }
-    .hero .btn{
-      padding:9px 14px;
-      border-radius:12px;
-      text-decoration:none;
-      background:#0d0d0f;
-      border:1px solid #333;
-      color:#fff;
-      cursor:pointer;
+    .coins {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin: 30px auto 0;
     }
-    .hero .btn.primary{ background:linear-gradient(135deg,var(--gold-1),var(--gold-2)); color:#1c2630 }
-
-    /* MØNTER */
-    .coins-wrap{
-      margin: var(--gap-lg) auto;
-      display:flex; justify-content:center;
-      gap: clamp(16px, 6vw, 40px);
-      flex-wrap:wrap;
-      max-width:900px;
+    .coin {
+      background: #f5f5dc;
+      border: 2px solid gold;
+      border-radius: 10px;
+      width: 160px;
+      text-align: center;
+      padding: 12px;
     }
-    .coin{
-      background:rgba(255,248,220,.95);
-      padding:10px;
-      border-radius:15px;
-      width:180px;
-      text-align:center;
-      border:2px solid #e5c100;
+    .coin img {
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
     }
-    .coin img{
-      width:150px; height:150px;
-      object-fit:cover;
-      border-radius:10px;
+    .coin button {
+      margin-top: 10px;
+      padding: 6px 12px;
+      background: gold;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
     }
-    .button{
-      background:linear-gradient(135deg,var(--gold-1),var(--gold-2));
-      color:#004d73;
-      padding:8px 14px;
-      border:none;
-      margin-top:8px;
-      border-radius:6px;
-      font-weight:bold;
-      cursor:pointer;
-    }
-
-    /* GRID: YT + CHART */
-    .below-grid{
-      display:grid;
-      gap: var(--gap-lg);
+    .main {
+      display: grid;
       grid-template-columns: 1fr 1fr;
+      gap: 20px;
       max-width: 1100px;
-      width:100%;
-      margin: 0 auto var(--gap-lg);
-      padding: 0 var(--edge-pad);
+      margin: 20px auto;
+      padding: 0 20px;
     }
-    .yt,.chart{
-      background:var(--panel-bg);
-      border:1px solid var(--panel-border);
-      border-radius:16px;
-      padding:10px;
+    .hero, .graf, .youtube {
+      background: rgba(0,0,0,0.8);
+      border-radius: 10px;
+      padding: 20px;
     }
-    .yt .player{ position:relative; padding-top:56.25%; border-radius:12px; overflow:hidden }
-    .yt iframe{ position:absolute; inset:0; width:100%; height:100%; border:0 }
-    .chart{ display:flex; align-items:center; justify-content:center; min-height:220px }
-
-    footer{ text-align:center; padding:16px; background:#e4e6c5; color:#000 }
-
-    @media (max-width:900px){
-      .below-grid{ grid-template-columns:1fr }
+    .hero {
+      grid-column: 1;
+      align-self: start;
+    }
+    .graf {
+      grid-column: 2;
+      align-self: start;
+    }
+    .youtube {
+      grid-column: 1 / span 2;
+      margin-top: 20px;
+      text-align: center;
+    }
+    .video-main {
+      width: 100%;
+      max-width: 560px;
+      aspect-ratio: 16/9;
+      margin: 0 auto 16px;
+    }
+    .video-list {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .video-list iframe {
+      width: 160px;
+      height: 90px;
+    }
+    footer {
+      text-align: center;
+      padding: 12px;
+      margin-top: 40px;
+      background: #000;
+      color: #fff;
     }
   </style>
 </head>
 <body>
-
-  <!-- NAV -->
-  <header class="site-nav">
-    <nav class="nav">
-      <a href="/index.html" aria-current="page">Home</a>
-      <a href="/madacoin.html">Om</a>
-      <a href="/rapporter.html">Rapporter</a>
-      <a href="/roadmap.html">Roadmap</a>
-    </nav>
+  <header>
+    <a href="index.html">Home</a>
+    <a href="about.html">Om</a>
+    <a href="reports.html">Rapporter</a>
+    <a href="roadmap.html">Roadmap</a>
   </header>
 
-  <!-- HERO -->
-  <section class="hero">
-    <h1>Hero Titel</h1>
-    <p class="sub">Her står hero-teksten.</p>
-    <div class="btns">
-      <a class="btn primary" href="#">Støt med MadaCoin</a>
-      <a class="btn" href="/rapporter.html">Se rapporter</a>
-    </div>
-  </section>
-
-  <!-- MØNTER -->
-  <div class="coins-wrap">
+  <!-- Mønter -->
+  <div class="coins">
     <div class="coin">
-      <img id="coinD" alt="MCD" />
-      <p>MCD</p>
-      <button class="button">Køb MCD</button>
+      <img src="MCD.png" alt="MCD">
+      <div>MCD</div>
+      <button>Køb MCD</button>
     </div>
     <div class="coin">
-      <img id="coinC" alt="MCN" />
-      <p>MCN</p>
-      <button class="button">Køb MCN</button>
+      <img src="MCN.png" alt="MCN">
+      <div>MCN</div>
+      <button>Køb MCN</button>
     </div>
   </div>
 
-  <!-- YT + CHART -->
-  <main class="below-grid">
-    <div class="yt">
-      <div class="player">
-        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe>
-      </div>
+  <!-- Hero + Graf -->
+  <div class="main">
+    <div class="hero">
+      <h2>Donér. Byg. Forandr Madagaskar</h2>
+      <p>MadaCoin gør donationer til skoler, solenergi og lokal udvikling — med fuld gennemsigtighed.</p>
+      <button>Støt med MadaCoin</button>
+      <button>Se rapporter</button>
     </div>
-    <div class="chart">
-      <span>(placeholder graf)</span>
+    <div class="graf">
+      <h2>Live Kurs (MCN)</h2>
+      <p>(placeholder graf)</p>
     </div>
-  </main>
+  </div>
 
-  <footer>© 2025 MadaCoin. All rights reserved.</footer>
+  <!-- YouTube sektion -->
+  <div class="youtube">
+    <div class="video-main">
+      <iframe src="https://www.youtube.com/embed/SlPhMPnQ58k" frameborder="0" allowfullscreen></iframe>
+    </div>
+    <div class="video-list">
+      <iframe src="https://www.youtube.com/embed/L_jWHffIx5E" frameborder="0"></iframe>
+      <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0"></iframe>
+      <iframe src="https://www.youtube.com/embed/9bZkp7q19f0" frameborder="0"></iframe>
+    </div>
+  </div>
 
+  <footer>
+    © 2025 MadaCoin. All rights reserved.
+  </footer>
 </body>
 </html>
