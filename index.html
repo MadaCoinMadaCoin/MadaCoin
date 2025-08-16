@@ -1,194 +1,104 @@
 <!DOCTYPE html>
 <html lang="da">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <title>MadaCoin</title>
-  <meta name="description" content="MadaCoin støtter udvikling i Madagaskar gennem donationer og gennemsigtighed.">
-  <link rel="icon" href="/favicon_boosted.ico?v=1" type="image/x-icon">
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="MadaCoin — Donations for Madagascar">
-  <meta property="og:description" content="Støt udvikling i Madagaskar gennem MadaCoin.">
-  <meta property="og:url" content="https://madacoin.pro">
-  <meta property="og:type" content="website">
-
-  <!-- Supabase -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MadaCoin – Layout Udkast</title>
   <style>
-    *,*::before,*::after{ box-sizing:border-box }
-    html{ font-size:16px }
-    :root{
-      --fs-h1: clamp(20px, 2.6vw, 28px);
-      --fs-sub: clamp(14px, 1.6vw, 16px);
-      --fs-base: clamp(13px, 1.2vw, 16px);
-      --gap-lg: clamp(12px, 2.2vw, 28px);
-      --gap-sm: clamp(8px, 1.2vw, 14px);
-
-      --edge-pad:24px;
-      --nav-gap:14px; --nav-pad-x:14px; --nav-pad-y:8px;
-      --nav-text:#fff; --nav-bg:#0d0d0f; --nav-border:#333;
-      --nav-hover-bg:#151517; --nav-hover-border:#444; --nav-active:#5aa9ff;
-      --panel-bg: rgba(11,11,12,0.92);
-      --panel-border: #2a2a2a;
-      --gold-1:#FFD700; --gold-2:#DAA520;
+    body {
+      margin:0;
+      font-family: system-ui, sans-serif;
+      background:#061a2b;
+      color:#fff;
     }
 
-    body{
-      margin:0; color:#fff;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
-      background:#061a2b no-repeat center/cover fixed;
-      background-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
-      min-height:100svh; display:flex; flex-direction:column;
+    /* --- Mønter øverst --- */
+    .coins-wrap {
+      display:flex;
+      justify-content:center;
+      gap:30px;
+      padding:20px;
     }
-    @media (max-width:800px){ body{ background-attachment:scroll } }
+    .coin {
+      background:rgba(255,248,220,.95);
+      border:2px solid #e5c100;
+      border-radius:12px;
+      padding:10px;
+      width:180px; /* ca. 50% af tidligere */
+      text-align:center;
+    }
+    .coin img { width:150px; height:150px; object-fit:cover; }
 
-    /* NAV */
-    .site-nav{ position:sticky; top:0; z-index:9999; padding:24px 0; background:transparent }
-    .site-nav .nav-inner{ padding:0 var(--edge-pad) }
-    .nav{ display:flex; gap:var(--nav-gap); align-items:center; flex-wrap:wrap; justify-content:flex-start; transform:translateY(-2px) }
-    .nav a{
-      display:inline-flex; align-items:center; justify-content:center;
-      padding:var(--nav-pad-y) var(--nav-pad-x);
-      color:var(--nav-text); background:var(--nav-bg); border:1px solid var(--nav-border);
-      border-radius:12px; text-decoration:none; opacity:.96; box-shadow:inset 0 1px 0 rgba(255,255,255,.06)
+    /* --- Grid nedenunder --- */
+    .below-grid {
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:20px;
+      padding:20px;
+      max-width:1200px;
+      margin:auto;
     }
-    .nav a:hover{ background:var(--nav-hover-bg); border-color:var(--nav-hover-border) }
-    .nav a[aria-current="page"]{ border-color:var(--nav-active); box-shadow:0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset }
 
-    /* SOCIAL */
-    .social-menu{ position:fixed; top:104px; left:var(--edge-pad); display:flex; flex-direction:column; gap:10px; z-index:1000 }
-    .social-menu a{ display:flex; align-items:center; justify-content:center; width:42px; height:42px; background:rgba(0,0,0,.7); border-radius:8px; text-decoration:none; transition:background-color .2s, transform .15s }
-    .social-menu a:hover{ background:rgba(0,0,0,.85); transform:translateY(-2px) }
-    .social-menu a img{ width:22px; height:22px }
+    .hero {
+      grid-column:1 / 2;
+      background:rgba(0,0,0,.6);
+      border-radius:12px;
+      padding:16px;
+    }
 
-    /* PAGE GRID */
-    .page{ flex:1; display:grid; grid-template-rows:auto auto 1fr auto }
+    .yt {
+      grid-column:1 / 2;
+      background:rgba(0,0,0,.6);
+      border-radius:12px;
+      padding:10px;
+      margin-top:20px;
+    }
+    .yt iframe {
+      width:100%;
+      height:180px; /* ca. 50% af normal højde */
+      border:0;
+      border-radius:8px;
+    }
 
-    /* MØNTER (50% mindre) */
-    .coins-wrap{ padding: 6px var(--edge-pad) 0; display:flex; justify-content:center }
-    .coin-section{
-      display:flex; flex-wrap:wrap; justify-content:center; gap: clamp(12px, 4vw, 24px);
-      width: min(900px, 100%); margin: 4px auto 0;
+    .chart {
+      grid-column:2 / 3;
+      grid-row: span 2; /* fylder samme højde som hero+yt */
+      background:rgba(0,0,0,.6);
+      border-radius:12px;
+      padding:20px;
     }
-    .coin{
-      background:rgba(255,248,220,.95); padding:8px; border-radius:12px;
-      width: clamp(140px, 20vw, 200px); text-align:center;
-      box-shadow:0 0 12px rgba(0,0,0,.1); border:2px solid #e5c100;
-    }
-    .coin img{
-      width: clamp(100px, 18vw, 160px); height: clamp(100px, 18vw, 160px);
-      border-radius:8px; margin-bottom:8px; object-fit:cover;
-    }
-    .coin-description{ font-size:.85rem; margin-bottom:8px; color:#333 }
-    .button{
-      background:linear-gradient(135deg,var(--gold-1),var(--gold-2)); color:#004d73!important;
-      padding:8px 16px; border:none; margin-top:6px; cursor:pointer; border-radius:5px; font-weight:bold;
-      box-shadow:0 4px 8px rgba(0,0,0,.2); transition:all .3s
-    }
-    .button:hover{ background:linear-gradient(135deg,#FFC107,#B8860B); transform:scale(1.05) }
 
-    /* HOVEDGRID */
-    .below-grid{
-      padding: var(--gap-lg) var(--edge-pad) var(--gap-lg);
-      display:grid; gap: var(--gap-lg);
-      grid-template-columns: 1.15fr 0.85fr;
-      align-items:start; max-width: 1200px; width:100%; margin: 0 auto;
-    }
-    .left-col{ display:grid; grid-template-rows:auto auto; gap: var(--gap-lg); min-width:0 }
-
-    /* HERO */
-    .hero{
-      background:var(--panel-bg); border:1px solid var(--panel-border); border-radius:16px;
-      box-shadow:0 12px 26px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
-      padding:16px 18px;
-    }
-    .hero h1{ font-size:var(--fs-h1); margin:0 0 .4rem }
-
-    /* YOUTUBE (50% mindre) */
-    .yt{
-      background:var(--panel-bg); border:1px solid var(--panel-border); border-radius:16px; padding:8px;
-    }
-    .yt .player{
-      position:relative; padding-top:28%; border-radius:12px; overflow:hidden; border:2px solid #222;
-    }
-    .yt iframe{ position:absolute; inset:0; width:100%; height:100%; border:0 }
-
-    /* GRAF */
-    .right-col{ min-width:0; display:flex; align-items:flex-start; justify-content:stretch }
-    .chart{
-      background:var(--panel-bg); border:1px solid var(--panel-border); border-radius:16px; padding:10px;
-      width:100%; min-height:220px; display:flex; align-items:center; justify-content:center;
-    }
-    .chart .placeholder{ opacity:.8; font-size:.95rem; text-align:center }
-
-    /* FOOTER */
-    footer{ text-align:center; padding:16px 20px; background:#e4e6c5; color:#000 }
-
-    /* RESPONSIVE */
-    @media (max-width:1100px){
-      .below-grid{ grid-template-columns: 1fr }
-      .right-col{ order:3 }
+    /* Responsivt */
+    @media(max-width:900px){
+      .below-grid { grid-template-columns:1fr; }
+      .chart { grid-row:auto; }
     }
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <header class="site-nav">
-    <div class="nav-inner">
-      <nav class="nav">
-        <a href="/index.html" aria-current="page">Home</a>
-        <a href="/madacoin.html">Om</a>
-        <a href="/rapporter.html">Rapporter</a>
-        <a href="/roadmap.html">Roadmap</a>
-      </nav>
-    </div>
-  </header>
-
-  <!-- Social -->
-  <div class="social-menu" id="social-menu"></div>
-
-  <!-- MØNTER -->
+  <!-- Mønter -->
   <div class="coins-wrap">
-    <section class="coin-section">
-      <div class="coin">
-        <img id="coinD" alt="MadaCoin Donation" />
-        <p class="coin-description">Støt vores mission ved at købe MadaCoin Donation.</p>
-        <button class="button">Køb MadaCoin Donation</button>
-      </div>
-      <div class="coin">
-        <img id="coinC" alt="MadaCoin" />
-        <p class="coin-description">Investér i MadaCoin – fremtidens valuta for Madagaskar.</p>
-        <button class="button">Køb MadaCoin</button>
-      </div>
-    </section>
+    <div class="coin"><img src="https://via.placeholder.com/150"><p>MCD</p></div>
+    <div class="coin"><img src="https://via.placeholder.com/150"><p>MCN</p></div>
   </div>
 
-  <!-- HOVEDGRID -->
-  <main class="below-grid">
-    <section class="left-col">
-      <div class="hero">
-        <h1>Donér. Byg. Forandr Madagaskar.</h1>
-        <p class="sub">MadaCoin gør donationer til skoler, solenergi og lokale jobs.</p>
-      </div>
+  <!-- Hero + YouTube (venstre) / Graf (højre) -->
+  <div class="below-grid">
+    <div class="hero">
+      <h1>Hero Titel</h1>
+      <p>Her står hero-teksten.</p>
+    </div>
 
-      <div class="yt">
-        <div class="player" id="yt-player"></div>
-        <div id="yt-thumbs" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:10px;margin-top:10px;"></div>
-      </div>
-    </section>
+    <div class="yt">
+      <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe>
+    </div>
 
-    <aside class="right-col">
-      <div class="chart">
-        <div class="placeholder">Live MCN/MCD<br>Graf kommer her</div>
-        <canvas id="mcmChart" style="display:none;"></canvas>
-      </div>
-    </aside>
-  </main>
+    <div class="chart">
+      <h2>Graf</h2>
+      <p>(placeholder)</p>
+    </div>
+  </div>
 
-  <footer><span>© 2025 MadaCoin. All rights reserved.</span></footer>
 </body>
 </html>
