@@ -16,8 +16,8 @@
       --right-col: 720px;
 
       /* Afstande */
-      --edge-pad: 24px;      /* global venstre/højre indrykning */
-      --right-gutter: 48px;  /* ekstra luft i højre side af “Vores version” */
+      --edge-pad: 24px;
+      --right-gutter: 48px;
       --center-offset: -36px;
 
       /* Foto-størrelser (desktop) */
@@ -39,7 +39,7 @@
       --nav-text:#fff; --nav-bg:#0d0d0f; --nav-border:#333;
       --nav-hover-bg:#151517; --nav-hover-border:#444; --nav-active:#5aa9ff;
 
-      /* Baggrund (kan overskrives via site_settings) */
+      /* Baggrund (overskrives fra DB) */
       --bg-1x: var(--bg-image);
       --bg-2x: var(--bg-image);
     }
@@ -65,7 +65,7 @@
     }
     @media (max-width:900px){ body{ background-attachment:scroll,scroll,scroll } }
 
-    /* NAV – venstre-justeret (som side 1) */
+    /* NAV */
     .site-nav{
       position: sticky; top: 0; z-index: 9999;
       padding: 24px 0;
@@ -91,7 +91,7 @@
       box-shadow:0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset;
     }
 
-    /* Social menu (som side 1) */
+    /* Social menu */
     .social-menu{
       position:fixed; top:var(--social-top); left:var(--edge-pad);
       display:flex; flex-direction:column; gap:10px; z-index:1000;
@@ -104,7 +104,7 @@
     .social-menu a:hover{ background:rgba(0,0,0,.85); transform:translateY(-2px); }
     .social-menu a img{ width:22px; height:22px; }
 
-    /* Mobil HERO (kun på mobil) */
+    /* Mobil HERO (kun mobil) */
     .m-hero{ display:none; }
     .m-hero .box{
       background:#0b0b0c; border:1px solid #2a2a2a; border-radius:16px;
@@ -153,10 +153,6 @@
     #bio-top{ grid-column:1; grid-row:1; }
     #bio-thomas{ grid-column:1; grid-row:2; }
 
-    /* Hemmeligt logo (åbner login) */
-    .secret-logo{ display:inline-block; cursor:pointer; margin:6px 0 12px; }
-    .secret-logo img{ height:56px; width:auto; filter: drop-shadow(0 4px 10px rgba(0,0,0,.35)); }
-
     /* Midterkolonnen (pyramiden) */
     .center-col{
       grid-column:2; display:flex; flex-direction:column; align-items:center; gap:32px;
@@ -175,6 +171,7 @@
       width:var(--photo-top); height:var(--photo-top);
       border-radius:8px; background-position:50% 50%; background-size:cover; background-repeat:no-repeat;
       border:1px solid transparent;
+      cursor:default; /* ser ikke klikbar ud */
     }
     .photo-peer, .photo-sub{
       border-radius:8px; background-position:50% 50%; background-size:cover; background-repeat:no-repeat;
@@ -237,7 +234,7 @@
       background:rgba(0,0,0,.75); border-top:1px solid rgba(255,255,255,.06);
     }
 
-    /* ============ LOGIN MODAL ============ */
+    /* LOGIN MODAL */
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:9999}
     .modal.active{display:flex}
     .sheet{width:min(420px,92vw);background:#0f1423;border:1px solid #2a3a55;border-radius:16px;padding:18px}
@@ -249,14 +246,14 @@
     .x{border:none;background:transparent;color:#9ccfff;font-size:22px;line-height:1;cursor:pointer}
     .small{font-size:13px;color:#a9b4c8}
 
-    /* ============ MOBIL (match side 1) ============ */
+    /* MOBIL */
     @media (max-width: 900px){
       body{ font-size: .95rem; }
       h1{ font-size: clamp(18px, 6.2vw, 22px); }
       h2{ font-size: clamp(16px, 5.2vw, 20px); }
       :root{ --social-top: 116px; }
       .m-hero{ display:block; }
-      .m-hero .box{ padding-left: calc(16px + 76px); } /* indrykning pga ikoner */
+      .m-hero .box{ padding-left: calc(16px + 76px); }
 
       .layout{
         grid-template-columns: 1fr;
@@ -314,11 +311,6 @@
   <div class="layout">
     <!-- Venstre bio-kolonne -->
     <article class="card pad bio-card" id="bio-top">
-      <!-- HEMMELIGT LOGO: klik åbner login-modal -->
-      <a class="secret-logo" id="secret-admin" title="MadaCoin">
-        <img src="/img/madacoin_logo.svg" alt="MadaCoin logo">
-      </a>
-
       <h2 data-text="about:bio_top_title">Direktør · profil</h2>
       <div class="muted" data-text="about:bio_top">
         CM Manager for InnoGames for 10 years with up to 4 workers directly under me.
@@ -335,7 +327,7 @@
     <!-- Midterkolonnen: pyramiden -->
     <section class="center-col" id="pyr-top">
       <div class="person">
-        <div class="photo-top" id="photo-top" aria-label="Julienne"></div>
+        <div class="photo-top" id="photo-top" aria-label="Julienne" tabindex="0"></div>
         <div class="label">
           <div class="name" id="name-top">Julienne</div>
           <div class="title" id="title-top">Ejer og Direktør</div>
@@ -465,7 +457,7 @@
     }
     applyBackgroundForPage('om');
 
-    /* Sociale links (samme som side 1) */
+    /* Sociale links */
     function normalizeUrl(u){ if(!u) return null; const t=u.trim(); return /^https?:\/\//i.test(t)?t:'https://'+t }
     function iconUrlFor(platform){
       if(!sb) return null;
@@ -501,7 +493,7 @@
     }
     window.addEventListener('load', renderSocialLinks);
 
-    /* Personer/partnere – uændret fra din version (separate fetches) */
+    /* Personer/partnere */
     (async function(){
       if(!sb) return;
       try{
@@ -602,15 +594,41 @@
       }catch(e){ console.warn('[partners] exception:', e); }
     })();
 
-    /* ===== Hemmelig indgang: logo → login-modal → admin ===== */
+    /* ===== Skjult admin: Ejerens billede ===== */
     const $ = s=>document.querySelector(s);
     const modal = $('#admin-modal');
     const openModal = ()=>{ modal.classList.add('active'); modal.setAttribute('aria-hidden','false'); $('#adm-email')?.focus(); };
     const closeModal = ()=>{ modal.classList.remove('active'); modal.setAttribute('aria-hidden','true'); $('#adm-msg').textContent=''; };
-    $('#secret-admin')?.addEventListener('click', openModal);
+
     $('#mdl-close')?.addEventListener('click', closeModal);
     $('#mdl-cancel')?.addEventListener('click', closeModal);
 
+    // Trigger på Ejerens billede (#photo-top): dblclick + langt tryk
+    const ownerPic = document.getElementById('photo-top');
+    if(ownerPic){
+      // Dobbeltklik (desktop)
+      ownerPic.addEventListener('dblclick', openModal);
+
+      // Langt tryk (mobil/desktop): ~800ms
+      let pressTimer=null;
+      const startPress = ()=>{ clearTimeout(pressTimer); pressTimer=setTimeout(openModal, 800); };
+      const cancelPress= ()=>{ clearTimeout(pressTimer); };
+
+      ownerPic.addEventListener('mousedown', startPress);
+      ownerPic.addEventListener('mouseup', cancelPress);
+      ownerPic.addEventListener('mouseleave', cancelPress);
+
+      ownerPic.addEventListener('touchstart', startPress, {passive:true});
+      ownerPic.addEventListener('touchend', cancelPress);
+      ownerPic.addEventListener('touchcancel', cancelPress);
+
+      // Diskret tastatur-genvej når billedet har fokus: Alt + Enter
+      ownerPic.addEventListener('keydown', (e)=>{
+        if((e.altKey || e.metaKey) && e.key==='Enter'){ openModal(); }
+      });
+    }
+
+    /* Login → check admins → redirect */
     async function isAdmin(session){
       if(!session) return false;
       const { data, error } = await sb.from('admins').select('id').eq('id', session.user.id).maybeSingle();
