@@ -1,614 +1,772 @@
 <!doctype html>
 <html lang="da">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>MadaCoin · Admin</title>
-<link rel="preconnect" href="https://unpkg.com" />
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<style>
-  :root{
-    --edge:20px;
-    --bg:#0a1220;
-    --card:#0f172a; --card-b:#21324d; --soft:#0b1324;
-    --text:#eaf2ff; --muted:#b9c6dd; --acc:#8bd5ff; --warn:#ffb8b8; --ok:#68e39b;
-    --radius:14px; --shadow:0 12px 28px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.05);
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0; font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
-    background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.10)), var(--bg);
-    color:var(--text);
-  }
-  a{ color:var(--acc); text-decoration:none }
-  .wrap{ max-width:1200px; margin:0 auto; padding:16px var(--edge) 32px }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MadaCoin – Admin</title>
+  <link rel="preconnect" href="https://unpkg.com" />
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    :root{
+      --bg:#0b0b0c; --panel:#151518; --accent:#3aa0ff; --text:#e9e9ef; --muted:#9aa0a6; --danger:#ff6363; --ok:#4ade80;
+      --br:14px;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; background:var(--bg); color:var(--text); margin:0; font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial; }
+    a{ color:var(--accent); text-decoration:none; }
+    .wrap{ max-width:1200px; margin:24px auto; padding:0 16px; }
+    .topbar{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+    .topbar h1{ font-size:20px; margin:0; }
+    .badge{ padding:4px 10px; background:#1f2937; border-radius:999px; border:1px solid #2a3342; color:#cbd5e1; font-size:12px; }
+    .row{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    button, .btn{
+      background:#1f2937; border:1px solid #2a3342; color:#e5e7eb; padding:8px 12px; border-radius:10px; cursor:pointer;
+    }
+    button:hover{ border-color:#39485f; }
+    .btn.danger{ border-color:#5b2830; background:#2a0f12; color:#ffb4b4; }
+    .btn.ok{ border-color:#214d34; background:#0f261a; color:#9ef0c0; }
+    input,select,textarea{
+      background:#0f1217; border:1px solid #2a3342; color:#e5e7eb; padding:8px 10px; border-radius:10px; width:100%;
+    }
+    textarea{ min-height:120px; white-space:pre-wrap; }
+    .panel{ background:var(--panel); border:1px solid #22242b; border-radius:var(--br); padding:14px; }
+    .tabs{ display:flex; gap:8px; margin:10px 0 14px; flex-wrap:wrap; }
+    .tab-btn{ padding:8px 12px; border:1px solid #2a3342; background:#14161b; color:#cbd5e1; border-radius:10px; cursor:pointer; }
+    .tab-btn.active{ background:#0f1217; border-color:#3aa0ff; color:#e9f2ff; }
+    .tab{ display:none; }
+    .tab.active{ display:block; }
+    table{ width:100%; border-collapse:separate; border-spacing:0 8px; }
+    th,td{ text-align:left; padding:6px; }
+    th{ color:#b8c0cc; font-weight:600; }
+    tr{ background:#101217; }
+    tr td:first-child, tr th:first-child{ border-top-left-radius:10px; border-bottom-left-radius:10px; }
+    tr td:last-child, tr th:last-child{ border-top-right-radius:10px; border-bottom-right-radius:10px; }
+    .status{ margin:12px 0; font-size:13px; color:#cbd5e1; }
+    .status .ok{ color:var(--ok); }
+    .status .err{ color:var(--danger); }
+    .grid{ display:grid; gap:10px; grid-template-columns:repeat(12,1fr); }
+    .g6{ grid-column:span 6; } .g4{ grid-column:span 4; } .g3{ grid-column:span 3; } .g12{ grid-column:span 12; }
+    @media (max-width:960px){ .g6,.g4,.g3{ grid-column:span 12; } }
 
-  .topbar{
-    display:flex; align-items:center; justify-content:space-between; gap:12px;
-    padding:12px var(--edge);
-    position:sticky; top:0; z-index:5;
-    background:rgba(7,12,24,.85); backdrop-filter: blur(6px);
-    border-bottom:1px solid rgba(255,255,255,.06);
-  }
-  .brand{ display:flex; align-items:center; gap:10px; }
-  .brand img{ width:32px; height:32px; }
-  .brand .t{ font-weight:700; letter-spacing:.3px }
-  .user{ font-size:13px; color:var(--muted) }
-  .signout{ border:1px solid #34557c; border-radius:10px; padding:8px 12px; background:#0e1a2f; color:#eaf2ff; cursor:pointer }
-
-  .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin:18px 0 }
-  .tabs button{
-    border:1px solid #2a3e5d; background:#0d172b; color:#eaf2ff; padding:10px 14px; border-radius:999px; cursor:pointer;
-  }
-  .tabs button.active{ border-color:#5aa9ff; box-shadow:0 0 0 2px rgba(90,169,255,.25) inset; }
-
-  .grid{ display:grid; gap:16px }
-  @media(min-width:900px){ .cols-2{ grid-template-columns:1fr 1fr } .cols-3{ grid-template-columns:1fr 1fr 1fr } }
-
-  .card{
-    background:var(--card); border:1px solid var(--card-b); border-radius:var(--radius); box-shadow:var(--shadow);
-    padding:16px;
-  }
-  .card h3{ margin:4px 0 12px }
-  .row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap }
-  .field{ display:flex; flex-direction:column; gap:6px; min-width:220px }
-  label{ font-size:13px; color:#cfe3ff }
-  input, select, textarea{
-    width:100%; padding:10px 12px; border-radius:10px; border:1px solid #2a3e5d; background:#0a1427; color:#fff;
-  }
-  textarea{ min-height:120px; resize:vertical }
-  .btn{ cursor:pointer; border:1px solid #2c4e74; border-radius:10px; padding:10px 12px; background:#0f1c33; color:#fff }
-  .btn.primary{ background:linear-gradient(135deg,#8bd5ff,#66c2ff); color:#0b2236; border-color:#27608a; font-weight:700 }
-  .btn.warn{ background:#3a1010; border-color:#7a2a2a }
-  .hint{ font-size:12px; color:var(--muted) }
-  .ok{ color:var(--ok) } .err{ color:#ff9aa3 }
-  .sep{ height:1px; background:rgba(255,255,255,.08); margin:12px 0 }
-
-  table{ width:100%; border-collapse:collapse; }
-  th,td{ padding:10px; border-bottom:1px solid rgba(255,255,255,.08); text-align:left; vertical-align:top; }
-  th{ color:#cfe3ff; font-weight:600 }
-
-  .hidden{ display:none !important }
-</style>
+    /* Login modal */
+    .modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; z-index:99; }
+    .modal{ width:min(480px, 92vw); background:#0e1116; border:1px solid #2a3342; border-radius:16px; padding:18px; }
+    .modal h2{ margin:0 0 10px; }
+    .modal .hint{ color:#9aa0a6; font-size:12px; margin-top:6px; }
+    .modal-backdrop.show{ display:flex; }
+    .pill{ display:inline-block; padding:4px 8px; border:1px solid #2a3342; border-radius:999px; color:#aab4c0; font-size:12px; }
+    .muted{ color:#a3aab4; }
+    .sr{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+    .thumb{ width:64px; height:64px; object-fit:cover; border-radius:10px; border:1px solid #2a3342; }
+    .mono{ font-family: ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12px; color:#c7ced8; }
+  </style>
 </head>
 <body>
-  <div class="topbar">
-    <div class="brand">
-      <img src="/img/madacoin_logo.svg" alt="MC">
-      <div class="t">MadaCoin · Admin</div>
-    </div>
-    <div class="row">
-      <div class="user" id="who"></div>
-      <button class="signout" id="btn-signout">Log ud</button>
-    </div>
-  </div>
-
   <div class="wrap">
-    <!-- Tabs -->
-    <div class="tabs" id="tabs">
-      <button data-tab="dash" class="active">Overblik</button>
-      <button data-tab="bg">Baggrunde</button>
-      <button data-tab="social">Sociale links</button>
-      <button data-tab="text">Tekster</button>
-      <button data-tab="yt">YouTube</button>
-      <button data-tab="team">Team</button>
-      <button data-tab="partners">Partnere</button>
+    <div class="topbar">
+      <h1>MadaCoin – Admin</h1>
+      <div class="row">
+        <span id="who" class="badge">Ikke logget ind</span>
+        <button id="btnSignIn">Log ind</button>
+        <button id="btnSignOut" style="display:none">Log ud</button>
+      </div>
     </div>
 
-    <!-- DASHBOARD -->
-    <section id="tab-dash" class="card">
-      <h3>Velkommen</h3>
-      <div class="grid cols-3">
-        <div class="card">
-          <h4>Hurtige genveje</h4>
-          <div class="row">
-            <a class="btn" href="/index.html" target="_blank">Forside</a>
-            <a class="btn" href="/madacoin.html" target="_blank">Om</a>
-            <a class="btn" href="/roadmap.html" target="_blank">Roadmap</a>
-            <a class="btn" href="/rapporter.html" target="_blank">Rapporter</a>
-          </div>
-          <div class="hint" style="margin-top:10px">Alle tekster/baggrunde/links styres her fra panelet.</div>
-        </div>
-        <div class="card">
-          <h4>Status</h4>
-          <div id="status-box" class="hint">Indlæser…</div>
-        </div>
-        <div class="card">
-          <h4>Tips</h4>
-          <ul class="hint" style="margin:0 0 0 16px">
-            <li>Upload 1× ≈ 2048px og 2× ≈ 4096px for skarpe baggrunde.</li>
-            <li>Ikon-navne i <code>social.icons</code> skal starte med stort bogstav (fx <code>Twitter.svg</code>).</li>
-          </ul>
-        </div>
-      </div>
-    </section>
+    <div id="gate" class="panel">
+      <div class="status" id="gateMsg">Tjekker adgang…</div>
+    </div>
 
-    <!-- BAGGRUNDE -->
-    <section id="tab-bg" class="card hidden">
-      <h3>Baggrunde pr. side</h3>
-      <div class="grid cols-2">
-        <div class="card">
-          <div class="row">
-            <div class="field">
-              <label>Arbejdsside</label>
-              <select id="bg-work">
+    <div id="app" style="display:none">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="tab-bg">Baggrunde</button>
+        <button class="tab-btn" data-tab="tab-social">Sociale links</button>
+        <button class="tab-btn" data-tab="tab-text">Tekster</button>
+        <button class="tab-btn" data-tab="tab-yt">YouTube</button>
+        <button class="tab-btn" data-tab="tab-team">Team</button>
+        <button class="tab-btn" data-tab="tab-partners">Partnere</button>
+        <button class="tab-btn" data-tab="tab-translate">ChatGPT oversætter</button>
+      </div>
+
+      <!-- BAGGRUNDE -->
+      <div id="tab-bg" class="tab active">
+        <div class="panel">
+          <h3>Baggrunde (upload til <code>backgrounds</code>-bucket)</h3>
+          <p class="muted">Vælg side + 1×/2×. Upload skriver ind i <code>site_settings</code> (nøgler: <code>home_bg_1x</code>, <code>home_bg_2x</code> osv.).</p>
+          <div class="grid">
+            <div class="g3">
+              <label>Side</label>
+              <select id="bgPage">
                 <option value="home">home</option>
                 <option value="om">om</option>
                 <option value="roadmap">roadmap</option>
                 <option value="rapporter">rapporter</option>
-                <option value="default">default (fallback)</option>
               </select>
             </div>
-            <div class="field"><label>1× (ca. 2048px)</label><input type="file" id="bg-1x" accept=".webp,.jpg,.jpeg,.png"/></div>
-            <div class="field"><label>2× (ca. 4096px)</label><input type="file" id="bg-2x" accept=".webp,.jpg,.jpeg,.png"/></div>
+            <div class="g3">
+              <label>Tæthed</label>
+              <select id="bgDensity">
+                <option value="1x">1x</option>
+                <option value="2x">2x</option>
+              </select>
+            </div>
+            <div class="g6">
+              <label>Fil</label>
+              <input type="file" id="bgFile" accept="image/*" />
+            </div>
+            <div class="g12">
+              <button id="btnUploadBg">Upload & gem</button>
+              <span id="bgStatus" class="status"></span>
+            </div>
           </div>
-          <div class="sep"></div>
-          <div class="hint">Anvend samme billede på:</div>
-          <div class="row" id="bg-apply">
-            <label><input type="checkbox" value="home" checked> home</label>
-            <label><input type="checkbox" value="om" checked> om</label>
-            <label><input type="checkbox" value="roadmap" checked> roadmap</label>
-            <label><input type="checkbox" value="rapporter" checked> rapporter</label>
-            <label><input type="checkbox" value="default"> default</label>
+          <div class="grid" style="margin-top:12px">
+            <div class="g6">
+              <label>Aktuel 1× URL</label>
+              <div class="mono" id="curBg1x">–</div>
+            </div>
+            <div class="g6">
+              <label>Aktuel 2× URL</label>
+              <div class="mono" id="curBg2x">–</div>
+            </div>
           </div>
-          <div class="row" style="margin-top:10px">
-            <button class="btn primary" id="btn-bg-save">Upload & gem</button>
-            <div id="bg-msg" class="hint"></div>
-          </div>
-        </div>
-        <div class="card">
-          <h4>Nuværende værdier</h4>
-          <div id="bg-list" class="hint">Indlæser…</div>
         </div>
       </div>
-    </section>
 
-    <!-- SOCIALE LINKS -->
-    <section id="tab-social" class="card hidden">
-      <h3>Sociale links</h3>
-      <div class="row">
-        <div class="hint">Ikoner hentes fra bucket <code>social.icons</code> som <code>Platform.svg</code> (første bogstav stort).</div>
-        <div class="row" style="margin-left:auto">
-          <label class="btn">
-            Upload ikon <input type="file" id="social-icon-file" accept=".svg" style="display:none">
-          </label>
-          <span id="social-icon-msg" class="hint"></span>
-        </div>
-      </div>
-      <div class="sep"></div>
-      <table id="social-table">
-        <thead><tr><th>Platform</th><th>URL</th><th>Aktiv</th><th>Sortering</th><th></th></tr></thead>
-        <tbody></tbody>
-      </table>
-      <div class="row" style="margin-top:10px">
-        <button class="btn" id="btn-social-add">+ Tilføj</button>
-        <button class="btn primary" id="btn-social-save">Gem alle</button>
-        <div id="social-msg" class="hint"></div>
-      </div>
-    </section>
-
-    <!-- TEKSTER -->
-    <section id="tab-text" class="card hidden">
-      <h3>Tekster (site_text)</h3>
-      <div class="row">
-        <div class="field">
-          <label>Side</label>
-          <select id="txt-page">
-            <option>common</option>
-            <option>home</option>
-            <option>about</option>
-            <option>roadmap</option>
-            <option>rapporter</option>
-          </select>
-        </div>
-        <button class="btn" id="btn-text-load">Indlæs</button>
-        <button class="btn" id="btn-text-add">+ Tilføj nøgle</button>
-        <button class="btn primary" id="btn-text-save">Gem</button>
-        <div id="text-msg" class="hint"></div>
-      </div>
-      <div class="sep"></div>
-      <table id="text-table">
-        <thead><tr><th>Key</th><th>Value (HTML tilladt)</th><th></th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-    <!-- YOUTUBE -->
-    <section id="tab-yt" class="card hidden">
-      <h3>YouTube videoer</h3>
-      <div class="grid cols-2">
-        <div class="card">
-          <div class="field"><label>URL</label><input id="yt-url" placeholder="https://www.youtube.com/watch?v=..." /></div>
-          <div class="field"><label>Titel</label><input id="yt-title" placeholder="Visningstitel" /></div>
-          <div class="row">
-            <div class="field"><label>Sortering</label><input id="yt-sort" type="number" value="1"/></div>
-            <label><input id="yt-active" type="checkbox" checked/> Aktiv</label>
+      <!-- SOCIALE LINKS -->
+      <div id="tab-social" class="tab">
+        <div class="panel">
+          <div class="row" style="justify-content:space-between">
+            <h3>Sociale links</h3>
+            <button id="btnAddSocial">+ Tilføj</button>
           </div>
-          <div class="row">
-            <button class="btn primary" id="btn-yt-add">Tilføj</button>
-            <div id="yt-msg" class="hint"></div>
-          </div>
-        </div>
-        <div class="card">
-          <h4>Listen</h4>
-          <table id="yt-table">
-            <thead><tr><th>Titel</th><th>URL</th><th>Aktiv</th><th>Sort</th><th></th></tr></thead>
+          <table id="tblSocial">
+            <thead>
+              <tr><th>Platform</th><th>URL</th><th>Aktiv</th><th>Sort</th><th>Handling</th></tr>
+            </thead>
             <tbody></tbody>
           </table>
-          <div class="row" style="margin-top:8px">
-            <button class="btn primary" id="btn-yt-save">Gem ændringer</button>
-            <div id="yt-save-msg" class="hint"></div>
-          </div>
+          <div id="socialStatus" class="status"></div>
         </div>
       </div>
-    </section>
 
-    <!-- TEAM -->
-    <section id="tab-team" class="card hidden">
-      <h3>Team (org_people)</h3>
-      <div class="hint">Slots: <code>top</code>, <code>mid</code>, <code>accounting</code>, <code>sub1</code>, <code>sub2</code>, <code>sub3</code></div>
-      <div class="grid cols-3" id="team-grid"></div>
-      <div class="row" style="margin-top:10px">
-        <button class="btn primary" id="btn-team-save">Gem team</button>
-        <div id="team-msg" class="hint"></div>
+      <!-- TEKSTER -->
+      <div id="tab-text" class="tab">
+        <div class="panel">
+          <h3>Tekster (site_text)</h3>
+          <div class="grid">
+            <div class="g3">
+              <label>Side</label>
+              <select id="txtPage">
+                <option value="home">home</option>
+                <option value="om">om</option>
+                <option value="roadmap">roadmap</option>
+                <option value="rapporter">rapporter</option>
+              </select>
+            </div>
+            <div class="g3">
+              <label>Sprog</label>
+              <select id="txtLang">
+                <option value="da">da</option>
+                <option value="en">en</option>
+                <option value="fr">fr</option>
+                <option value="mg">mg</option>
+              </select>
+            </div>
+            <div class="g6" style="align-self:end">
+              <button id="btnLoadTexts">Hent</button>
+              <button id="btnAddText">+ Tilføj</button>
+            </div>
+          </div>
+          <table id="tblText" style="margin-top:10px">
+            <thead>
+              <tr><th>Sektion</th><th>Nøgle</th><th>Indhold</th><th>Handling</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div id="textStatus" class="status"></div>
+        </div>
       </div>
-    </section>
 
-    <!-- PARTNERE -->
-    <section id="tab-partners" class="card hidden">
-      <h3>Partnere</h3>
-      <div class="row">
-        <button class="btn" id="btn-partner-add">+ Tilføj partner</button>
-        <div class="hint">Upload logoer til bucket <code>people</code> eller indsæt direkte URL.</div>
+      <!-- YOUTUBE -->
+      <div id="tab-yt" class="tab">
+        <div class="panel">
+          <div class="row" style="justify-content:space-between">
+            <h3>YouTube (liste)</h3>
+            <button id="btnAddYt">+ Tilføj</button>
+          </div>
+          <table id="tblYt">
+            <thead>
+            <tr><th>Video ID</th><th>Titel</th><th>Aktiv</th><th>Sort</th><th>Handling</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div id="ytStatus" class="status"></div>
+        </div>
       </div>
-      <div class="sep"></div>
-      <table id="partners-table">
-        <thead><tr><th>Navn</th><th>Website</th><th>Logo URL</th><th>Alt</th><th>Kategori</th><th>Aktiv</th><th></th></tr></thead>
-        <tbody></tbody>
-      </table>
-      <div class="row" style="margin-top:10px">
-        <button class="btn primary" id="btn-partners-save">Gem partnere</button>
-        <div id="partners-msg" class="hint"></div>
+
+      <!-- TEAM -->
+      <div id="tab-team" class="tab">
+        <div class="panel">
+          <div class="row" style="justify-content:space-between">
+            <h3>Team (org_people)</h3>
+            <button id="btnAddPerson">+ Tilføj</button>
+          </div>
+          <table id="tblPeople">
+            <thead>
+              <tr><th>Foto</th><th>Navn</th><th>Rolle</th><th>Bio</th><th>Aktiv</th><th>Sort</th><th>Handling</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div id="peopleStatus" class="status"></div>
+        </div>
       </div>
-    </section>
+
+      <!-- PARTNERE -->
+      <div id="tab-partners" class="tab">
+        <div class="panel">
+          <div class="row" style="justify-content:space-between">
+            <h3>Partnere</h3>
+            <button id="btnAddPartner">+ Tilføj</button>
+          </div>
+          <table id="tblPartners">
+            <thead>
+              <tr><th>Logo</th><th>Navn</th><th>URL</th><th>Aktiv</th><th>Sort</th><th>Handling</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div id="partnersStatus" class="status"></div>
+        </div>
+      </div>
+
+      <!-- CHATGPT OVERSÆTTER -->
+      <div id="tab-translate" class="tab">
+        <div class="panel">
+          <h3>ChatGPT oversætter</h3>
+          <div class="grid">
+            <div class="g12">
+              <label for="trSrc">Kildetekst</label>
+              <textarea id="trSrc" placeholder="Sæt tekst ind, der skal oversættes…"></textarea>
+            </div>
+            <div class="g4">
+              <label for="trFrom">Fra sprog (valgfri)</label>
+              <select id="trFrom">
+                <option value="">Auto-detect</option>
+                <option>da</option><option>en</option><option>fr</option><option>mg</option>
+              </select>
+            </div>
+            <div class="g4">
+              <label for="trTo">Til sprog</label>
+              <select id="trTo">
+                <option>da</option><option selected>en</option><option>fr</option><option>mg</option>
+              </select>
+            </div>
+            <div class="g4" style="align-self:end">
+              <button id="btnTranslate">Oversæt</button>
+            </div>
+            <div class="g12">
+              <label for="trOut">Resultat</label>
+              <textarea id="trOut" readonly></textarea>
+              <div id="trStatus" class="status"></div>
+            </div>
+          </div>
+          <p class="hint">Kræver Edge Function <code>/functions/v1/translate</code>. Hvis du får 404, mangler den at blive deployet.</p>
+        </div>
+      </div>
+    </div>
   </div>
 
-<script>
-/* ---------- Supabase ---------- */
-const SUPABASE_URL = "https://byrlebjwknppjbtbkozt.supabase.co";
-const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-
-/* ---------- Gatekeeping: kræver login + admin ---------- */
-async function requireAdmin(){
-  const sess = await sb.auth.getSession();
-  const user = sess?.data?.session?.user;
-  if(!user){ window.location.href="/madacoin.html"; return null; }
-  const { data, error } = await sb.from('admins').select('id').eq('id', user.id).maybeSingle();
-  if(error || !data){ await sb.auth.signOut(); window.location.href="/madacoin.html"; return null; }
-  document.getElementById('who').textContent = user.email || 'admin';
-  return user;
-}
-document.getElementById('btn-signout').onclick = async()=>{ await sb.auth.signOut(); window.location.href="/madacoin.html"; };
-
-requireAdmin().then(user=>{ if(user) init(); });
-
-/* ---------- Tabs ---------- */
-function initTabs(){
-  const tabs=document.getElementById('tabs').querySelectorAll('button');
-  tabs.forEach(b=>{
-    b.onclick=()=>{
-      tabs.forEach(x=>x.classList.remove('active'));
-      b.classList.add('active');
-      document.querySelectorAll('[id^="tab-"]').forEach(s=>s.classList.add('hidden'));
-      document.getElementById('tab-'+b.dataset.tab).classList.remove('hidden');
-    };
-  });
-}
-
-/* ---------- Utils ---------- */
-const ext = n => { const i=n.lastIndexOf('.'); return i>-1?n.slice(i+1).toLowerCase():'webp'; };
-const toast = (el,msg,ok=true)=>{ el.textContent=msg; el.className = 'hint ' + (ok?'ok':'err'); setTimeout(()=>{ el.textContent=''; el.className='hint'; }, 3000); };
-
-/* ---------- Dashboard ---------- */
-async function loadStatus(){
-  try{
-    const boxes=[];
-    const t1= await sb.from('site_text').select('id',{count:'exact',head:true}); boxes.push(`site_text: ${t1.count||0}`);
-    const t2= await sb.from('social_links').select('id',{count:'exact',head:true}); boxes.push(`social_links: ${t2.count||0}`);
-    const t3= await sb.from('youtube_videos').select('id',{count:'exact',head:true}); boxes.push(`youtube_videos: ${t3.count||0}`);
-    const t4= await sb.from('partners').select('id',{count:'exact',head:true}); boxes.push(`partners: ${t4.count||0}`);
-    document.getElementById('status-box').textContent = boxes.join(' · ');
-  }catch{ document.getElementById('status-box').textContent='—'; }
-}
-
-/* ---------- Baggrunde ---------- */
-async function loadBackgroundList(){
-  const PAGES=['home','om','roadmap','rapporter','default'];
-  const keys=[]; PAGES.forEach(p=>keys.push(`bg_${p}_1x`,`bg_${p}_2x`));
-  const { data } = await sb.from('site_settings').select('key,value').in('key',keys);
-  const map = Object.fromEntries((data||[]).map(r=>[r.key,r.value]));
-  const html = PAGES.map(p=>`<div style="margin:6px 0"><b>${p}</b> — 1×: ${map[`bg_${p}_1x`]||'<i>ikke sat</i>'}, 2×: ${map[`bg_${p}_2x`]||'<i>ikke sat</i>'}</div>`).join('');
-  document.getElementById('bg-list').innerHTML = html || '<span class="hint">Ingen endnu.</span>';
-}
-async function saveBackgrounds(){
-  const work = document.getElementById('bg-work').value;
-  const f1 = document.getElementById('bg-1x').files[0];
-  const f2 = document.getElementById('bg-2x').files[0];
-  const apply = Array.from(document.querySelectorAll('#bg-apply input:checked')).map(i=>i.value);
-  const msg=document.getElementById('bg-msg');
-  if(!f1 && !f2){ toast(msg,'Vælg mindst én fil.', false); return; }
-  const bucket='backgrounds';
-  let url1=null, url2=null;
-  if(f1){
-    const p1=`bg_${work}_1x_${Date.now()}.${ext(f1.name)}`;
-    const { error }=await sb.storage.from(bucket).upload(p1,f1);
-    if(error) return toast(msg,error.message,false);
-    url1 = `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${p1}`;
-  }
-  if(f2){
-    const p2=`bg_${work}_2x_${Date.now()}.${ext(f2.name)}`;
-    const { error }=await sb.storage.from(bucket).upload(p2,f2);
-    if(error) return toast(msg,error.message,false);
-    url2 = `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${p2}`;
-  }
-  for(const page of apply){
-    if(url1){ const {error}=await sb.from('site_settings').upsert({key:`bg_${page}_1x`, value:url1}); if(error) return toast(msg,error.message,false); }
-    if(url2){ const {error}=await sb.from('site_settings').upsert({key:`bg_${page}_2x`, value:url2}); if(error) return toast(msg,error.message,false); }
-  }
-  toast(msg,'Uploadet & gemt ✅');
-  loadBackgroundList();
-}
-
-/* ---------- Sociale links ---------- */
-async function loadSocial(){
-  const { data } = await sb.from('social_links').select('id,platform,url,is_active,sort_order').order('sort_order',{ascending:true});
-  const tbody=document.querySelector('#social-table tbody');
-  tbody.innerHTML='';
-  (data||[]).forEach(r=>tbody.appendChild(socialRow(r)));
-}
-function socialRow(r={}){
-  const tr=document.createElement('tr');
-  tr.innerHTML = `
-    <td><input value="${r.platform||''}" placeholder="Twitter"/></td>
-    <td><input value="${r.url||''}" placeholder="https://..."/></td>
-    <td><input type="checkbox" ${r.is_active?'checked':''}/></td>
-    <td><input type="number" value="${r.sort_order??1}" style="width:90px"/></td>
-    <td><button class="btn warn">Slet</button></td>`;
-  tr.querySelector('button').onclick = ()=> tr.remove();
-  tr.dataset.id = r.id||'';
-  return tr;
-}
-document.getElementById('btn-social-add').onclick=()=>document.querySelector('#social-table tbody').appendChild(socialRow({is_active:true,sort_order:1}));
-document.getElementById('btn-social-save').onclick=async()=>{
-  const tbody=document.querySelector('#social-table tbody');
-  const rows=[...tbody.querySelectorAll('tr')].map(tr=>{
-    const [platform,url,active,sort]=tr.querySelectorAll('input');
-    return {
-      id: tr.dataset.id || undefined,
-      platform: platform.value.trim(),
-      url: url.value.trim(),
-      is_active: active.checked,
-      sort_order: parseInt(sort.value||'0',10)
-    };
-  }).filter(r=>r.platform && r.url);
-  const msg=document.getElementById('social-msg');
-  try{
-    // Simple approach: upsert all, then delete removed ones
-    const { data:existing } = await sb.from('social_links').select('id');
-    const keepIds = rows.filter(r=>r.id).map(r=>r.id);
-    const delIds = (existing||[]).map(x=>x.id).filter(id=>!keepIds.includes(id));
-    if(rows.length){ const { error }=await sb.from('social_links').upsert(rows); if(error) throw error; }
-    if(delIds.length){ const { error }=await sb.from('social_links').delete().in('id',delIds); if(error) throw error; }
-    toast(msg,'Gemt ✅');
-    loadSocial();
-  }catch(e){ toast(msg,e.message,false); }
-};
-// ikon upload
-document.getElementById('social-icon-file').addEventListener('change', async (e)=>{
-  const f=e.target.files[0]; if(!f) return;
-  const msg=document.getElementById('social-icon-msg');
-  const name=f.name; // forvent .svg, Platform.svg
-  const { error } = await sb.storage.from('social.icons').upload(name,f,{upsert:true,contentType:'image/svg+xml'});
-  if(error) toast(msg,error.message,false); else toast(msg,'Ikon uploadet ✅');
-});
-
-/* ---------- Tekster ---------- */
-async function loadTexts(){
-  const page=document.getElementById('txt-page').value;
-  const { data } = await sb.from('site_text').select('id,key,value').eq('page',page).order('key');
-  const tbody=document.querySelector('#text-table tbody'); tbody.innerHTML='';
-  (data||[]).forEach(r=>tbody.appendChild(textRow(r.key,r.value,r.id)));
-}
-function textRow(key='',value='',id=''){
-  const tr=document.createElement('tr');
-  tr.innerHTML=`<td style="width:240px"><input value="${key}" placeholder="about:right_title"/></td>
-                <td><textarea>${value||''}</textarea></td>
-                <td><button class="btn warn">Slet</button></td>`;
-  tr.querySelector('button').onclick=()=>tr.remove();
-  tr.dataset.id=id;
-  return tr;
-}
-document.getElementById('btn-text-load').onclick=loadTexts;
-document.getElementById('btn-text-add').onclick=()=>document.querySelector('#text-table tbody').appendChild(textRow());
-document.getElementById('btn-text-save').onclick=async()=>{
-  const page=document.getElementById('txt-page').value;
-  const rows=[...document.querySelectorAll('#text-table tbody tr')].map(tr=>{
-    const [k,v]=tr.querySelectorAll('input,textarea');
-    return { id: tr.dataset.id||undefined, page, key:k.value.trim(), value:v.value };
-  }).filter(r=>r.key);
-  const msg=document.getElementById('text-msg');
-  try{
-    // load existing to find deletions
-    const { data:existing } = await sb.from('site_text').select('id').eq('page',page);
-    const keepIds = rows.filter(r=>r.id).map(r=>r.id);
-    const delIds = (existing||[]).map(x=>x.id).filter(id=>!keepIds.includes(id));
-    if(rows.length){ const { error }=await sb.from('site_text').upsert(rows); if(error) throw error; }
-    if(delIds.length){ const { error }=await sb.from('site_text').delete().in('id',delIds); if(error) throw error; }
-    toast(msg,'Gemt ✅');
-    loadTexts();
-  }catch(e){ toast(msg,e.message,false); }
-};
-
-/* ---------- YouTube ---------- */
-function ytId(u){ try{ const url=new URL(u); if(url.hostname.includes('youtu.be')) return url.pathname.slice(1);
-  if(url.searchParams.get('v')) return url.searchParams.get('v');
-  const m=u.match(/(?:embed|shorts)\/([a-zA-Z0-9_-]{6,})/); if(m) return m[1];
-  const seg=url.pathname.split('/').pop(); return seg&&seg.length>=6?seg:null; }catch{ return null; } }
-async function loadYt(){
-  const { data } = await sb.from('youtube_videos').select('id,youtube_url,title,is_active,sort_order').order('sort_order',{ascending:true}).order('created_at',{ascending:false});
-  const tb=document.querySelector('#yt-table tbody'); tb.innerHTML='';
-  (data||[]).forEach(r=>tb.appendChild(ytRow(r)));
-}
-function ytRow(r){
-  const tr=document.createElement('tr');
-  tr.innerHTML=`<td><input value="${r.title||''}" placeholder="Titel"/></td>
-                <td><input value="${r.youtube_url||''}" placeholder="https://..."/></td>
-                <td><input type="checkbox" ${r.is_active?'checked':''}/></td>
-                <td><input type="number" value="${r.sort_order??1}" style="width:90px"/></td>
-                <td><button class="btn warn">Slet</button></td>`;
-  tr.dataset.id=r.id;
-  tr.querySelector('button').onclick=()=>tr.remove();
-  return tr;
-}
-document.getElementById('btn-yt-add').onclick=async()=>{
-  const url=document.getElementById('yt-url').value.trim();
-  const title=document.getElementById('yt-title').value.trim();
-  const active=document.getElementById('yt-active').checked;
-  const sort=parseInt(document.getElementById('yt-sort').value||'1',10);
-  const msg=document.getElementById('yt-msg');
-  if(!ytId(url)) return toast(msg,'URL ser ikke ud som en YouTube-URL.',false);
-  const { error } = await sb.from('youtube_videos').insert({ youtube_url:url, title, is_active:active, sort_order:sort });
-  if(error) return toast(msg,error.message,false);
-  toast(msg,'Tilføjet ✅'); document.getElementById('yt-url').value=''; document.getElementById('yt-title').value='';
-  loadYt();
-};
-document.getElementById('btn-yt-save').onclick=async()=>{
-  const rows=[...document.querySelectorAll('#yt-table tbody tr')].map(tr=>{
-    const [t,u,a,s]=tr.querySelectorAll('input');
-    return { id:tr.dataset.id, title:t.value, youtube_url:u.value, is_active:a.checked, sort_order:parseInt(s.value||'0',10) };
-  });
-  const msg=document.getElementById('yt-save-msg');
-  try{
-    const { data:ex } = await sb.from('youtube_videos').select('id');
-    const keep=rows.map(r=>r.id);
-    const del=(ex||[]).map(x=>x.id).filter(id=>!keep.includes(id));
-    if(rows.length){ const { error }=await sb.from('youtube_videos').upsert(rows); if(error) throw error; }
-    if(del.length){ const { error }=await sb.from('youtube_videos').delete().in('id',del); if(error) throw error; }
-    toast(msg,'Gemt ✅'); loadYt();
-  }catch(e){ toast(msg,e.message,false); }
-};
-
-/* ---------- Team ---------- */
-const TEAM_SLOTS=['top','mid','accounting','sub1','sub2','sub3'];
-function teamCard(p={}){
-  const div=document.createElement('div'); div.className='card';
-  div.innerHTML=`
-    <div class="field"><label>Slot</label><input value="${p.slot||''}" placeholder="top/mid/accounting/sub1"/></div>
-    <div class="field"><label>Navn</label><input value="${p.name||''}"/></div>
-    <div class="field"><label>Titel</label><input value="${p.title||''}"/></div>
-    <div class="field"><label>Foto URL</label><input value="${p.photo_url||''}" placeholder="https://..."/></div>
-    <div class="field"><label>Bio (HTML ok)</label><textarea>${p.bio||''}</textarea></div>
-    <div class="row">
-      <div class="field"><label>Partner ID (valgfri)</label><input value="${p.partner_id||''}" /></div>
-      <button class="btn warn" style="margin-top:22px">Ryd</button>
+  <!-- Login modal -->
+  <div id="loginModal" class="modal-backdrop">
+    <div class="modal">
+      <h2>Log ind</h2>
+      <div class="grid">
+        <div class="g12"><label class="sr" for="email">Email</label><input id="email" type="email" placeholder="din@email.com" /></div>
+        <div class="g12"><label class="sr" for="password">Password</label><input id="password" type="password" placeholder="Password" /></div>
+        <div class="g12 row" style="justify-content:space-between">
+          <button id="doLogin" class="btn ok">Log ind</button>
+          <button id="closeLogin" class="btn">Luk</button>
+        </div>
+        <div class="g12 status" id="loginStatus"></div>
+      </div>
+      <p class="hint">Kun brugere i tabellen <code>admins</code> får adgang.</p>
     </div>
-  `;
-  div.querySelector('button').onclick=()=>{ div.remove(); };
-  div.dataset.id = p.id||'';
-  return div;
-}
-async function loadTeam(){
-  const { data } = await sb.from('org_people').select('id,slot,name,title,photo_url,bio,partner_id');
-  const grid=document.getElementById('team-grid'); grid.innerHTML='';
-  // vis i slot-rækkefølge, men tillad ekstra
-  TEAM_SLOTS.forEach(s=>{
-    const p=(data||[]).find(x=>x.slot===s) || {slot:s};
-    grid.appendChild(teamCard(p));
-  });
-  (data||[]).filter(x=>!TEAM_SLOTS.includes(x.slot)).forEach(p=>grid.appendChild(teamCard(p)));
-}
-document.getElementById('btn-team-save').onclick=async()=>{
-  const cards=[...document.querySelectorAll('#team-grid .card')].map(el=>{
-    const inputs=el.querySelectorAll('input,textarea');
-    const [slot,name,title,photo_url,bio,partner_id]=inputs;
-    return { id:el.dataset.id||undefined, slot:slot.value.trim(), name:name.value.trim(), title:title.value.trim(),
-             photo_url:photo_url.value.trim(), bio:bio.value, partner_id:partner_id.value||null };
-  }).filter(r=>r.slot);
-  const msg=document.getElementById('team-msg');
-  try{
-    // upsert alle; slet dem med slots der ikke længere findes
-    const { data:ex } = await sb.from('org_people').select('id,slot');
-    const keepIds = cards.filter(c=>c.id).map(c=>c.id);
-    const delIds = (ex||[]).map(x=>x.id).filter(id=>!keepIds.includes(id));
-    if(cards.length){ const { error }=await sb.from('org_people').upsert(cards); if(error) throw error; }
-    if(delIds.length){ const { error }=await sb.from('org_people').delete().in('id',delIds); if(error) throw error; }
-    toast(msg,'Gemt ✅'); loadTeam();
-  }catch(e){ toast(msg,e.message,false); }
-};
+  </div>
 
-/* ---------- Partnere ---------- */
-async function loadPartners(){
-  const { data } = await sb.from('partners').select('id,name,website,logo_url,logo_alt,category,active').order('name');
-  const tb=document.querySelector('#partners-table tbody'); tb.innerHTML='';
-  (data||[]).forEach(p=>tb.appendChild(partnerRow(p)));
-}
-function partnerRow(p={}){
-  const tr=document.createElement('tr');
-  tr.innerHTML=`<td><input value="${p.name||''}"/></td>
-    <td><input value="${p.website||''}" placeholder="https://..."/></td>
-    <td><input value="${p.logo_url||''}" placeholder="https://..."/></td>
-    <td><input value="${p.logo_alt||''}" placeholder="Alt-tekst"/></td>
-    <td><input value="${p.category||''}" placeholder="Kategori"/></td>
-    <td><input type="checkbox" ${p.active?'checked':''}/></td>
-    <td><button class="btn warn">Slet</button></td>`;
-  tr.dataset.id=p.id||'';
-  tr.querySelector('button').onclick=()=>tr.remove();
-  return tr;
-}
-document.getElementById('btn-partner-add').onclick=()=>document.querySelector('#partners-table tbody').appendChild(partnerRow({active:true}));
-document.getElementById('btn-partners-save').onclick=async()=>{
-  const rows=[...document.querySelectorAll('#partners-table tbody tr')].map(tr=>{
-    const [name,website,logo_url,logo_alt,category,active]=tr.querySelectorAll('input');
-    return { id:tr.dataset.id||undefined, name:name.value.trim(), website:website.value.trim(), logo_url:logo_url.value.trim(),
-             logo_alt:logo_alt.value.trim(), category:category.value.trim(), active:active.checked };
-  }).filter(r=>r.name);
-  const msg=document.getElementById('partners-msg');
-  try{
-    const { data:ex } = await sb.from('partners').select('id');
-    const keep=rows.filter(r=>r.id).map(r=>r.id);
-    const del=(ex||[]).map(x=>x.id).filter(id=>!keep.includes(id));
-    if(rows.length){ const { error }=await sb.from('partners').upsert(rows); if(error) throw error; }
-    if(del.length){ const { error }=await sb.from('partners').delete().in('id',del); if(error) throw error; }
-    toast(msg,'Gemt ✅'); loadPartners();
-  }catch(e){ toast(msg,e.message,false); }
-};
+  <script>
+    // 1) Supabase client
+  const SUPABASE_URL = "https://byrlebjwknppjbtbkozt.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* ---------- Init ---------- */
-function init(){
-  initTabs();
-  loadStatus();
+    // Helpers
+    const $ = s => document.querySelector(s);
+    const $$ = s => Array.from(document.querySelectorAll(s));
+    const status = (el, msg, ok=false) => el.innerHTML = msg ? (ok ? `<span class="ok">${msg}</span>` : `<span class="err">${msg}</span>`) : '';
 
-  // BG
-  document.getElementById('btn-bg-save').onclick=saveBackgrounds;
-  loadBackgroundList();
+    // UI: Tabs
+    $$(".tab-btn").forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        $$(".tab-btn").forEach(b=>b.classList.remove('active'));
+        $$(".tab").forEach(t=>t.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+      });
+    });
 
-  // Social
-  loadSocial();
+    // Login modal controls
+    const modal = $("#loginModal");
+    const openLogin = ()=> modal.classList.add('show');
+    const closeLogin = ()=> modal.classList.remove('show');
 
-  // Tekster
-  loadTexts();
+    $("#btnSignIn").addEventListener('click', openLogin);
+    $("#closeLogin").addEventListener('click', closeLogin);
+    $("#doLogin").addEventListener('click', async ()=>{
+      const email = $("#email").value.trim();
+      const password = $("#password").value;
+      try{
+        status($("#loginStatus"), "Logger ind…", true);
+        const { data, error } = await sb.auth.signInWithPassword({ email, password });
+        if(error) throw error;
+        closeLogin();
+        await gateAdmin(true);
+      }catch(e){
+        status($("#loginStatus"), e.message || String(e));
+      }
+    });
+    $("#btnSignOut").addEventListener('click', async ()=>{
+      await sb.auth.signOut();
+      $("#who").textContent = 'Ikke logget ind';
+      document.getElementById('app').style.display = 'none';
+      document.getElementById('gate').style.display = 'block';
+      $("#btnSignOut").style.display = 'none';
+      $("#btnSignIn").style.display = 'inline-block';
+      $("#gateMsg").innerHTML = 'Log venligst ind for adgang.';
+    });
 
-  // YouTube
-  loadYt();
+    // 2) Gate: kræver login + membership i `admins`
+    async function gateAdmin(refresh){
+      const gate = $("#gate"), app = $("#app");
+      const who = $("#who"), msg = $("#gateMsg");
+      try{
+        const { data: { user }, error } = await sb.auth.getUser();
+        if(error) throw error;
+        if(!user){
+          who.textContent = 'Ikke logget ind';
+          app.style.display = 'none';
+          gate.style.display = 'block';
+          msg.innerHTML = 'Ingen session. <button class="btn" onclick="document.getElementById(\'loginModal\').classList.add(\'show\')">Log ind</button>';
+          return;
+        }
+        who.textContent = user.email || user.id;
+        $("#btnSignOut").style.display = 'inline-block';
+        $("#btnSignIn").style.display = 'none';
 
-  // Team
-  loadTeam();
+        const { data: adminRow, error: e2 } = await sb
+          .from('admins')
+          .select('user_id,email')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        if(e2) throw e2;
+        if(!adminRow){
+          app.style.display = 'none';
+          gate.style.display = 'block';
+          msg.innerHTML = `<span class="err">Du er logget ind, men ikke admin.</span>`;
+          return;
+        }
+        // OK: vis app
+        gate.style.display = 'none';
+        app.style.display = 'block';
+        if(refresh){
+          await Promise.all([
+            loadBgPreview(),
+            loadSocial(),
+            loadTexts(),
+            loadYt(),
+            loadPeople(),
+            loadPartners()
+          ]).catch(console.error);
+        }else{
+          // første load
+          await Promise.all([
+            loadBgPreview(),
+            loadSocial(),
+            loadTexts(true),
+            loadYt(),
+            loadPeople(),
+            loadPartners()
+          ]).catch(console.error);
+        }
+      }catch(e){
+        msg.innerHTML = `<span class="err">${e.message || e}</span>`;
+        app.style.display = 'none';
+        gate.style.display = 'block';
+      }
+    }
 
-  // Partnere
-  loadPartners();
-}
-</script>
+    // 3) BAGGRUNDE
+    async function loadBgPreview(){
+      const page = $("#bgPage").value;
+      // Hent settings (1x/2x)
+      const { data } = await sb.from('site_settings').select('key,value').in('key',[`${page}_bg_1x`, `${page}_bg_2x`]);
+      const m = Object.fromEntries((data||[]).map(r=>[r.key,r.value]));
+      const one = m[`${page}_bg_1x`], two = m[`${page}_bg_2x`];
+      $("#curBg1x").textContent = one ? publicUrl(one.bucket, one.path) : '–';
+      $("#curBg2x").textContent = two ? publicUrl(two.bucket, two.path) : '–';
+    }
+    $("#bgPage").addEventListener('change', loadBgPreview);
+
+    function publicUrl(bucket, path){
+      const { data } = sb.storage.from(bucket).getPublicUrl(path);
+      return data?.publicUrl || '';
+    }
+
+    $("#btnUploadBg").addEventListener('click', async ()=>{
+      const page = $("#bgPage").value;
+      const density = $("#bgDensity").value; // '1x' | '2x'
+      const file = $("#bgFile").files[0];
+      if(!file){ status($("#bgStatus"), "Vælg en fil."); return; }
+      try{
+        status($("#bgStatus"), "Uploader…", true);
+        const path = `${page}/bg@${density}${file.name.toLowerCase().endsWith('.webp')?'.webp':'.jpg'}`; // ens navn
+        const { error: upErr } = await sb.storage.from('backgrounds').upload(path, file, { upsert:true });
+        if(upErr) throw upErr;
+        const value = { bucket:'backgrounds', path };
+        const key = `${page}_bg_${density}`;
+        const { error: setErr } = await sb.from('site_settings').upsert({ key, value });
+        if(setErr) throw setErr;
+        status($("#bgStatus"), "Gemt ✔", true);
+        await loadBgPreview();
+      }catch(e){
+        status($("#bgStatus"), e.message || String(e));
+      }
+    });
+
+    // 4) SOCIALE LINKS
+    async function loadSocial(){
+      const { data, error } = await sb.from('social_links').select('*').order('sort', {ascending:true});
+      if(error){ status($("#socialStatus"), error.message); return; }
+      const tbody = $("#tblSocial tbody");
+      tbody.innerHTML = '';
+      (data||[]).forEach(row => addSocialRow(row));
+    }
+    function addSocialRow(row={}){
+      const tbody = $("#tblSocial tbody");
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input value="${row.platform||''}" data-k="platform" placeholder="youtube/x/facebook/…" /></td>
+        <td><input value="${row.url||''}" data-k="url" placeholder="https://…" /></td>
+        <td><input type="checkbox" data-k="active" ${row.active?'checked':''}></td>
+        <td><input type="number" data-k="sort" value="${row.sort??0}" style="max-width:90px"></td>
+        <td class="row">
+          <button class="btn ok">Gem</button>
+          <button class="btn danger">Slet</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+      tr.querySelector('.ok').addEventListener('click', async ()=>{
+        const payload = readRow(tr, row.id);
+        try{
+          const { error } = await sb.from('social_links').upsert(payload);
+          if(error) throw error;
+          status($("#socialStatus"), "Gemt ✔", true);
+          await loadSocial();
+        }catch(e){ status($("#socialStatus"), e.message || String(e)); }
+      });
+      tr.querySelector('.danger').addEventListener('click', async ()=>{
+        if(!row.id){ tr.remove(); return; }
+        if(!confirm('Slet dette link?')) return;
+        try{
+          const { error } = await sb.from('social_links').delete().eq('id', row.id);
+          if(error) throw error;
+          await loadSocial();
+        }catch(e){ status($("#socialStatus"), e.message || String(e)); }
+      });
+    }
+    function readRow(tr, id){
+      const get = k => tr.querySelector(`[data-k="${k}"]`);
+      return {
+        id,
+        platform: get('platform').value.trim(),
+        url: get('url').value.trim(),
+        active: get('active').checked,
+        sort: parseInt(get('sort').value || '0',10)
+      };
+    }
+    $("#btnAddSocial").addEventListener('click', ()=> addSocialRow({active:true, sort:0}));
+
+    // 5) TEKSTER
+    async function loadTexts(skipFetch){
+      if(skipFetch!==true){} // placeholder
+      const page = $("#txtPage").value, lang=$("#txtLang").value;
+      const { data, error } = await sb.from('site_text').select('*')
+        .eq('page', page).eq('lang', lang)
+        .order('section').order('tkey');
+      if(error){ status($("#textStatus"), error.message); return; }
+      const tbody = $("#tblText tbody");
+      tbody.innerHTML = '';
+      (data||[]).forEach(r=> addTextRow(r));
+    }
+    function addTextRow(row={}){
+      const tbody = $("#tblText tbody");
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="min-width:140px"><input value="${row.section||''}" data-k="section" placeholder="fx hero" /></td>
+        <td style="min-width:120px"><input value="${row.tkey||''}" data-k="tkey" placeholder="fx title/body" /></td>
+        <td><textarea data-k="content" placeholder="Tekst…">${row.content||''}</textarea></td>
+        <td class="row">
+          <button class="btn ok">Gem</button>
+          <button class="btn danger">Slet</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+      tr.querySelector('.ok').addEventListener('click', async ()=>{
+        const payload = {
+          id: row.id,
+          page: $("#txtPage").value,
+          lang: $("#txtLang").value,
+          section: tr.querySelector('[data-k="section"]').value.trim(),
+          tkey: tr.querySelector('[data-k="tkey"]').value.trim(),
+          content: tr.querySelector('[data-k="content"]').value
+        };
+        try{
+          const { error } = await sb.from('site_text').upsert(payload, { onConflict:'page,section,tkey,lang' });
+          if(error) throw error;
+          status($("#textStatus"), "Gemt ✔", true);
+          await loadTexts();
+        }catch(e){ status($("#textStatus"), e.message || String(e)); }
+      });
+      tr.querySelector('.danger').addEventListener('click', async ()=>{
+        if(!row.id){ tr.remove(); return; }
+        if(!confirm('Slet denne tekst?')) return;
+        try{
+          const { error } = await sb.from('site_text').delete().eq('id', row.id);
+          if(error) throw error;
+          await loadTexts();
+        }catch(e){ status($("#textStatus"), e.message || String(e)); }
+      });
+    }
+    $("#btnLoadTexts").addEventListener('click', loadTexts);
+    $("#btnAddText").addEventListener('click', ()=> addTextRow({}));
+
+    // 6) YOUTUBE
+    async function loadYt(){
+      const { data, error } = await sb.from('youtube_videos').select('*').order('sort',{ascending:true});
+      if(error){ status($("#ytStatus"), error.message); return; }
+      const tbody = $("#tblYt tbody"); tbody.innerHTML='';
+      (data||[]).forEach(r=> addYtRow(r));
+    }
+    function addYtRow(row={}){
+      const tbody = $("#tblYt tbody");
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input value="${row.video_id||''}" data-k="video_id" placeholder="YouTube ID" /></td>
+        <td><input value="${row.title||''}" data-k="title" placeholder="Titel" /></td>
+        <td><input type="checkbox" data-k="active" ${row.active?'checked':''}></td>
+        <td><input type="number" data-k="sort" value="${row.sort??0}" style="max-width:90px"></td>
+        <td class="row">
+          <button class="btn ok">Gem</button>
+          <button class="btn danger">Slet</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+      tr.querySelector('.ok').addEventListener('click', async ()=>{
+        const p = {
+          id: row.id,
+          video_id: tr.querySelector('[data-k="video_id"]').value.trim(),
+          title: tr.querySelector('[data-k="title"]').value.trim(),
+          active: tr.querySelector('[data-k="active"]').checked,
+          sort: parseInt(tr.querySelector('[data-k="sort"]').value || '0',10)
+        };
+        try{
+          const { error } = await sb.from('youtube_videos').upsert(p);
+          if(error) throw error;
+          status($("#ytStatus"), "Gemt ✔", true);
+          await loadYt();
+        }catch(e){ status($("#ytStatus"), e.message || String(e)); }
+      });
+      tr.querySelector('.danger').addEventListener('click', async ()=>{
+        if(!row.id){ tr.remove(); return; }
+        if(!confirm('Slet denne video?')) return;
+        try{
+          const { error } = await sb.from('youtube_videos').delete().eq('id', row.id);
+          if(error) throw error;
+          await loadYt();
+        }catch(e){ status($("#ytStatus"), e.message || String(e)); }
+      });
+    }
+    $("#btnAddYt").addEventListener('click', ()=> addYtRow({active:true, sort:0}));
+
+    // 7) TEAM (org_people)
+    async function loadPeople(){
+      const { data, error } = await sb.from('org_people').select('*').order('sort',{ascending:true});
+      if(error){ status($("#peopleStatus"), error.message); return; }
+      const tbody = $("#tblPeople tbody"); tbody.innerHTML='';
+      (data||[]).forEach(r=> addPersonRow(r));
+    }
+    function addPersonRow(row={}){
+      const tbody = $("#tblPeople tbody");
+      const tr = document.createElement('tr');
+      const publicPhoto = row.photo_path ? publicUrl('people', row.photo_path) : '';
+      tr.innerHTML = `
+        <td>${publicPhoto?`<img class="thumb" src="${publicPhoto}" alt="">`:'-'}</td>
+        <td><input value="${row.name||''}" data-k="name" placeholder="Navn" /></td>
+        <td><input value="${row.role||''}" data-k="role" placeholder="Rolle" /></td>
+        <td><textarea data-k="bio" placeholder="Kort bio…">${row.bio||''}</textarea></td>
+        <td><input type="checkbox" data-k="active" ${row.active?'checked':''}></td>
+        <td><input type="number" data-k="sort" value="${row.sort??0}" style="max-width:90px"></td>
+        <td class="row">
+          <label class="btn">Upload foto<input type="file" accept="image/*" style="display:none" data-k="file"></label>
+          <button class="btn ok">Gem</button>
+          <button class="btn danger">Slet</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+
+      async function savePerson(){
+        // upload hvis valgt
+        let photo_path = row.photo_path || null;
+        const f = tr.querySelector('[data-k="file"]').files[0];
+        if(f){
+          const path = `p_${Date.now()}_${(f.name||'').replaceAll(' ','_')}`;
+          const { error: upErr } = await sb.storage.from('people').upload(path, f, { upsert:true });
+          if(upErr) throw upErr;
+          photo_path = path;
+        }
+        const p = {
+          id: row.id,
+          name: tr.querySelector('[data-k="name"]').value.trim(),
+          role: tr.querySelector('[data-k="role"]').value.trim(),
+          bio: tr.querySelector('[data-k="bio"]').value,
+          active: tr.querySelector('[data-k="active"]').checked,
+          sort: parseInt(tr.querySelector('[data-k="sort"]').value || '0',10),
+          photo_path
+        };
+        const { error } = await sb.from('org_people').upsert(p);
+        if(error) throw error;
+      }
+
+      tr.querySelector('.ok').addEventListener('click', async ()=>{
+        try{
+          await savePerson();
+          status($("#peopleStatus"), "Gemt ✔", true);
+          await loadPeople();
+        }catch(e){ status($("#peopleStatus"), e.message || String(e)); }
+      });
+      tr.querySelector('.danger').addEventListener('click', async ()=>{
+        if(!row.id){ tr.remove(); return; }
+        if(!confirm('Slet denne person?')) return;
+        try{
+          const { error } = await sb.from('org_people').delete().eq('id', row.id);
+          if(error) throw error;
+          await loadPeople();
+        }catch(e){ status($("#peopleStatus"), e.message || String(e)); }
+      });
+    }
+    $("#btnAddPerson").addEventListener('click', ()=> addPersonRow({active:true, sort:0}));
+
+    // 8) PARTNERE
+    async function loadPartners(){
+      const { data, error } = await sb.from('partners').select('*').order('sort',{ascending:true});
+      if(error){ status($("#partnersStatus"), error.message); return; }
+      const tbody = $("#tblPartners tbody"); tbody.innerHTML='';
+      (data||[]).forEach(r=> addPartnerRow(r));
+    }
+    function addPartnerRow(row={}){
+      const tbody = $("#tblPartners tbody");
+      const tr = document.createElement('tr');
+      const logo = row.logo_path ? publicUrl('partners', row.logo_path) : '';
+      tr.innerHTML = `
+        <td>${logo?`<img class="thumb" src="${logo}" alt="">`:'-'}</td>
+        <td><input value="${row.name||''}" data-k="name" placeholder="Navn" /></td>
+        <td><input value="${row.url||''}" data-k="url" placeholder="https://…" /></td>
+        <td><input type="checkbox" data-k="active" ${row.active?'checked':''}></td>
+        <td><input type="number" data-k="sort" value="${row.sort??0}" style="max-width:90px"></td>
+        <td class="row">
+          <label class="btn">Upload logo<input type="file" accept="image/*" style="display:none" data-k="file"></label>
+          <button class="btn ok">Gem</button>
+          <button class="btn danger">Slet</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+
+      async function savePartner(){
+        let logo_path = row.logo_path || null;
+        const f = tr.querySelector('[data-k="file"]').files[0];
+        if(f){
+          const path = `l_${Date.now()}_${(f.name||'').replaceAll(' ','_')}`;
+          const { error: upErr } = await sb.storage.from('partners').upload(path, f, { upsert:true });
+          if(upErr) throw upErr;
+          logo_path = path;
+        }
+        const p = {
+          id: row.id,
+          name: tr.querySelector('[data-k="name"]').value.trim(),
+          url: tr.querySelector('[data-k="url"]').value.trim(),
+          active: tr.querySelector('[data-k="active"]').checked,
+          sort: parseInt(tr.querySelector('[data-k="sort"]').value || '0',10),
+          logo_path
+        };
+        const { error } = await sb.from('partners').upsert(p);
+        if(error) throw error;
+      }
+
+      tr.querySelector('.ok').addEventListener('click', async ()=>{
+        try{
+          await savePartner();
+          status($("#partnersStatus"), "Gemt ✔", true);
+          await loadPartners();
+        }catch(e){ status($("#partnersStatus"), e.message || String(e)); }
+      });
+      tr.querySelector('.danger').addEventListener('click', async ()=>{
+        if(!row.id){ tr.remove(); return; }
+        if(!confirm('Slet denne partner?')) return;
+        try{
+          const { error } = await sb.from('partners').delete().eq('id', row.id);
+          if(error) throw error;
+          await loadPartners();
+        }catch(e){ status($("#partnersStatus"), e.message || String(e)); }
+      });
+    }
+    $("#btnAddPartner").addEventListener('click', ()=> addPartnerRow({active:true, sort:0}));
+
+    // 9) ChatGPT oversætter (Edge Function)
+    async function translateText(text, targetLang, sourceLang){
+      const { data: { session } } = await sb.auth.getSession();
+      if(!session) throw new Error('Login kræves.');
+      const url = `${SUPABASE_URL}/functions/v1/translate`;
+      const res = await fetch(url, {
+        method:'POST',
+        headers:{
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ text, targetLang, sourceLang })
+      });
+      if(!res.ok){
+        const t = await res.text();
+        throw new Error(`Translate fejlede (${res.status}): ${t}`);
+      }
+      const json = await res.json();
+      return json.translation || '';
+    }
+    $("#btnTranslate").addEventListener('click', async ()=>{
+      const src = $("#trSrc").value, to = $("#trTo").value, from = $("#trFrom").value || undefined;
+      try{
+        status($("#trStatus"), "Oversætter…", true);
+        const out = await translateText(src, to, from);
+        $("#trOut").value = out;
+        status($("#trStatus"), "Færdig ✔", true);
+      }catch(e){
+        status($("#trStatus"), e.message || String(e));
+      }
+    });
+
+    // 10) Første load
+    (async ()=>{
+      // Autoåbn login hvis ingen session
+      const { data: { user } } = await sb.auth.getUser();
+      if(!user) openLogin();
+      await gateAdmin(true);
+    })();
+  </script>
 </body>
 </html>
