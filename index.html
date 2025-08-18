@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>MadaCoin</title>
-  <meta name="description" content="MadaCoin støtter udvikling i Madagaskar gennem donationer og gennemsigtighed.">
+  <title>MadaCoin – MCN</title>
+  <meta name="description" content="MadaCoin (MCN) – værditokenet i MadaCoin økosystemet. Live-graf, videoer og information.">
   <link rel="icon" href="/favicon_boosted.ico?v=1" type="image/x-icon">
 
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -23,14 +23,14 @@
       --nav-gap:14px; --nav-px:14px; --nav-py:8px;
       --nav-bg:#0d0d0f; --nav-b:#333; --nav-hover:#151517; --nav-active:#5aa9ff;
 
-      /* Venstre kolonne (Hero) */
+      /* Venstre kolonne (Hero + MCN-graf) */
       --left-col:520px;
       --social-top:106px;
       --left-rail-nudge:-100px;
       --left-rail-top: calc(var(--social-top) + var(--left-rail-nudge));
       --left-rail-left: -260px;
 
-      /* Højre kolonne (mønt+YouTube) */
+      /* Højre kolonne (mønt + YouTube) */
       --right-rail-left: 538px;
 
       /* Base farver */
@@ -110,7 +110,17 @@
     .hero .btn{ padding:9px 14px; border-radius:12px; text-decoration:none; background:#0d0d0f; border:1px solid #333; color:#fff }
     .hero .btn.primary{ background:linear-gradient(135deg,#FFD700,#DAA520); color:#1c2630 }
 
-    /* Højre kolonne (mønt+YouTube) */
+    /* MCN panel (live graf) */
+    .mcn-panel{
+      margin-top:22px;
+      background:#0b0b0c;
+      border:1px solid #2a2a2a; border-radius:16px;
+      padding:16px 18px; min-height:420px;
+      box-shadow:0 12px 26px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .mcn-panel h3{ margin:0 0 10px }
+
+    /* Højre kolonne (mønt + YouTube) */
     .right-rail{ margin-left: var(--right-rail-left); position:relative; z-index:3 }
     .right-stack{ display:inline-block; vertical-align:top }
 
@@ -160,20 +170,33 @@
     <section class="stage">
       <!-- Venstre kolonne -->
       <div class="left-rail-box">
-        <section class="hero" id="home-hero">
-          <div class="ribbon">NYHED: 25% hotelrabat til MCD-holders</div>
-          <h1>Donér. Byg. Forandr Madagaskar.</h1>
-          <p class="sub">MadaCoin Donation (MCD) finansierer skoler, solenergi og lokale jobs — med fuld gennemsigtighed.</p>
+        <!-- MCN-Hero -->
+        <section class="hero" id="mcn-hero">
+          <div class="ribbon">Opdatering: MCN roadmap & live-graf</div>
+          <h1>MadaCoin (MCN) – værditokenet</h1>
+          <p class="sub">MCN er det kommercielle token i MadaCoin-økosystemet (ikke donation). Følg kursen i realtid og se vores seneste videoer.</p>
           <div class="points">
-            <span class="pt">Skolebyggeri</span>
-            <span class="pt">Solceller &amp; batterier</span>
-            <span class="pt">Åbne rapporter</span>
+            <span class="pt">Polygon</span>
+            <span class="pt">Utility & økosystem</span>
+            <span class="pt">Transparens</span>
           </div>
           <div class="btns">
-            <button class="btn primary" id="hero-primary">Støt med MadaCoin</button>
-            <a class="btn" href="/rapporter.html">Se rapporter</a>
+            <button class="btn primary" id="buy-mcn">Køb / handl MCN</button>
+            <a class="btn" href="/roadmap.html">Se roadmap</a>
           </div>
         </section>
+
+        <!-- MCN live-graf -->
+        <aside class="mcn-panel" id="mcn-panel">
+          <h3>MCN – live graf</h3>
+          <div id="mcn-chart-wrap" style="border:1px solid #222;border-radius:12px;overflow:hidden;background:#070707">
+            <iframe id="mcn-chart" title="MCN live chart" style="display:none;width:100%;height:420px;border:0;"></iframe>
+            <div id="mcn-chart-fallback" style="padding:12px;color:#cfd3d7;">
+              Indsæt grafen via Supabase: tabel <code>site_text</code>, sæt <code>page=home</code>, <code>key=mcn_chart_url</code> til en iframe-venlig URL
+              (f.eks. Dexscreener/Dextools embed). Når den er sat, vises grafen automatisk her.
+            </div>
+          </div>
+        </aside>
       </div>
 
       <!-- Højre kolonne -->
@@ -181,9 +204,9 @@
         <div class="right-stack">
           <section class="coins">
             <div class="coin">
-              <img id="coinD" alt="MadaCoin Donation" />
-              <p class="coin-description">Støt vores mission ved at købe MadaCoin Donation.</p>
-              <button class="button" id="buy-mcd">Køb MadaCoin Donation</button>
+              <img id="coinC" alt="MadaCoin (MCN)" />
+              <p class="coin-description">MadaCoin (MCN) – værditokenet i økosystemet.</p>
+              <button class="button" id="buy-mcn-2">Køb / handl MCN</button>
             </div>
           </section>
 
@@ -204,19 +227,39 @@
     const SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
     const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON) : null;
 
-    /* ===== RAMP (on-ramp) – placeholder til buy_config ===== */
-    const DEFAULT_MCD_WALLET = "0xa594586B04f1b6782EC906B49882EbD0E652a388"; // skiftes via buy_config senere
-    async function openRampMCD(){
-      // Eksempel (senere): hent fra Supabase buy_config
-      // const { data } = await sb.from('buy_config').select('*').eq('key','MCD').single();
-      // const wallet = data?.wallet || DEFAULT_MCD_WALLET;
-      const wallet = DEFAULT_MCD_WALLET;
+    /* ===== BUY / ON-RAMP for MCN =====
+       Vi kører efter din plan:
+       - buy_config i Supabase styrer knapperne
+       - Ramp (ikke Transak) – eller DEX-link, afhængig af hvad du sætter
+    */
+    async function openBuyMCN(){
+      try{
+        if(!sb){ alert("Konfiguration hentes fra Supabase senere."); return; }
+        const { data, error } = await sb
+          .from('buy_config')
+          .select('url, provider, wallet, asset')
+          .eq('key','MCN')
+          .single();
 
-      alert("Ramp (MCD) aktiveres fuldt når buy_config er sat. Vi åbner Ramp i mellemtiden.");
-      window.open("https://ramp.network/buy", "_blank");
+        if(error){
+          alert("Kunne ikke hente købskonfiguration for MCN endnu. Sæt den i Supabase (buy_config).");
+          return;
+        }
+
+        // Hvis du gemmer en fuld deeplink-URL i 'url', åbner vi bare den.
+        if(data?.url){
+          window.open(data.url, "_blank");
+          return;
+        }
+
+        // Simpel fallback-besked:
+        alert("Købslink for MCN er ikke sat. Udfyld buy_config (key=MCN) i Supabase med fx Ramp/Dex-link.");
+      }catch(e){
+        alert("MCN-købsknappen kan ikke bruges endnu. Vi tilslutter den, når buy_config er sat.");
+      }
     }
 
-    /* Tekster & sociale links */
+    /* ===== Tekster & sociale links ===== */
     async function loadSiteText(){
       if(!sb) return {};
       try{
@@ -229,8 +272,17 @@
       }catch{ return {}; }
     }
     function normalizeUrl(u){ if(!u) return null; const t=u.trim(); return /^https?:\/\//i.test(t)?t:'https://'+t }
-    function iconUrlFor(p){ const name=p.charAt(0).toUpperCase()+p.slice(1).toLowerCase(); const {data}=sb.storage.from('social.icons').getPublicUrl(`${name}.svg`); return data?.publicUrl||null }
-    function fallbackIconUrl(){ const {data}=sb.storage.from('social.icons').getPublicUrl('Globe.svg'); return data?.publicUrl||'' }
+    function iconUrlFor(p){
+      if(!sb) return null;
+      const name=p.charAt(0).toUpperCase()+p.slice(1).toLowerCase();
+      const {data}=sb.storage.from('social.icons').getPublicUrl(`${name}.svg`);
+      return data?.publicUrl||null
+    }
+    function fallbackIconUrl(){
+      if(!sb) return '';
+      const {data}=sb.storage.from('social.icons').getPublicUrl('Globe.svg');
+      return data?.publicUrl||''
+    }
     async function renderSocialLinks(){
       const el=document.getElementById('social-menu'); if(!el||!sb) return;
       el.innerHTML='';
@@ -244,14 +296,15 @@
       });
     }
 
+    /* ===== Assets ===== */
     const storeBase="https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public";
     const pub=(...p)=>`${storeBase}/${p.map(encodeURIComponent).join('/')}`;
     function setCoinImages(){
-      const d=document.getElementById('coinD');
-      if(d) d.src=pub('images','MadaCoin_D.png');
+      const c=document.getElementById('coinC');
+      if(c) c.src=pub('images','MadaCoin_C.png');
     }
 
-    /* YouTube */
+    /* ===== YouTube ===== */
     function getYouTubeId(url){ if(!url) return null; try{ const u=new URL(url); if(u.hostname.includes('youtu.be')) return u.pathname.slice(1); if(u.searchParams.get('v')) return u.searchParams.get('v'); const m=url.match(/(?:embed|shorts)\/([a-zA-Z0-9_-]{6,})/); if(m) return m[1]; const seg=u.pathname.split('/').pop(); return seg&&seg.length>=6?seg:null }catch{return null} }
     function thumbUrl(id){ return `https://i.ytimg.com/vi/${id}/hqdefault.jpg` }
     function renderPlayer(id){
@@ -288,19 +341,45 @@
       renderPlayer(vids[0]._id); renderThumbs(vids,vids[0]._id);
     }
 
-    function attachHeroActions(){
-      const btn1=document.getElementById('hero-primary');
-      const btn2=document.getElementById('buy-mcd');
-      if(btn1) btn1.addEventListener('click',openRampMCD);
-      if(btn2) btn2.addEventListener('click',openRampMCD);
+    /* ===== MCN graf (iframe-URL fra Supabase site_text) ===== */
+    async function initMCNChart(){
+      const frame=document.getElementById('mcn-chart');
+      const fallback=document.getElementById('mcn-chart-fallback');
+      if(!sb || !frame){ return; }
+      try{
+        const { data } = await sb.from('site_text')
+          .select('key,value')
+          .eq('page','home')
+          .eq('key','mcn_chart_url')
+          .maybeSingle?.() ?? await sb.from('site_text').select('key,value').eq('page','home').eq('key','mcn_chart_url').single();
+
+        const url = (data && data.value || '').trim();
+        if(url){
+          frame.src = url;
+          frame.style.display = 'block';
+          if(fallback) fallback.style.display = 'none';
+        }
+      }catch(e){
+        // Beholder fallback-teksten
+      }
     }
 
+    /* ===== Events ===== */
+    function attachActions(){
+      const b1=document.getElementById('buy-mcn');
+      const b2=document.getElementById('buy-mcn-2');
+      if(b1) b1.addEventListener('click',openBuyMCN);
+      if(b2) b2.addEventListener('click',openBuyMCN);
+    }
+
+    /* ===== Init ===== */
     window.addEventListener('load', async ()=>{
       await loadSiteText();
       await renderSocialLinks();
       setCoinImages();
       initYouTube();
-      attachHeroActions();
+      initMCNChart();
+      attachActions();
     });
   </script>
 </body>
