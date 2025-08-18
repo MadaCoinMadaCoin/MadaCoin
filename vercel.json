@@ -3,7 +3,7 @@
     {
       "source": "/:path*",
       "has": [
-        { "type": "header", "key": "host", "value": "donate.madacoin.pro" }
+        { "type": "host", "value": "donate.madacoin.pro" }
       ],
       "destination": "/donate.html"
     }
