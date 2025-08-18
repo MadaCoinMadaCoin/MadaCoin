@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>MadaCoin</title>
+  <title>MadaCoin – Donation (MCD)</title>
   <meta name="description" content="MadaCoin støtter udvikling i Madagaskar gennem donationer og gennemsigtighed.">
   <link rel="icon" href="/favicon_boosted.ico?v=1" type="image/x-icon">
 
@@ -23,10 +23,10 @@
       --nav-gap:14px; --nav-px:14px; --nav-py:8px;
       --nav-bg:#0d0d0f; --nav-b:#333; --nav-hover:#151517; --nav-active:#5aa9ff;
 
-      /* Venstre kolonne (Hero+Graf) */
+      /* Venstre kolonne (Hero) */
       --left-col:520px;
       --social-top:106px;
-      --left-rail-nudge:-100px;                    /* din fine justering */
+      --left-rail-nudge:-100px;
       --left-rail-top: calc(var(--social-top) + var(--left-rail-nudge));
       --left-rail-left: -260px;
 
@@ -38,8 +38,8 @@
       --base-bot:#e2ebf7;
 
       /* Baggrunds-placering (kan tweakes) */
-      --bg-x: 0px;        /* flyt baggrunden vandret: positive værdier mod højre */
-      --bg-y: 0px;        /* flyt baggrunden lodret: negative værdier op */
+      --bg-x: 0px;
+      --bg-y: 0px;
     }
 
     /* ===================== BODY / BAGGRUND ===================== */
@@ -47,30 +47,20 @@
       display:flex; flex-direction:column; margin:0; color:#fff;
       font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
 
-      /*
-       * Sæt dine rigtige billed-URL’er her:
-       *  - 2048px bred (1x)
-       *  - 4096px bred (2x / retina)
-       * Eksempel (Supabase):
-       *   url('https://YOUR-PROJECT.supabase.co/storage/v1/object/public/backgrounds/city_2048.webp')
-       */
       --city-bg-1x: url('/img/YOUR_CITY_BG_2048.webp');
       --city-bg-2x: url('/img/YOUR_CITY_BG_4096.webp');
 
       background:
-        /* let overlay for kontrast oven på fotoet */
         linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.14)),
-        /* foto-baggrund med 1x/2x automatic */
         image-set(var(--city-bg-1x) 1x, var(--city-bg-2x) 2x),
-        /* blød base-gradient som fallback */
         linear-gradient(var(--base-top), var(--base-bot));
       background-repeat: no-repeat, no-repeat, no-repeat;
       background-size: auto, cover, auto;
       background-attachment: fixed, fixed, fixed;
       background-position:
-        center center,                                   /* overlay */
-        calc(50% + var(--bg-x)) calc(0% + var(--bg-y)), /* foto */
-        center center;                                   /* base */
+        center center,
+        calc(50% + var(--bg-x)) calc(0% + var(--bg-y)),
+        center center;
 
       overflow-x:hidden;
     }
@@ -85,7 +75,6 @@
       background:var(--nav-bg); border:1px solid var(--nav-b); color:#fff
     }
     .nav a:hover{ background:var(--nav-hover) }
-    .nav a[aria-current="page"]{ border-color:var(--nav-active) }
 
     /* ===================== SOCIAL LINKS ===================== */
     .social-menu{ position:fixed; top:var(--social-top); left:var(--edge); display:flex; flex-direction:column; gap:10px; z-index:999 }
@@ -100,10 +89,10 @@
       padding:0 16px;
     }
 
-    /* Venstre kolonne (Hero+Graf) */
+    /* Venstre kolonne */
     .left-rail-box{
       position:absolute; top:var(--left-rail-top); left:var(--left-rail-left);
-      width:var(--left-col); z-index:3; /* over alt andet */
+      width:var(--left-col); z-index:3;
     }
 
     .hero{
@@ -120,19 +109,11 @@
     .hero .btn{ padding:9px 14px; border-radius:12px; text-decoration:none; background:#0d0d0f; border:1px solid #333; color:#fff }
     .hero .btn.primary{ background:linear-gradient(135deg,#FFD700,#DAA520); color:#1c2630 }
 
-    .mcn-panel{
-      margin-top:22px;
-      background:#0b0b0c; /* 100% opak */
-      border:1px solid #2a2a2a; border-radius:16px;
-      padding:16px 18px; min-height:400px;
-      box-shadow:0 12px 26px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06);
-    }
-
     /* Højre kolonne (mønter+YouTube) */
     .right-rail{ margin-left: var(--right-rail-left); position:relative; z-index:3 }
     .right-stack{ display:inline-block; vertical-align:top }
 
-    .coins{ display:inline-flex; flex-wrap:nowrap; gap:24px; align-items:flex-start; width:520px } /* samme bredde som YouTube */
+    .coins{ display:inline-flex; flex-wrap:nowrap; gap:24px; align-items:flex-start; width:520px; justify-content:center } /* centrer den ene mønt */
     .coin{
       background:#fff8dc; padding:10px; border-radius:15px; width:240px;
       text-align:center; box-shadow:0 0 12px rgba(0,0,0,.1); border:2px solid #e5c100
@@ -163,7 +144,7 @@
   <!-- NAV -->
   <header class="site-nav">
     <nav class="nav">
-      <a href="/index.html" aria-current="page">Home</a>
+      <a href="/index.html">Home</a>
       <a href="/madacoin.html">Om</a>
       <a href="/roadmap.html">Roadmap</a>
       <a href="/rapporter.html">Rapporter</a>
@@ -176,12 +157,12 @@
 
     <!-- Scene -->
     <section class="stage">
-      <!-- Venstre kolonne -->
+      <!-- Venstre kolonne (kun hero på donate) -->
       <div class="left-rail-box">
         <section class="hero" id="home-hero">
-          <div class="ribbon">NYHED: 25% hotelrabat til MCD &amp; MCN holders</div>
+          <div class="ribbon">NYHED: 25% hotelrabat til MCD-holders</div>
           <h1>Donér. Byg. Forandr Madagaskar.</h1>
-          <p class="sub">MadaCoin gør donationer til skoler, solenergi og lokale jobs — med fuld gennemsigtighed.</p>
+          <p class="sub">MadaCoin Donation (MCD) finansierer skoler, solenergi og lokale jobs — med fuld gennemsigtighed.</p>
           <div class="points">
             <span class="pt">Skolebyggeri</span>
             <span class="pt">Solceller &amp; batterier</span>
@@ -192,28 +173,17 @@
             <a class="btn" href="/rapporter.html">Se rapporter</a>
           </div>
         </section>
-
-        <aside class="mcn-panel" id="mcn-panel">
-          <h3>Diverse grafer om MCN / Polygon</h3>
-          <p>Alt der påvirker vores egen mønts værdi.</p>
-          <p style="opacity:.9">Live visning, så vidt muligt.</p>
-          <p style="opacity:.85">Boksen kan udvides nedad ved behov.</p>
-        </aside>
+        <!-- MCN-panel er fjernet på donate-siden -->
       </div>
 
-      <!-- Højre kolonne (låst) -->
+      <!-- Højre kolonne -->
       <div class="right-rail">
         <div class="right-stack">
           <section class="coins">
             <div class="coin">
               <img id="coinD" alt="MadaCoin Donation" />
               <p class="coin-description">Støt vores mission ved at købe MadaCoin Donation.</p>
-              <button class="button" onclick="openTransak('MCD','0xa594586B04f1b6782EC906B49882EbD0E652a388')">Køb MadaCoin Donation</button>
-            </div>
-            <div class="coin">
-              <img id="coinC" alt="MadaCoin" />
-              <p class="coin-description">Investér i MadaCoin – fremtidens valuta for Madagaskar.</p>
-              <button class="button" onclick="openTransak('MCN','DIN_MCN_KONTRAKT_ADRESSE')">Køb MadaCoin</button>
+              <button class="button" id="buy-mcd">Køb MadaCoin Donation</button>
             </div>
           </section>
 
@@ -234,13 +204,21 @@
     const SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
     const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON) : null;
 
-    const TRANSAK_KEY="DIN_API_KEY";
-    function openTransak(symbol,wallet){
-      if(!TRANSAK_KEY||TRANSAK_KEY==="DIN_API_KEY"||(wallet&&wallet.includes("DIN_MCN_KONTRAKT_ADRESSE"))){
-        alert("Køb-funktionen bliver aktiveret, når nøgle og kontrakt er sat."); return;
-      }
-      const url=`https://global.transak.com/?apiKey=${TRANSAK_KEY}&cryptoCurrencyCode=${symbol}&walletAddress=${wallet}&network=polygon&fiatCurrency=EUR&defaultPaymentMethod=credit_debit_card&themeColor=FFCC00`;
-      window.open(url,"_blank","width=500,height=700");
+    /* ===== RAMP (on-ramp) – placeholder til vi kobler buy_config ===== */
+    // Husk: vi bruger Ramp.network (ikke Transak).
+    // Når buy_config er klar i Supabase, henter vi API-nøgle, asset og wallet derfra.
+    const DEFAULT_MCD_WALLET = "0xa594586B04f1b6782EC906B49882EbD0E652a388"; // kan ændres i buy_config senere
+
+    async function openRampMCD(){
+      // Hvis du vil hente fra Supabase senere:
+      // const { data } = await sb.from('buy_config').select('*').eq('key','MCD').single();
+      // const wallet = data?.wallet || DEFAULT_MCD_WALLET;
+
+      const wallet = DEFAULT_MCD_WALLET;
+
+      alert("Ramp (MCD) bliver aktiveret, når API-nøgle/konfiguration er sat i buy_config. For nu åbner vi informationssiden.");
+      // Minimal fallback (uden parametre). Når vi er klar, erstatter vi med præ-konfigureret URL.
+      window.open("https://ramp.network/buy", "_blank");
     }
 
     /* Tekster & sociale links */
@@ -275,6 +253,7 @@
     const pub=(...p)=>`${storeBase}/${p.map(encodeURIComponent).join('/')}`;
     function setCoinImages(){
       const c=document.getElementById('coinC'), d=document.getElementById('coinD');
+      // C findes ikke på donate-siden, men det gør ikke noget – vi tjekker før brug:
       if(c) c.src=pub('images','MadaCoin_C.png');
       if(d) d.src=pub('images','MadaCoin_D.png');
     }
@@ -317,8 +296,10 @@
     }
 
     function attachHeroActions(){
-      const btn=document.getElementById('hero-primary');
-      if(btn){ btn.addEventListener('click',()=>openTransak('MCD','0xa594586B04f1b6782EC906B49882EbD0E652a388')) }
+      const btn1=document.getElementById('hero-primary');
+      const btn2=document.getElementById('buy-mcd');
+      if(btn1) btn1.addEventListener('click',openRampMCD);
+      if(btn2) btn2.addEventListener('click',openRampMCD);
     }
 
     window.addEventListener('load', async ()=>{
