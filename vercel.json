@@ -1,11 +1,11 @@
 {
   "rewrites": [
     {
-      "source": "/(.*)",
-      "destination": "/donate.html",
+      "source": "/:path*",
       "has": [
-        { "type": "host", "value": "donate.madacoin.pro" }
-      ]
+        { "type": "header", "key": "host", "value": "donate.madacoin.pro" }
+      ],
+      "destination": "/donate.html"
     }
   ]
 }
