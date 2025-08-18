@@ -1,11 +1,12 @@
 {
-  "rewrites": [
+  "version": 2,
+  "routes": [
     {
-      "source": "/:path*",
+      "src": "/(.*)",
       "has": [
         { "type": "host", "value": "donate.madacoin.pro" }
       ],
-      "destination": "/donate.html"
+      "dest": "/donate.html"
     }
   ]
 }
