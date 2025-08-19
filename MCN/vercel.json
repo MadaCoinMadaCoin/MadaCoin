@@ -1,7 +1,3 @@
 {
-  "cleanUrls": true,
-  "rewrites": [
-    { "source": "/about", "destination": "/about.html" },
-    { "source": "/adm",   "destination": "/adm_panel.html" }
-  ]
+  "cleanUrls": true
 }
