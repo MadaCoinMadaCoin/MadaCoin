@@ -1,14 +1,27 @@
 {
   "cleanUrls": true,
+  "redirects": [
+    { "source": "/(.*)", "has": [{ "type": "host", "value": "donate.madacoin.pro" }], "destination": "https://mcd.madacoin.pro/$1", "permanent": true }
+  ],
   "rewrites": [
-    { "source": "/",          "has": [{ "type": "host", "value": "donata.madacoin.pro" }], "destination": "/MCD/mcd_home" },
-    { "source": "/about",     "has": [{ "type": "host", "value": "donata.madacoin.pro" }], "destination": "/MCD/mcd_about" },
-    { "source": "/roadmap",   "has": [{ "type": "host", "value": "donata.madacoin.pro" }], "destination": "/MCD/mcd_roadmap" },
-    { "source": "/reports",   "has": [{ "type": "host", "value": "donata.madacoin.pro" }], "destination": "/MCD/mcd_reports" },
-    { "source": "/adm",       "has": [{ "type": "host", "value": "donata.madacoin.pro" }], "destination": "/MCD/adm_panel" },
+    { "source": "/",        "has": [{ "type": "host", "value": "mcd.madacoin.pro" }],     "destination": "/MCD/mcd_home" },
+    { "source": "/about",   "has": [{ "type": "host", "value": "mcd.madacoin.pro" }],     "destination": "/MCD/mcd_about" },
+    { "source": "/roadmap", "has": [{ "type": "host", "value": "mcd.madacoin.pro" }],     "destination": "/MCD/mcd_roadmap" },
+    { "source": "/reports", "has": [{ "type": "host", "value": "mcd.madacoin.pro" }],     "destination": "/MCD/mcd_reports" },
+    { "source": "/adm",     "has": [{ "type": "host", "value": "mcd.madacoin.pro" }],     "destination": "/MCD/adm_panel" },
 
-    { "source": "/",          "has": [{ "type": "host", "value": "madacoin.pro" }],       "destination": "/MCN/home" },
-    { "source": "/about",     "has": [{ "type": "host", "value": "madacoin.pro" }],       "destination": "/MCN/about" },
-    { "source": "/adm",       "has": [{ "type": "host", "value": "madacoin.pro" }],       "destination": "/MCN/adm_panel" }
+    { "source": "/",        "has": [{ "type": "host", "value": "www.mcd.madacoin.pro" }], "destination": "/MCD/mcd_home" },
+    { "source": "/about",   "has": [{ "type": "host", "value": "www.mcd.madacoin.pro" }], "destination": "/MCD/mcd_about" },
+    { "source": "/roadmap", "has": [{ "type": "host", "value": "www.mcd.madacoin.pro" }], "destination": "/MCD/mcd_roadmap" },
+    { "source": "/reports", "has": [{ "type": "host", "value": "www.mcd.madacoin.pro" }], "destination": "/MCD/mcd_reports" },
+    { "source": "/adm",     "has": [{ "type": "host", "value": "www.mcd.madacoin.pro" }], "destination": "/MCD/adm_panel" },
+
+    { "source": "/",        "has": [{ "type": "host", "value": "mcn.madacoin.pro" }],     "destination": "/MCN/home" },
+    { "source": "/about",   "has": [{ "type": "host", "value": "mcn.madacoin.pro" }],     "destination": "/MCN/about" },
+    { "source": "/adm",     "has": [{ "type": "host", "value": "mcn.madacoin.pro" }],     "destination": "/MCN/adm_panel" },
+
+    { "source": "/",        "has": [{ "type": "host", "value": "www.mcn.madacoin.pro" }], "destination": "/MCN/home" },
+    { "source": "/about",   "has": [{ "type": "host", "value": "www.mcn.madacoin.pro" }], "destination": "/MCN/about" },
+    { "source": "/adm",     "has": [{ "type": "host", "value": "www.mcn.madacoin.pro" }], "destination": "/MCN/adm_panel" }
   ]
 }
