@@ -1,14 +1,12 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    /* ===== MCD / donata.madacoin.pro ===== */
     { "source": "/",          "has": [{ "type": "host", "value": "donata.madacoin.pro" }], "destination": "/MCD/mcd_home.html" },
     { "source": "/om",        "has": [{ "type": "host", "value": "donata.madacoin.pro" }], "destination": "/MCD/mcd_om.html" },
     { "source": "/roadmap",   "has": [{ "type": "host", "value": "donata.madacoin.pro" }], "destination": "/MCD/mcd_roadmap.html" },
     { "source": "/rapporter", "has": [{ "type": "host", "value": "donata.madacoin.pro" }], "destination": "/MCD/mcd_rapporter.html" },
     { "source": "/adm",       "has": [{ "type": "host", "value": "donata.madacoin.pro" }], "destination": "/MCD/adm_panel.html" },
 
-    /* ===== MCN / madacoin.pro ===== */
     { "source": "/",   "has": [{ "type": "host", "value": "madacoin.pro" }], "destination": "/MCN/index.html" },
     { "source": "/om", "has": [{ "type": "host", "value": "madacoin.pro" }], "destination": "/MCN/madacoin.html" },
     { "source": "/adm","has": [{ "type": "host", "value": "madacoin.pro" }], "destination": "/MCN/adm_panel" }
