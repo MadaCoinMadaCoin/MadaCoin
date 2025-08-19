@@ -153,8 +153,8 @@
   <!-- NAV (kun Home + Om) -->
   <header class="site-nav">
     <nav class="nav">
-      <a href="/" aria-current="page">Home</a>
-      <a href="/about">About</a>
+      <a href="/index">Hjem</a>
+      <a href="/about">Om</a>
     </nav>
   </header>
 
@@ -224,7 +224,7 @@
     const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON) : null;
 
     /* ===== BAGGRUND via Supabase (klar til admin) =====
-       Vi prøver i rækkefølge:
+       Rækkefølge:
        1) site_media: { page:'MCN', key:'bg', url:'...' } eller {bucket, path}
        2) site_text: (page='MCN', key='bg_url')
        3) fallback: images/MCN_bg.webp i storage
@@ -386,7 +386,7 @@
 
     /* ===== Init ===== */
     window.addEventListener('load', async ()=>{
-      await applyBackground();      // <— dynamisk baggrund
+      await applyBackground();      // dynamisk baggrund
       await loadSiteText();
       await renderSocialLinks();
       setCoinImages();
