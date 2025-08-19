@@ -1,0 +1,9 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/about",   "destination": "/mcd_about.html" },
+    { "source": "/roadmap", "destination": "/mcd_roadmap.html" },
+    { "source": "/reports", "destination": "/mcd_reports.html" },
+    { "source": "/adm",     "destination": "/adm_panel.html" }
+  ]
+}
