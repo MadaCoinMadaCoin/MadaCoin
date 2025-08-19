@@ -47,12 +47,10 @@
       display:flex; flex-direction:column; margin:0; color:#fff;
       font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
 
-      --city-bg-1x: url('/img/YOUR_CITY_BG_2048.webp');
-      --city-bg-2x: url('/img/YOUR_CITY_BG_4096.webp');
-
+      /* Lag 1 = let overlay, lag 2 = dynamisk bg via JS (CSS var), lag 3 = gradient */
       background:
         linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.14)),
-        image-set(var(--city-bg-1x) 1x, var(--city-bg-2x) 2x),
+        var(--mcd-bg-image, none),
         linear-gradient(var(--base-top), var(--base-bot));
       background-repeat: no-repeat, no-repeat, no-repeat;
       background-size: auto, cover, auto;
@@ -67,7 +65,7 @@
 
     main{ flex:1 }
 
-    /* ===================== NAV ===================== */
+    /* ===================== NAV (samme look/placering) ===================== */
     .site-nav{ position:sticky; top:0; z-index:1000; padding:20px 0 }
     .nav{ display:flex; gap:var(--nav-gap); padding-left:var(--edge) }
     .nav a{
@@ -113,7 +111,7 @@
     .right-rail{ margin-left: var(--right-rail-left); position:relative; z-index:3 }
     .right-stack{ display:inline-block; vertical-align:top }
 
-    .coins{ display:inline-flex; flex-wrap:nowrap; gap:24px; align-items:flex-start; width:520px; justify-content:center } /* centrer den ene mønt */
+    .coins{ display:inline-flex; flex-wrap:nowrap; gap:24px; align-items:flex-start; width:520px; justify-content:center }
     .coin{
       background:#fff8dc; padding:10px; border-radius:15px; width:240px;
       text-align:center; box-shadow:0 0 12px rgba(0,0,0,.1); border:2px solid #e5c100
@@ -141,13 +139,13 @@
   </style>
 </head>
 <body>
-  <!-- NAV -->
+  <!-- NAV (samme stil/placering, men “flotte” URLs) -->
   <header class="site-nav">
     <nav class="nav">
-      <a href="/index.html">Home</a>
-      <a href="/madacoin.html">Om</a>
-      <a href="/roadmap.html">Roadmap</a>
-      <a href="/rapporter.html">Rapporter</a>
+      <a href="/">Home</a>
+      <a href="/about">Om</a>
+      <a href="/roadmap">Roadmap</a>
+      <a href="/reports">Rapporter</a>
     </nav>
   </header>
 
@@ -170,10 +168,9 @@
           </div>
           <div class="btns">
             <button class="btn primary" id="hero-primary">Støt med MadaCoin</button>
-            <a class="btn" href="/rapporter.html">Se rapporter</a>
+            <a class="btn" href="/reports">Se rapporter</a>
           </div>
         </section>
-        <!-- MCN-panel er fjernet på donate-siden -->
       </div>
 
       <!-- Højre kolonne -->
@@ -204,28 +201,62 @@
     const SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
     const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON) : null;
 
-    /* ===== RAMP (on-ramp) – placeholder til vi kobler buy_config ===== */
-    // Husk: vi bruger Ramp.network (ikke Transak).
-    // Når buy_config er klar i Supabase, henter vi API-nøgle, asset og wallet derfra.
-    const DEFAULT_MCD_WALLET = "0xa594586B04f1b6782EC906B49882EbD0E652a388"; // kan ændres i buy_config senere
+    /* ===== BAGGRUND via Supabase (klar til admin) =====
+       Vi prøver i rækkefølge:
+       1) Tabel 'site_media' med { page:'MCD', key:'bg', url:'<http...>' } ELLER {bucket:'images', path:'...'}
+       2) Tabel 'site_text' med (page='MCD', key='bg_url')
+       3) Fallback til et statisk billede i storage: images/MCD_bg.webp
+    */
+    const storeBase = `${SUPABASE_URL}/storage/v1/object/public`;
+    const pub = (...p)=>`${storeBase}/${p.map(encodeURIComponent).join('/')}`;
+
+    async function resolveMcdBgUrl(){
+      if(!sb) return null;
+      try{
+        // 1) site_media
+        let { data:media } = await sb.from('site_media')
+          .select('page,key,url,bucket,path')
+          .eq('page','MCD').eq('key','bg').limit(1).maybeSingle();
+        if(media){
+          if(media.url) return media.url;
+          if(media.bucket && media.path) return pub(media.bucket, media.path);
+        }
+      }catch(e){}
+      try{
+        // 2) site_text
+        let { data:text } = await sb.from('site_text')
+          .select('value').eq('page','MCD').eq('key','bg_url').limit(1).maybeSingle();
+        if(text?.value) return text.value;
+      }catch(e){}
+      // 3) fallback
+      return pub('images','MCD_bg.webp');
+    }
+
+    async function applyBackground(){
+      const url = await resolveMcdBgUrl();
+      if(url){
+        // Sæt CSS-var med image() så vi bevarer lagrækkefølgen i CSS
+        document.documentElement.style.setProperty('--mcd-bg-image', `url("${url}")`);
+      }
+    }
+
+    /* ===== RAMP (on-ramp) – placeholder (Ramp, ikke Transak) ===== */
+    const DEFAULT_MCD_WALLET = "0xa594586B04f1b6782EC906B49882EbD0E652a388";
 
     async function openRampMCD(){
-      // Hvis du vil hente fra Supabase senere:
+      // Her kan vi senere hente fra buy_config:
       // const { data } = await sb.from('buy_config').select('*').eq('key','MCD').single();
       // const wallet = data?.wallet || DEFAULT_MCD_WALLET;
-
       const wallet = DEFAULT_MCD_WALLET;
-
-      alert("Ramp (MCD) bliver aktiveret, når API-nøgle/konfiguration er sat i buy_config. For nu åbner vi informationssiden.");
-      // Minimal fallback (uden parametre). Når vi er klar, erstatter vi med præ-konfigureret URL.
-      window.open("https://ramp.network/buy", "_blank");
+      alert("Ramp (MCD) bliver aktiveret, når buy_config er sat. Indtil da åbner vi Ramp i et nyt vindue.");
+      window.open("https://ramp.network/buy?swapAsset=USDT&userAddress="+encodeURIComponent(wallet), "_blank");
     }
 
     /* Tekster & sociale links */
     async function loadSiteText(){
       if(!sb) return {};
       try{
-        const { data } = await sb.from('site_text').select('page,key,value').in('page',['common','home']);
+        const { data } = await sb.from('site_text').select('page,key,value').in('page',['common','home','MCD']);
         const dict={}; (data||[]).forEach(r=>dict[`${r.page}:${r.key}`]=r.value);
         document.querySelectorAll('[data-text]').forEach(el=>{
           const k=el.getAttribute('data-text'); if(dict[k]!=null) el.innerHTML=dict[k];
@@ -234,8 +265,8 @@
       }catch{ return {}; }
     }
     function normalizeUrl(u){ if(!u) return null; const t=u.trim(); return /^https?:\/\//i.test(t)?t:'https://'+t }
-    function iconUrlFor(p){ const name=p.charAt(0).toUpperCase()+p.slice(1).toLowerCase(); const {data}=sb.storage.from('social.icons').getPublicUrl(`${name}.svg`); return data?.publicUrl||null }
-    function fallbackIconUrl(){ const {data}=sb.storage.from('social.icons').getPublicUrl('Globe.svg'); return data?.publicUrl||'' }
+    function iconUrlFor(p){ if(!sb) return null; const name=p.charAt(0).toUpperCase()+p.slice(1).toLowerCase(); const {data}=sb.storage.from('social.icons').getPublicUrl(`${name}.svg`); return data?.publicUrl||null }
+    function fallbackIconUrl(){ if(!sb) return ''; const {data}=sb.storage.from('social.icons').getPublicUrl('Globe.svg'); return data?.publicUrl||'' }
     async function renderSocialLinks(){
       const el=document.getElementById('social-menu'); if(!el||!sb) return;
       el.innerHTML='';
@@ -249,12 +280,9 @@
       });
     }
 
-    const storeBase="https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public";
-    const pub=(...p)=>`${storeBase}/${p.map(encodeURIComponent).join('/')}`;
     function setCoinImages(){
-      const c=document.getElementById('coinC'), d=document.getElementById('coinD');
-      // C findes ikke på donate-siden, men det gør ikke noget – vi tjekker før brug:
-      if(c) c.src=pub('images','MadaCoin_C.png');
+      const d=document.getElementById('coinD');
+      // D-mønten
       if(d) d.src=pub('images','MadaCoin_D.png');
     }
 
@@ -303,6 +331,7 @@
     }
 
     window.addEventListener('load', async ()=>{
+      await applyBackground();      // <— Dynamisk baggrund (klar til admin)
       await loadSiteText();
       await renderSocialLinks();
       setCoinImages();
@@ -312,4 +341,3 @@
   </script>
 </body>
 </html>
-
