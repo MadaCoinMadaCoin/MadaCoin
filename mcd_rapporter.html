@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rapporter · MadaCoin</title>
+
+  <!-- Supabase SDK -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <style>
+    /* Box model + typografi (samme på alle sider) */
+    *,*::before,*::after{ box-sizing:border-box; }
+    html{ font-size:16px; }
+    body{
+      margin:0; min-height:100vh; display:flex; flex-direction:column;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+      font-size:1rem; line-height:1.5; color:#fff;
+      background:#061a2b no-repeat center/cover fixed;
+      background-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
+      overflow-x:hidden;
+    }
+    @media (max-width:900px){ body{ background-attachment:scroll } }
+    button, input, select, textarea{ font:inherit; }
+
+    /* Overskrifter (ens mellem siderne) */
+    h1{ font-size:clamp(22px,2.6vw,26px); line-height:1.25; margin:0 0 .6em; }
+    h2{ font-size:clamp(18px,2.2vw,22px); line-height:1.3;  margin:0 0 .5em; }
+    h3{ font-size:clamp(16px,1.8vw,18px); line-height:1.35; margin:0 0 .4em; }
+    .muted{ color:#cfd3d7 }
+
+    /* ===== Variabler (fælles) ===== */
+    :root{
+      --edge-pad: 24px;   /* samme venstre/højre indrykning som side 1 + 2 */
+
+      /* NAV */
+      --nav-gap:14px; --nav-pad-x:14px; --nav-pad-y:8px;
+      --nav-text:#fff; --nav-bg:#0d0d0f; --nav-border:#333;
+      --nav-hover-bg:#151517; --nav-hover-border:#444; --nav-active:#5aa9ff;
+
+      /* Social */
+      --social-top: 104px;
+
+      /* Cards */
+      --card-bg:#0b0b0c; --card-border:#2a2a2a; --radius:16px;
+      --shadow:0 12px 26px rgba(0,0,0,.5);
+      --chip-bg:#0d0d0f; --chip-border:#333;
+      --chip-active:#1a1a1d;
+    }
+
+    /* ===== NAV (venstrejusteret – identisk med side 1 + 2) ===== */
+    .site-nav{
+      position:sticky; top:0; z-index:9999;
+      padding:24px 0; background:transparent !important; border:0 !important; box-shadow:none !important;
+    }
+    .site-nav::before,.site-nav::after{ display:none !important; content:none !important; }
+    .site-nav .nav-inner{ max-width:none; margin:0; padding:0 var(--edge-pad); }
+    .nav{
+      display:flex; gap:var(--nav-gap); align-items:center; flex-wrap:wrap;
+      justify-content:flex-start; transform:translateY(-2px);
+    }
+    .nav a{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:var(--nav-pad-y) var(--nav-pad-x);
+      color:var(--nav-text); background:var(--nav-bg);
+      border:1px solid var(--nav-border); border-radius:12px;
+      text-decoration:none; opacity:.96; position:relative; z-index:1; pointer-events:auto;
+      -webkit-tap-highlight-color:rgba(255,255,255,.15);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+      font-size:1rem;
+    }
+    .nav a:hover{ background:var(--nav-hover-bg); border-color:var(--nav-hover-border); }
+    .nav a.active, .nav a[aria-current="page"]{
+      border-color:var(--nav-active);
+      box-shadow:0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset;
+    }
+
+    /* Sociale links (samme som de andre sider) */
+    .social-menu{
+      position:fixed; top:var(--social-top); left:var(--edge-pad);
+      display:flex; flex-direction:column; gap:10px; z-index:1000;
+    }
+    .social-menu a{
+      display:flex; align-items:center; justify-content:center;
+      width:42px; height:42px; background-color:rgba(0,0,0,.7);
+      border-radius:8px; text-decoration:none;
+      transition:background-color .2s ease, transform .15s ease;
+    }
+    .social-menu a:hover{ background-color:rgba(0,0,0,.85); transform:translateY(-2px); }
+    .social-menu a img{ width:22px; height:22px; }
+
+    /* Indhold-container */
+    .wrap{ max-width:1200px; margin:0 auto; padding:18px var(--edge-pad) 48px; }
+
+    /* Sidehoved */
+    .page-head{ margin:4px 0 18px; }
+    .page-sub{ margin:0 0 18px; }
+
+    /* Filter/search bar */
+    .toolbar{
+      display:flex; flex-wrap:wrap; gap:10px 12px; align-items:center;
+      margin:10px 0 18px;
+    }
+    .search{
+      display:flex; align-items:center; gap:8px; padding:8px 12px;
+      background:#0d0d0f; border:1px solid #333; border-radius:12px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+      min-width:240px;
+    }
+    .search input{
+      outline:none; border:0; background:transparent; color:#fff; width:220px;
+    }
+    .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+    .chip{
+      padding:7px 12px; border-radius:999px; cursor:pointer; user-select:none;
+      background:var(--chip-bg); border:1px solid var(--chip-border);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.06); opacity:.96;
+    }
+    .chip.active{ background:var(--chip-active); border-color:#555; }
+
+    /* Rapporter grid */
+    .reports-grid{
+      display:grid; gap:18px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
+    .card{
+      background:var(--card-bg); border:1px solid var(--card-border); border-radius:var(--radius);
+      box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,.06);
+      overflow:hidden; display:flex; flex-direction:column;
+    }
+    .cover{
+      width:100%; aspect-ratio: 16 / 9; background:#101113 center/cover no-repeat;
+      border-bottom:1px solid #222;
+    }
+    .card-body{ padding:14px 14px 16px; display:flex; flex-direction:column; gap:8px; }
+    .meta{ font-size:12px; opacity:.9; color:#cfd3d7; }
+    .summary{ color:#dfe3e7; font-size:.95rem; }
+    .btns{ display:flex; gap:10px; margin-top:auto; }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:8px 14px; border-radius:12px; text-decoration:none; cursor:pointer;
+      background:#0d0d0f; border:1px solid #333; color:#fff;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+      transition:filter .15s ease, transform .15s ease;
+    }
+    .btn:hover{ filter:brightness(1.08); transform:translateY(-1px); }
+
+    /* Tom-state */
+    .empty{
+      margin:18px 0; padding:14px 16px; border-radius:12px;
+      background:rgba(0,0,0,.45); border:1px dashed #3a3a3a; color:#cfd3d7;
+    }
+
+    /* Footer */
+    .site-footer{
+      margin-top:auto; padding:12px 16px; color:#fff; text-align:center;
+      background:rgba(0,0,0,.75); border-top:1px solid rgba(255,255,255,.06);
+    }
+
+    /* Mobil: løft social-menu en smule */
+    @media (max-width:900px){
+      :root{ --social-top: 116px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <header class="site-nav">
+    <div class="nav-inner">
+      <nav class="nav">
+        <a href="/index.html" data-text="common:nav_home">Home</a>
+        <a href="/madacoin.html" data-text="common:nav_about">Om</a>
+        <a href="/rapporter.html" class="active" aria-current="page" data-text="common:nav_reports">Rapporter</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Sociale links -->
+  <div class="social-menu" id="social-menu"></div>
+
+  <!-- Sideindhold -->
+  <main class="wrap">
+    <header class="page-head">
+      <h1 data-text="reports:title">Rapporter</h1>
+      <p class="page-sub muted" data-text="reports:subtitle">
+        <!-- fx: Transparens- og statusrapporter, donationer, forbrug, delmål m.m. -->
+      </p>
+    </header>
+
+    <!-- Søgning + filtre genereres fra data -->
+    <section class="toolbar">
+      <div class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M21 21l-3.9-3.9m1.4-5.6a7 7 0 11-14 0 7 7 0 0114 0z" stroke="#cfd3d7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <input id="q" type="search" placeholder="Søg…" aria-label="Søg i rapporter">
+      </div>
+      <div class="chips" id="chips">
+        <span class="chip active" data-filter="__ALL__" data-text="reports:filter_all">Alle</span>
+        <!-- Dynamiske kategori-chips indsættes her -->
+      </div>
+    </section>
+
+    <section class="reports-grid" id="reports-grid" aria-live="polite"></section>
+    <div class="empty" id="empty" style="display:none" data-text="reports:empty">
+      Der er ingen rapporter at vise endnu.
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <span data-text="common:footer">© 2025 MadaCoin. All rights reserved.</span>
+  </footer>
+
+  <script>
+    /* ========= Supabase klient ========= */
+    const SUPABASE_URL  = "https://byrlebjwknppjbtbkozt.supabase.co";
+    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
+    const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null;
+    window.sb = sb;
+
+    /* ========= Social links (fælles) ========= */
+    function normalizeUrl(url){ if(!url) return null; const u=url.trim(); return /^https?:\/\//i.test(u)?u:('https://'+u); }
+    function iconUrlFor(platform){
+      const formatted = platform.charAt(0).toUpperCase()+platform.slice(1).toLowerCase();
+      const { data } = sb.storage.from('social.icons').getPublicUrl(`${formatted}.svg`);
+      return data?.publicUrl || null;
+    }
+    function fallbackIconUrl(){
+      const { data } = sb.storage.from('social.icons').getPublicUrl('Globe.svg');
+      return data?.publicUrl || '';
+    }
+    async function renderSocialLinks(){
+      const el = document.getElementById('social-menu');
+      if(!el || !sb) return;
+      el.innerHTML = '';
+      const { data, error } = await sb
+        .from('social_links')
+        .select('platform,url,is_active,sort_order')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+      if(error){ console.error('[social_links]', error); return; }
+      const globe = fallbackIconUrl();
+      (data||[]).filter(r=>r.url && r.url.trim()!=='').forEach(r=>{
+        const a=document.createElement('a');
+        a.href=normalizeUrl(r.url); a.target='_blank'; a.rel='noopener noreferrer'; a.title=r.platform;
+        const img=document.createElement('img');
+        img.src=iconUrlFor(r.platform)||globe; img.onerror=()=>{ img.src=globe; };
+        a.appendChild(img); el.appendChild(a);
+      });
+    }
+
+    /* ========= Site text (common + reports) ========= */
+    async function loadSiteText(){
+      if(!sb) return {};
+      try{
+        const { data, error } = await sb.from('site_text').select('page,key,value').in('page',['common','reports']);
+        if(error){ console.warn('[site_text]', error); return {}; }
+        const dict={}; (data||[]).forEach(r=>dict[`${r.page}:${r.key}`]=r.value);
+        document.querySelectorAll('[data-text]').forEach(el=>{
+          const k=el.getAttribute('data-text'); if(dict[k]!=null) el.innerHTML=dict[k];
+        });
+        return dict;
+      }catch(e){ console.warn('[site_text ex]', e); return {}; }
+    }
+
+    /* ========= Rapporter =========
+       Forventet tabel: reports
+       Felter (anbefalet): id, title, summary, category, tags, cover_url, file_url, link_url,
+                           published_at (timestamp/date), is_active (bool)
+    ================================= */
+    const state = {
+      raw: [],       // alle rækker fra DB
+      filtered: [],  // filtreret liste
+      cat: '__ALL__',
+      q: ''
+    };
+
+    function fmtDate(s){
+      if(!s) return '';
+      const d=new Date(s);
+      if(Number.isNaN(d.getTime())) return s;
+      return d.toLocaleDateString('da-DK', { year:'numeric', month:'short', day:'2-digit' });
+    }
+
+    function renderChips(categories){
+      const wrap = document.getElementById('chips');
+      // behold "Alle" som første chip
+      // tilføj unikke kategorier efterfølgende
+      const existing = new Set(['__ALL__']);
+      categories.forEach(c=>{
+        const key=(c||'').trim();
+        if(!key || existing.has(key)) return;
+        existing.add(key);
+        const span = document.createElement('span');
+        span.className = 'chip';
+        span.textContent = key;
+        span.dataset.filter = key;
+        wrap.appendChild(span);
+      });
+
+      // click-handlers
+      wrap.querySelectorAll('.chip').forEach(ch=>{
+        ch.addEventListener('click', ()=>{
+          wrap.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+          ch.classList.add('active');
+          state.cat = ch.dataset.filter || '__ALL__';
+          applyFilter();
+        });
+      });
+    }
+
+    function cardTemplate(r){
+      const cover = r.cover_url && r.cover_url.trim()
+        ? r.cover_url
+        : (SUPABASE_URL.replace(/\/+$/,'') + '/storage/v1/object/public/people/Revision.jpg'); // enkel placeholder
+
+      const bestLink = r.file_url?.trim() || r.link_url?.trim() || '#';
+      const hasLink = bestLink && bestLink !== '#';
+
+      const el = document.createElement('article');
+      el.className = 'card';
+      el.innerHTML = `
+        <div class="cover" style="background-image:url('${cover}')"></div>
+        <div class="card-body">
+          <h3>${r.title || 'Ukendt titel'}</h3>
+          <div class="meta">
+            ${r.category ? `<span>${r.category}</span> · `:''}
+            <time datetime="${r.published_at || ''}">${fmtDate(r.published_at)}</time>
+          </div>
+          ${r.summary ? `<div class="summary">${r.summary}</div>`:''}
+          <div class="btns">
+            ${hasLink ? `<a class="btn" href="${bestLink}" target="_blank" rel="noopener">Åbn</a>`:''}
+          </div>
+        </div>`;
+      return el;
+    }
+
+    function renderGrid(rows){
+      const grid = document.getElementById('reports-grid');
+      const empty = document.getElementById('empty');
+      grid.innerHTML = '';
+
+      if(!rows.length){
+        empty.style.display = '';
+        return;
+      }
+      empty.style.display = 'none';
+
+      rows.forEach(r=> grid.appendChild(cardTemplate(r)));
+    }
+
+    function applyFilter(){
+      const q = state.q.trim().toLowerCase();
+      const cat = state.cat;
+      let rows = state.raw.slice();
+
+      if(cat !== '__ALL__'){
+        rows = rows.filter(r => (r.category||'').toLowerCase() === cat.toLowerCase());
+      }
+      if(q){
+        rows = rows.filter(r => {
+          const src = `${r.title||''} ${r.summary||''} ${r.category||''} ${(r.tags||'')}`.toLowerCase();
+          return src.includes(q);
+        });
+      }
+      state.filtered = rows;
+      renderGrid(rows);
+    }
+
+    async function loadReports(){
+      if(!sb) { renderGrid([]); return; }
+      try{
+        const { data, error } = await sb
+          .from('reports')
+          .select('id,title,summary,category,tags,cover_url,file_url,link_url,published_at,is_active')
+          .eq('is_active', true)
+          .order('published_at', { ascending:false });
+        if(error){ console.warn('[reports]', error); renderGrid([]); return; }
+
+        state.raw = (data||[]).map(r=>({...r}));
+        // byg kategori-chips
+        const cats = Array.from(new Set(state.raw.map(r=>r.category).filter(Boolean)));
+        renderChips(cats);
+        applyFilter();
+      }catch(e){
+        console.warn('[reports ex]', e);
+        renderGrid([]);
+      }
+    }
+
+    /* Init */
+    (async function init(){
+      await loadSiteText();
+      await renderSocialLinks();
+
+      // søgning
+      const q = document.getElementById('q');
+      q.addEventListener('input', (e)=>{ state.q = e.target.value; applyFilter(); });
+
+      await loadReports();
+    })();
+  </script>
+</body>
+</html>

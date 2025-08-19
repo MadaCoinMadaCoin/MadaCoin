@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MadaCoin – Roadmap</title>
+  <link rel="icon" href="/favicon_boosted.ico?v=1" type="image/x-icon">
+  <link rel="preconnect" href="https://unpkg.com" />
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <style>
+    *,*::before,*::after{ box-sizing:border-box }
+    html{ font-size:16px }
+    body{
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+      font-size:1rem; line-height:1.5; margin:0; padding:0; color:#fff;
+      background:#061a2b no-repeat center/cover fixed;
+      background-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
+      min-height:100svh;
+      display:flex; flex-direction:column;
+    }
+    @media (max-width:800px){ body{ background-attachment:scroll } }
+
+    /* NAV */
+    :root{ --edge-pad:24px; --nav-gap:14px; --nav-pad-x:14px; --nav-pad-y:8px; --nav-text:#fff; --nav-bg:#0d0d0f; --nav-border:#333; --nav-hover-bg:#151517; --nav-hover-border:#444; --nav-active:#5aa9ff; }
+    .site-nav{ position:sticky; top:0; z-index:9999; padding:24px 0; background:transparent }
+    .site-nav .nav-inner{ padding-left:var(--edge-pad); padding-right:var(--edge-pad) }
+    .nav{ display:flex; gap:var(--nav-gap); align-items:center; flex-wrap:wrap; justify-content:flex-start; transform:translateY(-2px) }
+    .nav a{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:var(--nav-pad-y) var(--nav-pad-x);
+      color:var(--nav-text); background:var(--nav-bg); border:1px solid var(--nav-border);
+      border-radius:12px; text-decoration:none; opacity:.96; box-shadow:inset 0 1px 0 rgba(255,255,255,.06)
+    }
+    .nav a:hover{ background:var(--nav-hover-bg); border-color:var(--nav-hover-border) }
+    .nav a[aria-current="page"]{ border-color:var(--nav-active); box-shadow:0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset }
+
+    /* WRAP */
+    .wrap{ flex:1; display:flex; align-items:center; justify-content:center; padding:24px; }
+
+    /* ROADMAP */
+    .roadmap{ margin:0 auto; max-width:800px; padding:0 20px; display:flex; flex-direction:column; align-items:center }
+    .roadmap-box{ background:rgba(255,248,220,.95); padding:15px 50px; border-radius:20px; border:2px solid #e5c100; box-shadow:0 0 12px rgba(0,0,0,.1); display:flex; flex-direction:column; gap:10px; margin-bottom:30px; width:100%; max-width:700px }
+    .roadmap-box h2{ margin:0; color:#444; font-size:1.2rem }
+    .description{ font-size:.8rem; margin:0; color:#555 }
+    .step-images{ display:flex; flex-wrap:wrap; gap:10px; max-width:100%; justify-content:flex-start; margin-top:10px }
+    .step-images img{ width:80px; height:80px; object-fit:cover; cursor:pointer; margin:5px; transition:transform .3s }
+    .roadmap-thumb{ cursor:zoom-in }
+
+    /* FOOTER */
+    footer{ text-align:center; padding:16px 20px; background:#e4e6c5; color:#000; margin-top:auto }
+
+    /* Lightbox */
+    #rm-lightbox{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:100000 }
+    #rm-lightbox.active{ display:flex }
+    #rm-lightbox .rm-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.85) }
+    body.modal-open{ overflow:hidden; height:100vh }
+    #rm-image{ -webkit-touch-callout:none; position:relative; max-width:100vw; max-height:100vh; transform-origin:center; touch-action:none; user-select:none; -webkit-user-drag:none; cursor:zoom-out }
+
+    @media (max-width:900px){
+      .roadmap-box{ padding:14px 16px }
+      .step-images img{ width:72px; height:72px }
+    }
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <header class="site-nav">
+    <div class="nav-inner">
+      <nav class="nav">
+        <a href="/index.html" data-text="common:nav_home">Home</a>
+        <a href="/madacoin.html" data-text="common:nav_about">Om</a>
+        <a href="/rapporter.html" data-text="common:nav_reports">Rapporter</a>
+        <a href="/roadmap.html" aria-current="page">Roadmap</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MIDTSTILLET ROADMAP -->
+  <main class="wrap">
+    <section class="roadmap" id="roadmap"></section>
+  </main>
+
+  <!-- Lightbox -->
+  <div id="rm-lightbox" aria-hidden="true">
+    <div class="rm-backdrop"></div>
+    <img id="rm-image" alt="Roadmap" />
+  </div>
+
+  <footer><span id="footer-text" data-text="common:footer">© 2025 MadaCoin. All rights reserved.</span></footer>
+
+  <script>
+    // Supabase init
+    const SUPABASE_URL="https://byrlebjwknppjbtbkozt.supabase.co";
+    const SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
+    const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON) : null;
+
+    // Roadmap buckets
+    const base="https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public";
+    const buckets=["roadmap1","roadmap2","roadmap3","roadmap4"];
+    const steps=[
+      {title:"Køb byggegrund - Opret projekt kontor",desc:"Når målet er opfyldt, køber vi byggegrund og opretter projektkontor."},
+      {title:"De første boliger bygges",desc:"Når minimum målet er opfyldt, sættes projektet i gang."},
+      {title:"Solcellepark og batterier",desc:"Når målet er opnået, installerer vi solceller og batterier."},
+      {title:"Byg en Skole",desc:"Byggeprojekt fra børnehave til gymnasium."}
+    ];
+
+    function renderRoadmap(){
+      const root=document.getElementById('roadmap'); root.innerHTML='';
+      buckets.forEach((bucket,idx)=>{
+        const i=idx+1, s=steps[idx]||{title:`Roadmap ${i}`,desc:''};
+        const box=document.createElement('div'); box.className='roadmap-box';
+        box.innerHTML=`<h2>${s.title}</h2><p class="description">${s.desc}</p><div class="step-images" id="imgs-${i}"></div>`;
+        root.appendChild(box);
+        const wrap=document.getElementById(`imgs-${i}`);
+        for(let k=1;k<=10;k++){
+          const url=`${base}/${bucket}/Roadmap_${i}_pic_${k}.png`;
+          const img=document.createElement('img'); img.alt=`Roadmap ${i} billede ${k}`; img.src=url; img.classList.add('roadmap-thumb');
+          img.onerror=()=>img.remove();
+          if(!img.dataset.lbBound){
+            img.dataset.lbBound="1";
+            img.addEventListener('click',(e)=>{ e.preventDefault(); const full=img.dataset.fullsrc||img.src; if(typeof openLightbox==='function') openLightbox(full); },{passive:false});
+          }
+          wrap.appendChild(img);
+        }
+        setTimeout(()=>{ if(!wrap.querySelector('img')) wrap.innerHTML=`<p style="color:#222;margin:6px 0;background:rgba(255,247,214,.95);padding:6px 8px;border-radius:8px;">Billeder kommer snart…</p>`; },500);
+      });
+    }
+
+    // Lightbox logic
+    let rmBox, rmImg, scale=1, tx=0, ty=0; const MIN_SCALE=1, MAX_SCALE=4;
+    function applyTransform(){ if(!rmImg) return; rmImg.style.transform=`translate(${tx}px, ${ty}px) scale(${scale})` }
+    function centerReset(){ scale=1; tx=0; ty=0; applyTransform() }
+    function openLightbox(src){ rmImg.src=src; centerReset(); document.body.classList.add('modal-open'); rmBox.classList.add('active'); rmBox.setAttribute('aria-hidden','false') }
+    function closeLightbox(){ document.body.classList.remove('modal-open'); rmBox.classList.remove('active'); rmBox.setAttribute('aria-hidden','true'); rmImg.src='' }
+    function rmWheelHandler(e){ e.preventDefault(); const r=rmImg.getBoundingClientRect(); const cx=e.clientX-(r.left+r.width/2)-tx, cy=e.clientY-(r.top+r.height/2)-ty; const old=scale; const factor=Math.exp(-e.deltaY*0.0015); scale=Math.max(MIN_SCALE,Math.min(MAX_SCALE,scale*factor)); const k=scale/old; tx-=cx*(k-1); ty-=cy*(k-1); applyTransform() }
+    let touchMoved=false,pinchStartDist=0,pinchStartScale=1,panStartX=0,panStartY=0,panning=false;
+    function rmTouchStart(e){ touchMoved=false; if(e.touches.length===2){ const[a,b]=e.touches; pinchStartDist=Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY); pinchStartScale=scale; } else if(e.touches.length===1 && scale>1){ const t=e.touches[0]; panning=true; panStartX=t.clientX-tx; panStartY=t.clientY-ty; } }
+    function rmTouchMove(e){ if(e.touches.length===2){ e.preventDefault(); const[a,b]=e.touches; const d=Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY); scale=Math.max(MIN_SCALE,Math.min(MAX_SCALE,pinchStartScale*(d/pinchStartDist))); applyTransform(); touchMoved=true; } else if(e.touches.length===1 && panning){ e.preventDefault(); const t=e.touches[0]; tx=t.clientX-panStartX; ty=t.clientY-panStartY; applyTransform(); touchMoved=true; } }
+    function rmTouchEnd(){ panning=false; if(!touchMoved){ if(scale>1) centerReset(); else closeLightbox(); } }
+
+    window.addEventListener('load',()=>{
+      rmBox=document.getElementById('rm-lightbox'); rmImg=document.getElementById('rm-image');
+      if(rmBox&&rmImg){
+        rmBox.addEventListener('click',(e)=>{ const backdrop=e.target===rmBox||e.target.classList.contains('rm-backdrop'); const img=e.target===rmImg; if(backdrop||img) closeLightbox(); },{passive:true});
+        rmImg.addEventListener('wheel',rmWheelHandler,{passive:false});
+        rmImg.addEventListener('click',()=>{ if(scale>1) centerReset(); else closeLightbox(); });
+        rmImg.addEventListener('touchstart',rmTouchStart,{passive:true});
+        rmImg.addEventListener('touchmove',rmTouchMove,{passive:false});
+        rmImg.addEventListener('touchend',rmTouchEnd,{passive:true});
+        rmImg.addEventListener('contextmenu',(e)=>e.preventDefault());
+      }
+      renderRoadmap();
+    });
+  </script>
+</body>
+</html>
