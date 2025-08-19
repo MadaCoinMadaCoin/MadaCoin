@@ -1,14 +1,14 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/",          "has": [{ "type": "host", "value": "donata.madacoin.pro" }], "destination": "/MCD/mcd_home.html" },
-    { "source": "/om",        "has": [{ "type": "host", "value": "donata.madacoin.pro" }], "destination": "/MCD/mcd_om.html" },
-    { "source": "/roadmap",   "has": [{ "type": "host", "value": "donata.madacoin.pro" }], "destination": "/MCD/mcd_roadmap.html" },
-    { "source": "/rapporter", "has": [{ "type": "host", "value": "donata.madacoin.pro" }], "destination": "/MCD/mcd_rapporter.html" },
-    { "source": "/adm",       "has": [{ "type": "host", "value": "donata.madacoin.pro" }], "destination": "/MCD/adm_panel.html" },
+    { "source": "/",          "has": [{ "type": "host", "value": "donata.madacoin.pro" }], "destination": "/MCD/mcd_home" },
+    { "source": "/about",     "has": [{ "type": "host", "value": "donata.madacoin.pro" }], "destination": "/MCD/mcd_about" },
+    { "source": "/roadmap",   "has": [{ "type": "host", "value": "donata.madacoin.pro" }], "destination": "/MCD/mcd_roadmap" },
+    { "source": "/reports",   "has": [{ "type": "host", "value": "donata.madacoin.pro" }], "destination": "/MCD/mcd_reports" },
+    { "source": "/adm",       "has": [{ "type": "host", "value": "donata.madacoin.pro" }], "destination": "/MCD/adm_panel" },
 
-    { "source": "/",   "has": [{ "type": "host", "value": "madacoin.pro" }], "destination": "/MCN/index.html" },
-    { "source": "/om", "has": [{ "type": "host", "value": "madacoin.pro" }], "destination": "/MCN/madacoin.html" },
-    { "source": "/adm","has": [{ "type": "host", "value": "madacoin.pro" }], "destination": "/MCN/adm_panel" }
+    { "source": "/",          "has": [{ "type": "host", "value": "madacoin.pro" }],       "destination": "/MCN/home" },
+    { "source": "/about",     "has": [{ "type": "host", "value": "madacoin.pro" }],       "destination": "/MCN/about" },
+    { "source": "/adm",       "has": [{ "type": "host", "value": "madacoin.pro" }],       "destination": "/MCN/adm_panel" }
   ]
 }
