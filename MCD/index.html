@@ -1,13 +1,344 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="da">
-<meta charset="utf-8">
-<title>MCD TEST – Home</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<nav>
-  <a href="/">Home</a>
-  <a href="/about">About</a>
-  <a href="/roadmap">Roadmap</a>
-  <a href="/reports">Reports</a>
+  <title>MadaCoin MCD</title>
+  <meta name="description" content="MadaCoin støtter udvikling i Madagaskar gennem donationer og gennemsigtighed.">
+  <link rel="icon" href="/favicon_boosted.ico?v=1" type="image/x-icon">
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <style>
+    *,*::before,*::after{ box-sizing:border-box }
+    html,body{ height:100% }
+
+    :root{
+      /* Layout */
+      --edge:24px;
+      --container:1200px;
+
+      /* Nav */
+      --nav-gap:14px; --nav-px:14px; --nav-py:8px;
+      --nav-bg:#0d0d0f; --nav-b:#333; --nav-hover:#151517; --nav-active:#5aa9ff;
+
+      /* Venstre kolonne (Hero) */
+      --left-col:520px;
+      --social-top:106px;
+      --left-rail-nudge:-100px;
+      --left-rail-top: calc(var(--social-top) + var(--left-rail-nudge));
+      --left-rail-left: -260px;
+
+      /* Højre kolonne (mønter+YouTube) – låst */
+      --right-rail-left: 538px;
+
+      /* Base farver */
+      --base-top:#eff3fb;
+      --base-bot:#e2ebf7;
+
+      /* Baggrunds-placering (kan tweakes) */
+      --bg-x: 0px;
+      --bg-y: 0px;
+    }
+
+    /* ===================== BODY / BAGGRUND ===================== */
+    body{
+      display:flex; flex-direction:column; margin:0; color:#fff;
+      font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+
+      /* Lag 1 = let overlay, lag 2 = dynamisk bg via JS (CSS var), lag 3 = gradient */
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.14)),
+        var(--mcd-bg-image, none),
+        linear-gradient(var(--base-top), var(--base-bot));
+      background-repeat: no-repeat, no-repeat, no-repeat;
+      background-size: auto, cover, auto;
+      background-attachment: fixed, fixed, fixed;
+      background-position:
+        center center,
+        calc(50% + var(--bg-x)) calc(0% + var(--bg-y)),
+        center center;
+
+      overflow-x:hidden;
+    }
+
+    main{ flex:1 }
+
+    /* ===================== NAV (samme look/placering) ===================== */
+    .site-nav{ position:sticky; top:0; z-index:1000; padding:20px 0 }
+    .nav{ display:flex; gap:var(--nav-gap); padding-left:var(--edge) }
+    .nav a{
+      padding:var(--nav-py) var(--nav-px); border-radius:12px; text-decoration:none;
+      background:var(--nav-bg); border:1px solid var(--nav-b); color:#fff
+    }
+    .nav a:hover{ background:var(--nav-hover) }
+
+    /* ===================== SOCIAL LINKS ===================== */
+    .social-menu{ position:fixed; top:var(--social-top); left:var(--edge); display:flex; flex-direction:column; gap:10px; z-index:999 }
+    .social-menu a{ width:42px; height:42px; display:grid; place-items:center; background:rgba(0,0,0,.7); border-radius:8px; text-decoration:none }
+    .social-menu a img{ width:22px; height:22px }
+
+    /* ===================== SCENE ===================== */
+    .stage{
+      position:relative;
+      max-width:var(--container);
+      margin:18px auto 26px;
+      padding:0 16px;
+    }
+
+    /* Venstre kolonne */
+    .left-rail-box{
+      position:absolute; top:var(--left-rail-top); left:var(--left-rail-left);
+      width:var(--left-col); z-index:3;
+    }
+
+    .hero{
+      background:#0b0b0c; border:1px solid #2a2a2a; border-radius:16px;
+      box-shadow:0 12px 26px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06);
+      padding:16px 18px;
+    }
+    .hero .ribbon{ display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; background:#102414; border:1px solid #1d3d22; color:#baf7c9; margin-bottom:6px }
+    .hero h1{ font-size:clamp(22px,2.6vw,26px); margin:0 0 .5rem }
+    .hero .sub{ color:#cfd3d7; margin:.25rem 0 .5rem }
+    .hero .points{ display:flex; flex-wrap:wrap; gap:6px 8px; margin:.5rem 0 .75rem }
+    .hero .pt{ padding:6px 10px; border-radius:999px; background:#0d0d0f; border:1px solid #333; font-size:.9rem }
+    .hero .btns{ display:flex; gap:10px; flex-wrap:wrap; margin-top:6px }
+    .hero .btn{ padding:9px 14px; border-radius:12px; text-decoration:none; background:#0d0d0f; border:1px solid #333; color:#fff }
+    .hero .btn.primary{ background:linear-gradient(135deg,#FFD700,#DAA520); color:#1c2630 }
+
+    /* Højre kolonne (mønter+YouTube) */
+    .right-rail{ margin-left: var(--right-rail-left); position:relative; z-index:3 }
+    .right-stack{ display:inline-block; vertical-align:top }
+
+    .coins{ display:inline-flex; flex-wrap:nowrap; gap:24px; align-items:flex-start; width:520px; justify-content:center }
+    .coin{
+      background:#fff8dc; padding:10px; border-radius:15px; width:240px;
+      text-align:center; box-shadow:0 0 12px rgba(0,0,0,.1); border:2px solid #e5c100
+    }
+    .coin img{ width:200px; height:200px; border-radius:10px; margin-bottom:8px; object-fit:cover }
+    .coin-description{ font-size:.9rem; color:#333; margin:0 0 8px }
+    .button{ background:linear-gradient(135deg,#FFD700,#DAA520); color:#004d73!important; padding:9px 14px; border:none; border-radius:6px; font-weight:700; cursor:pointer }
+    .button:hover{ background:linear-gradient(135deg,#FFC107,#B8860B) }
+
+    .yt-wrap{ width:520px; margin:22px 0 0 0 }
+    #yt-player{ position:relative; padding-top:56.25%; border:2px solid #222; border-radius:14px; overflow:hidden; background:#000 }
+    #yt-thumbs{ display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:12px; margin-top:12px }
+
+    footer{ margin-top:auto; text-align:center; padding:16px; background:#e4e6c5; color:#000 }
+
+    /* Responsiv fallback */
+    @media (max-width:1150px){
+      .left-rail-box{ position:static; width:auto }
+      .right-rail{ margin-left:0 }
+      .right-stack{ display:block }
+      .coins{ width:100%; justify-content:center; gap:16px; flex-wrap:wrap }
+      .yt-wrap{ width:100% }
+      .stage{ padding:0 16px }
+    }
+  </style>
+</head>
+<body>
+  <!-- NAV (samme stil/placering, men “flotte” URLs) -->
+  <header class="site-nav">
+    <nav class="nav">
+  <a href="/" data-text="common:nav_home">Home</a>
+  <a href="/about" data-text="common:nav_about">About</a>
+  <a href="/roadmap" data-text="common:nav_roadmap">Roadmap</a>
+  <a href="/reports" data-text="common:nav_reports">Reports</a>
 </nav>
+  </header>
 
-<h1>Dette er en test side! (HOME)</h1>
+  <main>
+    <!-- Sociale links -->
+    <div class="social-menu" id="social-menu"></div>
+
+    <!-- Scene -->
+    <section class="stage">
+      <!-- Venstre kolonne (kun hero på donate) -->
+      <div class="left-rail-box">
+        <section class="hero" id="home-hero">
+          <div class="ribbon">NYHED: 25% hotelrabat til MCD-holders</div>
+          <h1>Donér. Byg. Forandr Madagaskar.</h1>
+          <p class="sub">MadaCoin Donation (MCD) finansierer skoler, solenergi og lokale jobs — med fuld gennemsigtighed.</p>
+          <div class="points">
+            <span class="pt">Skolebyggeri</span>
+            <span class="pt">Solceller &amp; batterier</span>
+            <span class="pt">Åbne rapporter</span>
+          </div>
+          <div class="btns">
+            <button class="btn primary" id="hero-primary">Støt med MadaCoin</button>
+            <a class="btn" href="/reports">Se rapporter</a>
+          </div>
+        </section>
+      </div>
+
+      <!-- Højre kolonne -->
+      <div class="right-rail">
+        <div class="right-stack">
+          <section class="coins">
+            <div class="coin">
+              <img id="coinD" alt="MadaCoin Donation" />
+              <p class="coin-description">Støt vores mission ved at købe MadaCoin Donation.</p>
+              <button class="button" id="buy-mcd">Køb MadaCoin Donation</button>
+            </div>
+          </section>
+
+          <section id="yt-section" class="yt-wrap">
+            <div id="yt-player"></div>
+            <div id="yt-thumbs"></div>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2025 MadaCoin. All rights reserved.</footer>
+
+  <script>
+    /* ===== Supabase setup ===== */
+    const SUPABASE_URL="https://byrlebjwknppjbtbkozt.supabase.co";
+    const SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
+    const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON) : null;
+
+    /* ===== BAGGRUND via Supabase (klar til admin) =====
+       Vi prøver i rækkefølge:
+       1) Tabel 'site_media' med { page:'MCD', key:'bg', url:'<http...>' } ELLER {bucket:'images', path:'...'}
+       2) Tabel 'site_text' med (page='MCD', key='bg_url')
+       3) Fallback til et statisk billede i storage: images/MCD_bg.webp
+    */
+    const storeBase = `${SUPABASE_URL}/storage/v1/object/public`;
+    const pub = (...p)=>`${storeBase}/${p.map(encodeURIComponent).join('/')}`;
+
+    async function resolveMcdBgUrl(){
+      if(!sb) return null;
+      try{
+        // 1) site_media
+        let { data:media } = await sb.from('site_media')
+          .select('page,key,url,bucket,path')
+          .eq('page','MCD').eq('key','bg').limit(1).maybeSingle();
+        if(media){
+          if(media.url) return media.url;
+          if(media.bucket && media.path) return pub(media.bucket, media.path);
+        }
+      }catch(e){}
+      try{
+        // 2) site_text
+        let { data:text } = await sb.from('site_text')
+          .select('value').eq('page','MCD').eq('key','bg_url').limit(1).maybeSingle();
+        if(text?.value) return text.value;
+      }catch(e){}
+      // 3) fallback
+      return pub('images','MCD_bg.webp');
+    }
+
+    async function applyBackground(){
+      const url = await resolveMcdBgUrl();
+      if(url){
+        // Sæt CSS-var med image() så vi bevarer lagrækkefølgen i CSS
+        document.documentElement.style.setProperty('--mcd-bg-image', `url("${url}")`);
+      }
+    }
+
+    /* ===== RAMP (on-ramp) – placeholder (Ramp, ikke Transak) ===== */
+    const DEFAULT_MCD_WALLET = "0xa594586B04f1b6782EC906B49882EbD0E652a388";
+
+    async function openRampMCD(){
+      // Her kan vi senere hente fra buy_config:
+      // const { data } = await sb.from('buy_config').select('*').eq('key','MCD').single();
+      // const wallet = data?.wallet || DEFAULT_MCD_WALLET;
+      const wallet = DEFAULT_MCD_WALLET;
+      alert("Ramp (MCD) bliver aktiveret, når buy_config er sat. Indtil da åbner vi Ramp i et nyt vindue.");
+      window.open("https://ramp.network/buy?swapAsset=USDT&userAddress="+encodeURIComponent(wallet), "_blank");
+    }
+
+    /* Tekster & sociale links */
+    async function loadSiteText(){
+      if(!sb) return {};
+      try{
+        const { data } = await sb.from('site_text').select('page,key,value').in('page',['common','home','MCD']);
+        const dict={}; (data||[]).forEach(r=>dict[`${r.page}:${r.key}`]=r.value);
+        document.querySelectorAll('[data-text]').forEach(el=>{
+          const k=el.getAttribute('data-text'); if(dict[k]!=null) el.innerHTML=dict[k];
+        });
+        return dict;
+      }catch{ return {}; }
+    }
+    function normalizeUrl(u){ if(!u) return null; const t=u.trim(); return /^https?:\/\//i.test(t)?t:'https://'+t }
+    function iconUrlFor(p){ if(!sb) return null; const name=p.charAt(0).toUpperCase()+p.slice(1).toLowerCase(); const {data}=sb.storage.from('social.icons').getPublicUrl(`${name}.svg`); return data?.publicUrl||null }
+    function fallbackIconUrl(){ if(!sb) return ''; const {data}=sb.storage.from('social.icons').getPublicUrl('Globe.svg'); return data?.publicUrl||'' }
+    async function renderSocialLinks(){
+      const el=document.getElementById('social-menu'); if(!el||!sb) return;
+      el.innerHTML='';
+      const {data}=await sb.from('social_links').select('platform,url,is_active,sort_order')
+        .eq('is_active',true).order('sort_order',{ascending:true});
+      const globe=fallbackIconUrl();
+      (data||[]).filter(r=>r.url&&r.url.trim()!=='').forEach(r=>{
+        const a=document.createElement('a'); const href=normalizeUrl(r.url); if(!href) return;
+        a.href=href; a.target='_blank'; a.rel='noopener noreferrer'; a.title=r.platform; a.setAttribute('aria-label',r.platform);
+        const img=document.createElement('img'); img.src=iconUrlFor(r.platform)||globe; img.onerror=()=>{img.src=globe}; a.appendChild(img); el.appendChild(a);
+      });
+    }
+
+    function setCoinImages(){
+      const d=document.getElementById('coinD');
+      // D-mønten
+      if(d) d.src=pub('images','MadaCoin_D.png');
+    }
+
+    /* YouTube */
+    function getYouTubeId(url){ if(!url) return null; try{ const u=new URL(url); if(u.hostname.includes('youtu.be')) return u.pathname.slice(1); if(u.searchParams.get('v')) return u.searchParams.get('v'); const m=url.match(/(?:embed|shorts)\/([a-zA-Z0-9_-]{6,})/); if(m) return m[1]; const seg=u.pathname.split('/').pop(); return seg&&seg.length>=6?seg:null }catch{return null} }
+    function thumbUrl(id){ return `https://i.ytimg.com/vi/${id}/hqdefault.jpg` }
+    function renderPlayer(id){
+      const el=document.getElementById('yt-player');
+      el.innerHTML=`<iframe src="https://www.youtube.com/embed/${id}" title="MadaCoin video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;"></iframe>`;
+    }
+    function renderThumbs(videos,active){
+      const wrap=document.getElementById('yt-thumbs'); wrap.innerHTML='';
+      videos.forEach(v=>{
+        const id=v._id;
+        const btn=document.createElement('button');
+        btn.style.background='transparent';
+        btn.style.border=id===active?'3px solid #f0b90b':'2px solid #333';
+        btn.style.borderRadius='12px';
+        btn.style.overflow='hidden';
+        btn.style.cursor='pointer';
+        btn.style.padding='0';
+        btn.title=v.title||'Se video';
+        btn.innerHTML=`<img src='${thumbUrl(id)}' alt='${v.title||"YouTube thumbnail"}' style="display:block;width:100%;height:100%;object-fit:cover;">`;
+        btn.onclick=()=>{ renderPlayer(id); [...wrap.children].forEach(c=>c.style.border='2px solid #333'); btn.style.border='3px solid #f0b90b'; };
+        wrap.appendChild(btn);
+      });
+    }
+    async function initYouTube(){
+      if(!sb){ document.getElementById('yt-section').style.display='none'; return; }
+      const {data,error}=await sb.from('youtube_videos')
+        .select('youtube_url,is_active,created_at,title,sort_order')
+        .eq('is_active',true).not('youtube_url','is',null).neq('youtube_url','')
+        .order('sort_order',{ascending:true,nullsFirst:false}).order('created_at',{ascending:false});
+      if(error) return;
+      const vids=(data||[]).map(v=>({...v,_id:getYouTubeId(v.youtube_url)})).filter(v=>v._id);
+      if(!vids.length){ document.getElementById('yt-section').style.display='none'; return; }
+      document.getElementById('yt-section').style.display='';
+      renderPlayer(vids[0]._id); renderThumbs(vids,vids[0]._id);
+    }
+
+    function attachHeroActions(){
+      const btn1=document.getElementById('hero-primary');
+      const btn2=document.getElementById('buy-mcd');
+      if(btn1) btn1.addEventListener('click',openRampMCD);
+      if(btn2) btn2.addEventListener('click',openRampMCD);
+    }
+
+    window.addEventListener('load', async ()=>{
+      await applyBackground();      // <— Dynamisk baggrund (klar til admin)
+      await loadSiteText();
+      await renderSocialLinks();
+      setCoinImages();
+      initYouTube();
+      attachHeroActions();
+    });
+  </script>
+</body>
+</html>
+
