@@ -660,5 +660,94 @@
     /* Init: sociale links */
     window.addEventListener('load', renderSocialLinks);
   </script>
+  <style id="rc-hotfix-v2">
+  /* PÅFØRT KUN NÅR .rc-v2 ER PÅ <body>  */
+  .rc-v2 .rc-board{ width:min(450px,46vw) !important; }
+
+  .rc-v2 .leader{
+    position:absolute !important;
+    width:clamp(360px,28vw,480px) !important;
+    min-height:200px !important;
+    display:grid !important;
+    grid-template-columns:auto 1fr !important;
+    grid-template-rows:auto 1fr !important;
+    gap:12px 14px !important;
+    align-content:start !important;
+    background:linear-gradient(180deg,#151a21,#10151b) !important;
+    border:1px solid var(--card-border,#2a2a2a) !important;
+    border-radius:18px !important;
+    padding:16px !important;
+    box-shadow:0 12px 26px rgba(0,0,0,.5) !important;
+  }
+  .rc-v2 .leader .top{
+    grid-column:1 / -1 !important;
+    display:grid !important;
+    grid-template-columns:72px 1fr !important;
+    align-items:center !important;
+    column-gap:14px !important;
+    margin:0 !important;
+  }
+  .rc-v2 .leader img{
+    width:72px !important; height:72px !important;
+    border-radius:50% !important; object-fit:cover !important;
+    border:1px solid var(--card-border,#2a2a2a) !important;
+  }
+  .rc-v2 .leader .nm{ font-weight:700 !important; font-size:1.05rem !important; line-height:1.2 !important; }
+  .rc-v2 .leader .ti{ color:#cfd3d7 !important; font-size:.96rem !important; margin-top:2px !important; }
+  .rc-v2 .leader ul{
+    grid-column:1 / -1 !important; list-style:disc !important;
+    margin:.25rem 0 0 1.2rem !important; color:#cfd3d7 !important; line-height:1.4 !important;
+  }
+  .rc-v2 .leader ul li{ margin:.22rem 0 !important; }
+
+  /* forbindelseslinjer */
+  .rc-v2 .leader::after{ content:""; position:absolute; pointer-events:none; opacity:.9; }
+
+  /* placering UDENFOR ringen – justerbare offsets */
+  .rc-v2 .leader.pos-n{
+    left:50% !important; top:-26% !important; transform:translate(-50%,0) !important;
+  }
+  .rc-v2 .leader.pos-n::after{
+    left:50%; top:100%; transform:translateX(-50%); width:2px; height:24px;
+    background:linear-gradient(180deg, rgba(214,179,90,.85), rgba(214,179,90,0));
+  }
+
+  .rc-v2 .leader.pos-s{
+    left:50% !important; bottom:-26% !important; transform:translate(-50%,0) !important;
+  }
+  .rc-v2 .leader.pos-s::after{
+    left:50%; bottom:100%; transform:translateX(-50%); width:2px; height:24px;
+    background:linear-gradient(0deg, rgba(214,179,90,.85), rgba(214,179,90,0));
+  }
+
+  .rc-v2 .leader.pos-w{
+    right: calc(100% + 9vw) !important; top:50% !important; transform:translateY(-50%) !important;
+  }
+  .rc-v2 .leader.pos-w::after{
+    left:100%; top:50%; transform:translateY(-50%); width:28px; height:2px;
+    background:linear-gradient(90deg, rgba(214,179,90,.85), rgba(214,179,90,0));
+  }
+
+  .rc-v2 .leader.pos-e{
+    left: calc(100% + 9vw) !important; top:50% !important; transform:translateY(-50%) !important;
+  }
+  .rc-v2 .leader.pos-e::after{
+    right:100%; top:50%; transform:translateY(-50%); width:28px; height:2px;
+    background:linear-gradient(90deg, rgba(214,179,90,0), rgba(214,179,90,.85));
+  }
+
+  /* PM under ledelsen */
+  .rc-v2 .pm{ margin-top:10px !important; }
+</style>
+
+<script>
+  // Tving hotfixet til at gælde – og sæt et lille “versionsflag” i konsollen
+  (function(){
+    document.body.classList.add('rc-v2');
+    console.log('MCD About • RC hotfix v2 aktiv');
+  })();
+</script>
+
 </body>
 </html>
+
