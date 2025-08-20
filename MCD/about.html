@@ -55,26 +55,38 @@
       --bg-1x: var(--bg-image);
       --bg-2x: var(--bg-image);
 
-      /* Round Council */
+      /* Round Council – justérbar størrelse */
       --mc-gold:#d6b35a;
-      --ring-size:min(450px, 46vw); /* ~50% mindre end før */
-      --leader-w:max(360px, 28vw);  /* større kort udenfor ringen */
+      --ring-size:min(450px, 46vw);          /* ~50% af før */
+      --leader-w: clamp(360px, 28vw, 480px);  /* ens bredde for lederkort */
+      --leader-h: 200px;                      /* ens minimumshøjde */
+      --avatar: 72px;                         /* foto-størrelse */
+      --leader-side-offset: 9vw;              /* afstand fra ring (vandret) */
+      --leader-vert-offset: 26%;              /* afstand over/under ring (lodret) */
     }
 
     /* NAV */
-    .site-nav{ position: sticky; top: 0; z-index: 9999; padding: 24px 0; background: transparent !important; border:0 !important; box-shadow:none !important; }
+    .site-nav{
+      position: sticky; top: 0; z-index: 9999; padding: 24px 0;
+      background: transparent !important; border:0 !important; box-shadow:none !important;
+    }
     .site-nav::before,.site-nav::after{ display:none !important; content:none !important; }
     .nav-inner{ padding-left:var(--edge-pad); padding-right:var(--edge-pad); }
-    .site-nav nav{ display:flex; gap:var(--nav-gap); align-items:center; flex-wrap:wrap; justify-content:flex-start; transform:translateY(-2px); }
+    .site-nav nav{
+      display:flex; gap:var(--nav-gap); align-items:center; flex-wrap:wrap;
+      justify-content:flex-start; transform:translateY(-2px);
+    }
     .site-nav nav a{
       display:inline-flex; align-items:center; justify-content:center;
       padding:var(--nav-pad-y) var(--nav-pad-x);
       color:var(--nav-text); background:var(--nav-bg); border:1px solid var(--nav-border);
       border-radius:12px; text-decoration:none; opacity:.96; box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
-      -webkit-tap-highlight-color:rgba(255,255,255,.15); font-size:1rem;
+      -webkit-tap-highlight-color:rgba(255,255,255,.15);
+      font-size:1rem;
     }
     .site-nav nav a:hover{ background:var(--nav-hover-bg); border-color:var(--nav-hover-border); }
-    .site-nav nav a.active, .site-nav nav a[aria-current="page"]{
+    .site-nav nav a.active,
+    .site-nav nav a[aria-current="page"]{
       border-color:var(--nav-active);
       box-shadow:0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset;
     }
@@ -84,7 +96,11 @@
       position:fixed; top:var(--social-top); left:var(--edge-pad);
       display:flex; flex-direction:column; gap:10px; z-index:1000;
     }
-    .social-menu a{ display:flex; align-items:center; justify-content:center; width:42px; height:42px; background:rgba(0,0,0,.7); border-radius:8px; text-decoration:none; transition:background-color .2s, transform .15s; }
+    .social-menu a{
+      display:flex; align-items:center; justify-content:center;
+      width:42px; height:42px; background:rgba(0,0,0,.7); border-radius:8px;
+      text-decoration:none; transition:background-color .2s, transform .15s;
+    }
     .social-menu a:hover{ background:rgba(0,0,0,.85); transform:translateY(-2px); }
     .social-menu a img{ width:22px; height:22px }
 
@@ -139,46 +155,88 @@
       background:linear-gradient(180deg, rgba(214,179,90,.22), rgba(214,179,90,.08));
     }
 
-    /* Lederkort – udenfor ringen, store */
+    /* Lederkort – udenfor ringen, ENS STØRRELSE */
     .leader{
-      position:absolute; width:var(--leader-w); max-width:520px;
+      position:absolute;
+      width:var(--leader-w);
+      min-height:var(--leader-h);
+      display:grid;
+      grid-template-columns:auto 1fr;
+      grid-template-rows:auto 1fr;
+      gap:12px 14px;
+      align-content:start;
+
       background:linear-gradient(180deg, #151a21, #10151b);
-      border:1px solid var(--card-border); border-radius:18px; padding:16px;
+      border:1px solid var(--card-border);
+      border-radius:18px;
+      padding:16px;
       box-shadow:var(--shadow);
     }
-    .leader .top{ display:flex; align-items:center; gap:14px; margin-bottom:8px; }
-    .leader img{ width:64px; height:64px; border-radius:50%; object-fit:cover; border:1px solid var(--card-border) }
-    .leader .nm{ font-weight:700; letter-spacing:.2px; font-size:1.05rem }
+    .leader .top{
+      grid-column:1 / -1;
+      display:grid; grid-template-columns: var(--avatar) 1fr; align-items:center; column-gap:14px;
+      margin:0;
+    }
+    .leader img{
+      width:var(--avatar); height:var(--avatar);
+      border-radius:50%; object-fit:cover; border:1px solid var(--card-border)
+    }
+    .leader .nm{ font-weight:700; letter-spacing:.2px; font-size:1.05rem; line-height:1.2 }
     .leader .ti{ color:var(--muted); font-size:.96rem; margin-top:2px }
-    .leader ul{ margin:.35rem 0 0 1.1rem; color:var(--muted); line-height:1.4; }
+    .leader ul{
+      grid-column:1 / -1; list-style:disc; margin:.25rem 0 0 1.2rem;
+      color:var(--muted); line-height:1.4;
+    }
     .leader ul li{ margin:.22rem 0 }
 
-    /* Forbindelses-linje fra kort til ring */
-    .leader::after{
-      content:""; position:absolute; background:linear-gradient(180deg, rgba(214,179,90,.8), rgba(214,179,90,.0));
-      pointer-events:none; opacity:.8;
+    /* Forbindelseslinjer fra kort til ring */
+    .leader::after{ content:""; position:absolute; pointer-events:none; opacity:.9; }
+
+    .leader.pos-n{
+      left:50%; top: calc(-1 * var(--leader-vert-offset)); transform:translate(-50%,0);
+    }
+    .leader.pos-n::after{
+      left:50%; top:100%; transform:translateX(-50%); width:2px; height:24px;
+      background:linear-gradient(180deg, rgba(214,179,90,.85), rgba(214,179,90,0));
     }
 
-    /* Placeringer udenfor ringen */
-    .leader.pos-n{ left:50%; top:-26%; transform:translate(-50%,0); }
-    .leader.pos-n::after{ left:50%; transform:translateX(-50%); bottom:-24px; width:2px; height:24px; background:linear-gradient(180deg, rgba(214,179,90,.8), rgba(214,179,90,0)); }
+    .leader.pos-s{
+      left:50%; bottom: calc(-1 * var(--leader-vert-offset)); transform:translate(-50%,0);
+    }
+    .leader.pos-s::after{
+      left:50%; bottom:100%; transform:translateX(-50%); width:2px; height:24px;
+      background:linear-gradient(0deg, rgba(214,179,90,.85), rgba(214,179,90,0));
+    }
 
-    .leader.pos-s{ left:50%; bottom:-26%; transform:translate(-50%,0); }
-    .leader.pos-s::after{ left:50%; transform:translateX(-50%); top:-24px; width:2px; height:24px; background:linear-gradient(0deg, rgba(214,179,90,.8), rgba(214,179,90,0)); }
+    .leader.pos-w{
+      right: calc(100% + var(--leader-side-offset)); top:50%; transform:translateY(-50%);
+    }
+    .leader.pos-w::after{
+      left:100%; top:50%; transform:translateY(-50%); width:28px; height:2px;
+      background:linear-gradient(90deg, rgba(214,179,90,.85), rgba(214,179,90,0));
+    }
 
-    .leader.pos-w{ right:100%; top:50%; transform:translate(calc(-8vw),-50%); }
-    .leader.pos-w::after{ left:100%; top:50%; transform:translateY(-50%); width:28px; height:2px; background:linear-gradient(90deg, rgba(214,179,90,.8), rgba(214,179,90,0)); }
-
-    .leader.pos-e{ left:100%; top:50%; transform:translate(8vw,-50%); }
-    .leader.pos-e::after{ right:100%; top:50%; transform:translateY(-50%); width:28px; height:2px; background:linear-gradient(90deg, rgba(214,179,90,0), rgba(214,179,90,.8)); }
+    .leader.pos-e{
+      left: calc(100% + var(--leader-side-offset)); top:50%; transform:translateY(-50%);
+    }
+    .leader.pos-e::after{
+      right:100%; top:50%; transform:translateY(-50%); width:28px; height:2px;
+      background:linear-gradient(90deg, rgba(214,179,90,0), rgba(214,179,90,.85));
+    }
 
     /* Teams */
-    .rc-teams{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:6px auto 0; max-width:1200px; }
-    .chip{ border:1px solid var(--card-border); background:#0f141a; color:var(--muted); padding:6px 10px; border-radius:999px; font-size:.9rem; }
+    .rc-teams{
+      display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
+      margin:6px auto 0; max-width:1200px;
+    }
+    .chip{ border:1px solid var(--card-border); background:#0f141a; color:#cfd3d7; padding:6px 10px; border-radius:999px; font-size:.9rem; }
 
     /* PROJEKTMANAGER – under ledelsen */
-    .pm{ width:100%; max-width:1200px; margin:10px auto 0; background:linear-gradient(180deg, #10151b, #0f1319);
-         border:1px solid var(--card-border); border-radius:18px; padding:16px; box-shadow:var(--shadow); }
+    .pm{
+      width:100%; max-width:1200px; margin:10px auto 0;
+      background:linear-gradient(180deg, #10151b, #0f1319);
+      border:1px solid var(--card-border); border-radius:18px; padding:16px; box-shadow:var(--shadow);
+    }
     .pm .row{ display:flex; align-items:center; gap:14px; }
     .pm .row img{ width:58px; height:58px; border-radius:50%; object-fit:cover; border:1px solid var(--card-border) }
     .pm .muted{ color:var(--muted); }
@@ -204,26 +262,26 @@
     .m-hero .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:8px 12px; border-radius:12px; text-decoration:none; cursor:pointer; background:#0d0d0f; border:1px solid #333; color:#fff; box-shadow:inset 0 1px 0 rgba(255,255,255,.06); }
     .m-hero .btn.primary{ background:linear-gradient(135deg,#FFD700,#DAA520); color:#1c2630; border-color:#865c10 }
 
-    @media (max-width: 1100px){
+    @media (max-width: 1200px){
       /* træk sidekortene lidt ind når pladsen er mindre */
-      .leader.pos-w{ transform:translate(-4vw,-50%); }
-      .leader.pos-e{ transform:translate(4vw,-50%); }
+      :root{ --leader-side-offset: 5vw; }
     }
 
     @media (max-width: 900px){
       body{ font-size: .95rem; }
       h1{ font-size: clamp(18px, 6.2vw, 22px); }
       h2{ font-size: clamp(16px, 5.2vw, 20px); }
-      :root{ --social-top: 116px; --ring-size:min(360px, 74vw); --leader-w:92vw; }
+      :root{ --social-top: 116px; --ring-size:min(360px, 74vw); --leader-w:92vw; --leader-h:auto; }
 
-      .layout{ grid-template-columns: 1fr; grid-auto-flow: row; gap: 18px; padding: 12px 16px 24px; padding-left: calc(16px + 76px); }
+      .layout{ grid-template-columns: 1fr; grid-auto-flow: row; gap: 18px;
+        padding: 12px 16px 24px; padding-left: calc(16px + 76px); }
       .layout > *{ grid-column: 1 !important; min-width: 0; }
       .right-col{ margin: 0; padding: 0; }
       .right-col .card{ width:100%; margin:0; box-sizing:border-box; }
       .site-nav{ padding: 16px 0; }
       .nav-inner{ padding-left:16px; padding-right:24px; }
 
-      /* På mobil bliver lederkortene listet under ringen for læsbarhed */
+      /* På mobil vises lederkort i liste under ringen */
       .rc-board{ margin-bottom:12px; }
       .leader{ position:static; width:100%; transform:none !important; margin:8px 0; }
       .leader::after{ display:none; }
@@ -274,7 +332,7 @@
       <div class="rc-head">
         <div>
           <h2 data-text="about:council_title">Rådet (4 ledere)</h2>
-          <div class="rc-sub" data-text="about:council_sub">Beslutninger tages i fællesskab af fire ligestillede ledere.</div>
+        <div class="rc-sub" data-text="about:council_sub">Beslutninger tages i fællesskab af fire ligestillede ledere.</div>
         </div>
       </div>
 
@@ -358,7 +416,7 @@
           <img id="pm-photo-inline" alt="Projektmanager">
           <div>
             <div style="font-weight:700" id="pm-name-inline">Thomas</div>
-            <div class="muted" id="pm-role-inline">Projektmanager · rapporterer til Rådet</div>
+            <div class="muted" id="pm-role-inline">Projektmanager · rapporterer til Rådet (ingen økonomisk råderet)</div>
           </div>
         </div>
       </div>
