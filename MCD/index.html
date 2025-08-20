@@ -298,7 +298,11 @@
       if(d) d.src=pub('images','MadaCoin_D.png');
     }
 
-    /* (NYT) Branding – hero-logo + favicon fra site_settings */
+    /* ===== (NYT) Branding fra bucket 'logo' – hero-logo + favicon ===== */
+    const LOGO_BUCKET = 'logo';
+    const BRAND_EXTS  = ['svg','png','webp','jpg','jpeg'];
+    const FAV_EXTS    = ['svg','png','ico'];
+
     function setPlaceholderLogo(){
       const img=document.getElementById('brand-hero-img'); if(!img) return;
       img.src=`data:image/svg+xml;utf8,` +
@@ -310,23 +314,43 @@
           </svg>
         `);
     }
-    async function applyBranding(){
-      setPlaceholderLogo(); // vis noget pænt indtil vi evt. finder ægte logo
+    function publicUrl(bucket, path){
+      const { data } = sb.storage.from(bucket).getPublicUrl(path);
+      return data?.publicUrl || null;
+    }
+    function probeImage(url, timeoutMs=6000){
+      return new Promise((resolve)=>{
+        if(!url) return resolve(null);
+        const img = new Image(); let done=false;
+        const finish = ok => { if(!done){ done=true; resolve(ok ? url : null); } };
+        const t = setTimeout(()=>finish(false), timeoutMs);
+        img.onload = ()=>{ clearTimeout(t); finish(true); };
+        img.onerror = ()=>{ clearTimeout(t); finish(false); };
+        const cb = Math.floor(Date.now() / (12*60*60*1000));
+        img.src = url + (url.includes('?') ? `&cb=${cb}` : `?cb=${cb}`);
+      });
+    }
+    async function firstExisting(baseName, exts){
+      for(const ext of exts){
+        const u = publicUrl(LOGO_BUCKET, `${baseName}.${ext}`);
+        if(await probeImage(u)) return u;
+      }
+      return null;
+    }
+    async function applyBrandingFromBucket(project='MCD'){
+      setPlaceholderLogo();
       if(!sb) return;
-      try{
-        const keys = ['logo_mcd_hero','logo_mcd_nav','logo_mcd_mark','logo_mark_mcd','favicon_mcd'];
-        const { data } = await sb.from('site_settings').select('key,value').in('key', keys);
-        const map = Object.fromEntries((data||[]).map(r=>[r.key,r.value]));
-        const logo = map['logo_mcd_hero'] || map['logo_mcd_nav'] || map['logo_mcd_mark'] || map['logo_mark_mcd'] || '';
-        const img = document.getElementById('brand-hero-img');
-        if(img && logo){ img.src = logo; }
+      const base = (project||'MCD').toUpperCase();
 
-        const fav = map['favicon_mcd'];
-        if(fav){
-          const link = document.getElementById('favicon');
-          if(link) link.href = fav;
-        }
-      }catch(e){ console.warn('[home] branding', e); }
+      // Hero-logo
+      const hero = await firstExisting(base, BRAND_EXTS);
+      const heroEl = document.getElementById('brand-hero-img');
+      if(heroEl && hero) heroEl.src = hero;
+
+      // Favicon (særskilt fil → ellers logo)
+      const fav = await firstExisting(`${base}-favicon`, FAV_EXTS) || hero;
+      const favEl = document.getElementById('favicon');
+      if(favEl && fav) favEl.href = fav;
     }
 
     /* YouTube */
@@ -382,7 +406,7 @@
       await loadSiteText();
       await renderSocialLinks();
       setCoinImages();
-      await applyBranding();                 // (NYT) hero-logo + favicon
+      await applyBrandingFromBucket('MCD');  // (NYT) hero-logo + favicon fra bucket 'logo'
       initYouTube();
       attachHeroActions();
     });
