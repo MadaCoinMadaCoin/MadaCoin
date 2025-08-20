@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MCD • About</title>
-  <link rel="icon" href="/favicon_boosted.ico?v=3" type="image/x-icon" />
+  <link id="favicon" rel="icon" href="/favicon_boosted.ico?v=3" type="image/x-icon" />
   <link rel="preconnect" href="https://unpkg.com" />
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
@@ -564,6 +564,41 @@
       }catch(e){ console.warn('[partners] exception:', e); }
     })();
 
+    /* ===== BRANDING fra bucket 'logo': favicon (MCD-favicon.* → fallback MCD.*) ===== */
+    const LOGO_BUCKET = 'logo';
+    const BRAND_EXTS  = ['svg','png','webp','jpg','jpeg'];
+    const FAV_EXTS    = ['svg','png','ico'];
+    function publicUrl(bucket, path){
+      const { data } = sb.storage.from(bucket).getPublicUrl(path);
+      return data?.publicUrl || null;
+    }
+    function probeImage(url, timeoutMs=6000){
+      return new Promise((resolve)=>{
+        if(!url) return resolve(null);
+        const img = new Image(); let done=false;
+        const finish = ok => { if(!done){ done=true; resolve(ok ? url : null); } };
+        const t = setTimeout(()=>finish(false), timeoutMs);
+        img.onload = ()=>{ clearTimeout(t); finish(true); };
+        img.onerror = ()=>{ clearTimeout(t); finish(false); };
+        const cb = Math.floor(Date.now() / (12*60*60*1000));
+        img.src = url + (url.includes('?') ? `&cb=${cb}` : `?cb=${cb}`);
+      });
+    }
+    async function firstExisting(baseName, exts){
+      for(const ext of exts){
+        const u = publicUrl(LOGO_BUCKET, `${baseName}.${ext}`);
+        if(await probeImage(u)) return u;
+      }
+      return null;
+    }
+    async function applyBrandingFromBucket(project='MCD'){
+      if(!sb) return;
+      const base = (project||'MCD').toUpperCase();
+      const fav = await firstExisting(`${base}-favicon`, FAV_EXTS) || await firstExisting(base, BRAND_EXTS);
+      const favEl = document.getElementById('favicon');
+      if(favEl && fav) favEl.href = fav;
+    }
+
     /* Admin modal (klik på Julienne) */
     const $ = s=>document.querySelector(s);
     const modal = $('#admin-modal');
@@ -591,6 +626,11 @@
       const { data:{session} } = await sb.auth.getSession();
       if(!(await isAdmin(session))){ $('#adm-msg').textContent='Ingen adgang.'; await sb.auth.signOut(); return; }
       window.location.href = '/adm';
+    });
+
+    /* Init (About) */
+    window.addEventListener('load', async ()=>{
+      await applyBrandingFromBucket('MCD'); // ← favicon fra bucket 'logo'
     });
   </script>
 
