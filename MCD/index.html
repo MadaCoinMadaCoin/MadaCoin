@@ -1,284 +1,262 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="da">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MCD • Home</title>
 
-  <!-- Favicon opdateres dynamisk, men vi har et sikkert fallback -->
-  <link id="favicon" rel="icon" href="/favicon_boosted.ico?v=3" type="image/x-icon" />
+  <title>MadaCoin MCD</title>
+  <meta name="description" content="MadaCoin støtter udvikling i Madagaskar gennem donationer og gennemsigtighed.">
+  <link rel="icon" href="/favicon_boosted.ico?v=1" type="image/x-icon">
 
-  <!-- Supabase -->
-  <link rel="preconnect" href="https://unpkg.com" />
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
   <style>
     *,*::before,*::after{ box-sizing:border-box }
-    html{ font-size:16px }
-    body{
-      margin:0; min-height:100vh; display:flex; flex-direction:column;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
-      color:#fff; overflow-x:hidden;
-      /* Lagdelt baggrund (ens med About) */
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.14)),
-        image-set(var(--bg-1x) 1x, var(--bg-2x) 2x),
-        var(--bg);
-      background-repeat:no-repeat,no-repeat,no-repeat;
-      background-size:auto,cover,auto;
-      background-attachment:fixed,fixed,fixed;
-      background-position:center center, center top, center center;
-    }
-    @media (max-width:900px){ body{ background-attachment:scroll,scroll,scroll } }
+    html,body{ height:100% }
 
     :root{
-      --wrap: 1680px;
-      --edge: 24px;
-      --gap: 18px;
+      --edge:24px;
+      --container:1200px;
 
-      --nav-gap:14px; --nav-pad-x:14px; --nav-pad-y:8px;
-      --nav-text:#fff; --nav-bg:#0d0f12; --nav-border:#2a2f36;
-      --nav-hover-bg:#151517; --nav-hover-border:#444; --nav-active:#5aa9ff;
+      /* Nav */
+      --nav-gap:14px; --nav-px:14px; --nav-py:8px;
+      --nav-bg:#0d0d0f; --nav-b:#333; --nav-hover:#151517; --nav-active:#5aa9ff;
 
-      --card:#0b0f15; --bd:#222a33; --muted:#cfd3d7; --shadow:0 16px 40px rgba(0,0,0,.45);
+      /* Venstre kolonne (Hero) */
+      --left-col:520px;
+      --social-top:106px;
+      --left-rail-nudge:-100px;
+      --left-rail-top: calc(var(--social-top) + var(--left-rail-nudge));
+      --left-rail-left: -260px;
 
-      --bg:#061a2b;
-      --bg-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
-      --bg-1x: var(--bg-image);
-      --bg-2x: var(--bg-image);
-    }
+      /* Højre kolonne (mønter+YouTube) – låst */
+      --right-rail-left: 538px;
 
-    /* NAV + brand */
-    .site-nav{ position:sticky; top:0; z-index:1000; padding:14px 0; }
-    .nav-inner{ max-width:var(--wrap); margin:0 auto; padding:0 var(--edge); display:flex; align-items:center; gap:14px }
-    .brand{
-      display:inline-flex; align-items:center; gap:10px; padding:6px 8px; border-radius:12px; text-decoration:none; color:#fff;
-      background:rgba(0,0,0,.35); border:1px solid rgba(255,255,255,.08);
-    }
-    .brand img{ height:26px; width:auto; display:block }
-    .brand .txt{ font-weight:800; letter-spacing:.2px }
-    nav{
-      margin-left:auto; display:flex; gap:var(--nav-gap); align-items:center; flex-wrap:wrap;
-    }
-    nav a{
-      display:inline-flex; align-items:center; justify-content:center;
-      padding:var(--nav-pad-y) var(--nav-pad-x);
-      color:var(--nav-text); background:var(--nav-bg); border:1px solid var(--nav-border);
-      border-radius:12px; text-decoration:none; opacity:.96; box-shadow:inset 0 1px 0 rgba(255,255,255,.06)
-    }
-    nav a:hover{ background:var(--nav-hover-bg); border-color:var(--nav-hover-border) }
-    nav a[aria-current="page"]{
-      border-color:var(--nav-active);
-      box-shadow:0 0 0 2px color-mix(in srgb, var(--nav-active) 26%, transparent) inset;
+      --base-top:#eff3fb;
+      --base-bot:#e2ebf7;
+
+      --bg-x: 0px;
+      --bg-y: 0px;
     }
 
-    /* Sociale links (venstre side) */
-    .social-menu{ position:fixed; top:110px; left:16px; display:flex; flex-direction:column; gap:10px; z-index:999 }
-    .social-menu a{
-      display:flex; align-items:center; justify-content:center;
-      width:42px; height:42px; background:rgba(0,0,0,.7);
-      border:1px solid #2a2f36; border-radius:8px; text-decoration:none;
-      transition:background .15s, transform .15s;
+    /* ===================== BODY / BAGGRUND ===================== */
+    body{
+      display:flex; flex-direction:column; margin:0; color:#fff;
+      font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.14)),
+        var(--mcd-bg-image, none),
+        linear-gradient(var(--base-top), var(--base-bot));
+      background-repeat: no-repeat, no-repeat, no-repeat;
+      background-size: auto, cover, auto;
+      background-attachment: fixed, fixed, fixed;
+      background-position:
+        center center,
+        calc(50% + var(--bg-x)) calc(0% + var(--bg-y)),
+        center center;
+      overflow-x:hidden;
     }
-    .social-menu a:hover{ background:rgba(0,0,0,.85); transform:translateY(-2px) }
+
+    main{ flex:1 }
+
+    /* ===================== NAV ===================== */
+    .site-nav{ position:sticky; top:0; z-index:1000; padding:20px 0 }
+    .nav{
+      display:flex; gap:var(--nav-gap); padding-left:var(--edge); padding-right:var(--edge);
+      align-items:center;
+    }
+    .nav a{
+      padding:var(--nav-py) var(--nav-px); border-radius:12px; text-decoration:none;
+      background:var(--nav-bg); border:1px solid var(--nav-b); color:#fff
+    }
+    .nav a:hover{ background:var(--nav-hover) }
+
+    /* (NYT) Nav CTA – “Køb MCD” */
+    .nav .cta{
+      margin-left:auto;                      /* skub helt til højre */
+      background:linear-gradient(135deg,#FFD700,#DAA520);
+      color:#1c2630; border-color:#865c10; font-weight:800;
+    }
+    .nav .cta:hover{ filter:brightness(1.06) }
+
+    /* ===================== SOCIAL LINKS ===================== */
+    .social-menu{ position:fixed; top:var(--social-top); left:var(--edge); display:flex; flex-direction:column; gap:10px; z-index:999 }
+    .social-menu a{ width:42px; height:42px; display:grid; place-items:center; background:rgba(0,0,0,.7); border-radius:8px; text-decoration:none }
     .social-menu a img{ width:22px; height:22px }
 
-    /* Layout */
-    .wrap{ max-width:var(--wrap); margin:0 auto; padding:18px var(--edge) 32px }
+    /* ===================== SCENE ===================== */
+    .stage{
+      position:relative;
+      max-width:var(--container);
+      margin:18px auto 26px;
+      padding:0 16px;
+    }
 
-    /* Hero */
+    /* Venstre kolonne */
+    .left-rail-box{
+      position:absolute; top:var(--left-rail-top); left:var(--left-rail-left);
+      width:var(--left-col); z-index:3;
+    }
+
     .hero{
-      display:grid; grid-template-columns: 1.2fr 1fr; gap:24px; align-items:center;
+      background:#0b0b0c; border:1px solid #2a2a2a; border-radius:16px;
+      box-shadow:0 12px 26px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06);
+      padding:16px 18px;
     }
-    .card{
-      background:var(--card); border:1px solid var(--bd); border-radius:16px; padding:18px; box-shadow:var(--shadow)
-    }
-    .hero h1{ font-size:clamp(24px, 4.2vw, 42px); margin:.1rem 0 .4rem }
-    .hero p{ color:var(--muted); margin:.25rem 0 .6rem; font-size:1.05rem }
-    .cta-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:.5rem }
-    .btn{
-      display:inline-flex; align-items:center; justify-content:center; gap:8px;
-      padding:10px 14px; border-radius:12px; text-decoration:none; cursor:pointer;
-      background:#0d0f12; border:1px solid #2a2f36; color:#fff; box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
-    }
-    .btn.primary{ background:linear-gradient(135deg,#FFD700,#DAA520); color:#1c2630; border-color:#865c10; font-weight:800 }
+    .hero .ribbon{ display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; background:#102414; border:1px solid #1d3d22; color:#baf7c9; margin-bottom:6px }
+    .hero h1{ font-size:clamp(22px,2.6vw,26px); margin:0 0 .5rem }
+    .hero .sub{ color:#cfd3d7; margin:.25rem 0 .5rem }
+    .hero .points{ display:flex; flex-wrap:wrap; gap:6px 8px; margin:.5rem 0 .75rem }
+    .hero .pt{ padding:6px 10px; border-radius:999px; background:#0d0d0f; border:1px solid #333; font-size:.9rem }
+    .hero .btns{ display:flex; gap:10px; flex-wrap:wrap; margin-top:6px }
+    .hero .btn{ padding:9px 14px; border-radius:12px; text-decoration:none; background:#0d0d0f; border:1px solid #333; color:#fff }
+    .hero .btn.primary{ background:linear-gradient(135deg,#FFD700,#DAA520); color:#1c2630 }
 
-    /* Sektioner */
-    .grid{ display:grid; grid-template-columns: repeat(3, minmax(260px,1fr)); gap:18px; margin-top:22px }
-    .muted{ color:var(--muted) }
+    /* Højre kolonne (mønter+YouTube) */
+    .right-rail{ margin-left: var(--right-rail-left); position:relative; z-index:3 }
+    .right-stack{ display:inline-block; vertical-align:top }
 
-    /* Footer */
-    .site-footer{
-      margin-top:auto; padding:12px 16px; text-align:center;
-      background:rgba(0,0,0,.75); border-top:1px solid rgba(255,255,255,.06);
+    .coins{ display:inline-flex; flex-wrap:nowrap; gap:24px; align-items:flex-start; width:520px; justify-content:center }
+    .coin{
+      background:#fff8dc; padding:10px; border-radius:15px; width:240px;
+      text-align:center; box-shadow:0 0 12px rgba(0,0,0,.1); border:2px solid #e5c100
     }
+    .coin img{ width:200px; height:200px; border-radius:10px; margin-bottom:8px; object-fit:cover }
+    .coin-description{ font-size:.9rem; color:#333; margin:0 0 8px }
+    .button{ background:linear-gradient(135deg,#FFD700,#DAA520); color:#004d73!important; padding:9px 14px; border:none; border-radius:6px; font-weight:700; cursor:pointer }
+    .button:hover{ background:linear-gradient(135deg,#FFC107,#B8860B) }
 
-    /* Mobil */
-    @media (max-width: 980px){
-      .hero{ grid-template-columns: 1fr; }
-    }
-    @media (max-width: 640px){
-      .social-menu{ left:10px; top:96px }
-      .brand img{ height:22px }
+    .yt-wrap{ width:520px; margin:22px 0 0 0 }
+    #yt-player{ position:relative; padding-top:56.25%; border:2px solid #222; border-radius:14px; overflow:hidden; background:#000 }
+    #yt-thumbs{ display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:12px; margin-top:12px }
+
+    footer{ margin-top:auto; text-align:center; padding:16px; background:#e4e6c5; color:#000 }
+
+    @media (max-width:1150px){
+      .left-rail-box{ position:static; width:auto }
+      .right-rail{ margin-left:0 }
+      .right-stack{ display:block }
+      .coins{ width:100%; justify-content:center; gap:16px; flex-wrap:wrap }
+      .yt-wrap{ width:100% }
+      .stage{ padding:0 16px }
     }
   </style>
 </head>
 <body>
-  <!-- NAV + Brand -->
+  <!-- NAV -->
   <header class="site-nav">
-    <div class="nav-inner">
-      <a href="/" class="brand" aria-label="MCD forside">
-        <img id="brand-logo" alt="MCD logo" />
-        <span class="txt">MCD</span>
-      </a>
-      <nav>
-        <a href="/" aria-current="page" data-text="common:nav_home">Home</a>
-        <a href="/about" data-text="common:nav_about">About</a>
-        <a href="/roadmap" data-text="common:nav_roadmap">Roadmap</a>
-        <a href="/reports" data-text="common:nav_reports">Reports</a>
-      </nav>
-    </div>
+    <nav class="nav">
+      <a href="/" data-text="common:nav_home">Home</a>
+      <a href="/about" data-text="common:nav_about">About</a>
+      <a href="/roadmap" data-text="common:nav_roadmap">Roadmap</a>
+      <a href="/reports" data-text="common:nav_reports">Reports</a>
+      <!-- (NYT) KØB-KNAP I NAV -->
+      <a href="#" id="nav-buy" class="cta">Køb MCD</a>
+      <!-- Hvis du hellere vil have en /buy-side: skift href="/buy" og fjern JS-handleren i bunden -->
+    </nav>
   </header>
 
-  <!-- Sociale links -->
-  <div class="social-menu" id="social-menu" aria-label="Sociale medier"></div>
+  <main>
+    <!-- Sociale links -->
+    <div class="social-menu" id="social-menu"></div>
 
-  <!-- INDHOLD -->
-  <main class="wrap">
-    <!-- HERO -->
-    <section class="hero">
-      <article class="card">
-        <div class="ribbon" style="display:inline-block;margin:-2px 0 8px;padding:4px 10px;border-radius:999px;font-size:12px;background:#102414;border:1px solid #1d3d22;color:#baf7c9;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)">
-          <span data-text="home:ribbon">NYHED: 25% hotelrabat</span>
+    <!-- Scene -->
+    <section class="stage">
+      <!-- Venstre kolonne (kun hero på donate) -->
+      <div class="left-rail-box">
+        <section class="hero" id="home-hero">
+          <div class="ribbon">NYHED: 25% hotelrabat til MCD-holders</div>
+          <h1>Donér. Byg. Forandr Madagaskar.</h1>
+          <p class="sub">MadaCoin Donation (MCD) finansierer skoler, solenergi og lokale jobs — med fuld gennemsigtighed.</p>
+          <div class="points">
+            <span class="pt">Skolebyggeri</span>
+            <span class="pt">Solceller &amp; batterier</span>
+            <span class="pt">Åbne rapporter</span>
+          </div>
+          <div class="btns">
+            <button class="btn primary" id="hero-primary">Støt med MadaCoin</button>
+            <a class="btn" href="/reports">Se rapporter</a>
+          </div>
+        </section>
+      </div>
+
+      <!-- Højre kolonne -->
+      <div class="right-rail">
+        <div class="right-stack">
+          <section class="coins">
+            <div class="coin">
+              <img id="coinD" alt="MadaCoin Donation" />
+              <p class="coin-description">Støt vores mission ved at købe MadaCoin Donation.</p>
+              <button class="button" id="buy-mcd">Køb MadaCoin Donation</button>
+            </div>
+          </section>
+
+          <section id="yt-section" class="yt-wrap">
+            <div id="yt-player"></div>
+            <div id="yt-thumbs"></div>
+          </section>
         </div>
-        <h1 data-text="home:title">MadaCoin – Development in Madagascar</h1>
-        <p class="muted" data-text="home:subtitle">Donationer til skoler, solenergi og lokale jobs — med fuld gennemsigtighed.</p>
-        <div class="cta-row">
-          <a class="btn primary" href="/buy" data-text="home:cta_primary">Støt med MCD</a>
-          <a class="btn" href="/reports" data-text="home:cta_secondary">Se rapporter</a>
-        </div>
-      </article>
-
-      <aside class="card">
-        <h3 data-text="home:side_title">Hvorfor MCD?</h3>
-        <p class="muted" data-text="home:side_body">
-          MCD er en donator-token, der finansierer konkrete projekter: boliger, skoler, vand og energi.
-          Alt er spor­bart — fra donation til udført arbejde.
-        </p>
-      </aside>
-    </section>
-
-    <!-- 3 kolonne teaser (kan udfyldes fra site_text senere) -->
-    <section class="grid">
-      <article class="card">
-        <h3 data-text="home:box1_title">Skoler & uddannelse</h3>
-        <p class="muted" data-text="home:box1_body">Bygning, drift og praktikpladser i værkstederne.</p>
-      </article>
-      <article class="card">
-        <h3 data-text="home:box2_title">Energi & vand</h3>
-        <p class="muted" data-text="home:box2_body">Sol-mini-grids, batterier, drikkevand og rensning.</p>
-      </article>
-      <article class="card">
-        <h3 data-text="home:box3_title">Jobs & gennemsigtighed</h3>
-        <p class="muted" data-text="home:box3_body">Lokale leverandører først — med åbne budgetter.</p>
-      </article>
+      </div>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <span data-text="common:footer">© 2025 MadaCoin. All rights reserved.</span>
-  </footer>
+  <footer>© 2025 MadaCoin. All rights reserved.</footer>
 
   <script>
-    /* ===== Supabase klient ===== */
-    const SUPABASE_URL = "https://byrlebjwknppjbtbkozt.supabase.co";
-    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
-    const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null;
+    /* ===== Supabase setup ===== */
+    const SUPABASE_URL="https://byrlebjwknppjbtbkozt.supabase.co";
+    const SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
+    const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON) : null;
 
-    /* Aktiv menumarkering */
-    (function markActive(){
+    /* ===== BAGGRUND (sætter --mcd-bg-image) ===== */
+    const storeBase = `${SUPABASE_URL}/storage/v1/object/public`;
+    const pub = (...p)=>`${storeBase}/${p.map(encodeURIComponent).join('/')}`;
+
+    async function resolveMcdBgUrl(){
+      if(!sb) return null;
       try{
-        const here = location.pathname.replace(/\/index\.html?$/,'/');
-        document.querySelectorAll('header nav a').forEach(a=>{
-          const to = a.getAttribute('href');
-          if (to === here || (here === '/' && to === '/')) a.setAttribute('aria-current','page');
-          else a.removeAttribute('aria-current');
-        });
+        let { data:media } = await sb.from('site_media')
+          .select('page,key,url,bucket,path')
+          .eq('page','MCD').eq('key','bg').limit(1).maybeSingle();
+        if(media){
+          if(media.url) return media.url;
+          if(media.bucket && media.path) return pub(media.bucket, media.path);
+        }
       }catch(e){}
-    })();
-
-    /* Site-tekster (common + home) */
-    (async function(){
-      if(!sb) return;
       try{
-        const { data } = await sb.from('site_text').select('page,key,value,content,project,is_active')
-          .in('page',['common','home']).eq('project','MCD').eq('is_active',true);
-        const dict={};
-        (data||[]).forEach(r=>{
-          const v = (r.value ?? r.content ?? '').toString();
-          if(v) dict[`${r.page}:${r.key}`]=v;
-        });
+        let { data:text } = await sb.from('site_text')
+          .select('value').eq('page','MCD').eq('key','bg_url').limit(1).maybeSingle();
+        if(text?.value) return text.value;
+      }catch(e){}
+      return pub('images','MCD_bg.webp');
+    }
+    async function applyBackground(){
+      const url = await resolveMcdBgUrl();
+      if(url){ document.documentElement.style.setProperty('--mcd-bg-image', `url("${url}")`); }
+    }
+
+    /* ===== On-ramp (Ramp) ===== */
+    const DEFAULT_MCD_WALLET = "0xa594586B04f1b6782EC906B49882EbD0E652a388";
+    async function openRampMCD(){
+      const wallet = DEFAULT_MCD_WALLET;
+      window.open("https://ramp.network/buy?swapAsset=USDT&userAddress="+encodeURIComponent(wallet), "_blank");
+    }
+
+    /* Tekster & sociale links */
+    async function loadSiteText(){
+      if(!sb) return {};
+      try{
+        const { data } = await sb.from('site_text').select('page,key,value').in('page',['common','home','MCD']);
+        const dict={}; (data||[]).forEach(r=>dict[`${r.page}:${r.key}`]=r.value);
         document.querySelectorAll('[data-text]').forEach(el=>{
           const k=el.getAttribute('data-text'); if(dict[k]!=null) el.innerHTML=dict[k];
         });
-      }catch(e){ console.warn('[home] site_text', e); }
-    })();
-
-    /* Baggrund pr. side (site_settings) */
-    async function applyBackgroundForPage(pageKey='home'){
-      if(!sb) return;
-      try{
-        const keys=[`bg_${pageKey}_1x`,`bg_${pageKey}_2x`,`bg_default_1x`,`bg_default_2x`];
-        const { data } = await sb.from('site_settings').select('key,value').in('key', keys);
-        const map = Object.fromEntries((data||[]).map(r=>[r.key,r.value]));
-        const one = map[`bg_${pageKey}_1x`] || map['bg_default_1x'] || '';
-        const two = map[`bg_${pageKey}_2x`] || map['bg_default_2x'] || '';
-        if(one) document.body.style.setProperty('--bg-1x', `url("${one}")`);
-        if(two) document.body.style.setProperty('--bg-2x', `url("${two}")`);
-      }catch(e){ console.warn('[home] background', e); }
+        return dict;
+      }catch{ return {}; }
     }
-    applyBackgroundForPage('home');
-
-    /* Brand: logo + favicon fra site_settings */
-    (async function applyBranding(){
-      if(!sb) return;
-      try{
-        const keys = [
-          'logo_mcd_nav','logo_nav_mcd',      // nav wordmark
-          'logo_mcd_mark','logo_mark_mcd',    // emblem/mark
-          'favicon_mcd'
-        ];
-        const { data } = await sb.from('site_settings').select('key,value').in('key', keys);
-        const map = Object.fromEntries((data||[]).map(r=>[r.key,r.value]));
-
-        // Vælg logo i fornuftig prioritet
-        const logoUrl = map['logo_mcd_nav'] || map['logo_nav_mcd'] || map['logo_mcd_mark'] || map['logo_mark_mcd'] || '';
-        const elLogo = document.getElementById('brand-logo');
-        if(logoUrl && elLogo){ elLogo.src = logoUrl; elLogo.style.display='block'; }
-        else if(elLogo){ elLogo.style.display='none'; } // vis kun "MCD" tekst
-
-        // Favicon
-        const fav = map['favicon_mcd'];
-        if(fav){
-          const link = document.getElementById('favicon');
-          if(link) link.href = fav;
-        }
-      }catch(e){ console.warn('[home] branding', e); }
-    })();
-
-    /* Sociale links fra DB (samme som About) */
     function normalizeUrl(u){ if(!u) return null; const t=u.trim(); return /^https?:\/\//i.test(t)?t:'https://'+t }
-    function iconUrlFor(p){
-      if(!sb) return null;
-      const name=p.charAt(0).toUpperCase()+p.slice(1).toLowerCase();
-      const {data}=sb.storage.from('social.icons').getPublicUrl(`${name}.svg`);
-      return data?.publicUrl||null
-    }
-    function fallbackIconUrl(){
-      if(!sb) return '';
-      const {data}=sb.storage.from('social.icons').getPublicUrl('Globe.svg');
-      return data?.publicUrl||''
-    }
+    function iconUrlFor(p){ if(!sb) return null; const name=p.charAt(0).toUpperCase()+p.slice(1).toLowerCase(); const {data}=sb.storage.from('social.icons').getPublicUrl(`${name}.svg`); return data?.publicUrl||null }
+    function fallbackIconUrl(){ if(!sb) return ''; const {data}=sb.storage.from('social.icons').getPublicUrl('Globe.svg'); return data?.publicUrl||'' }
     async function renderSocialLinks(){
       const el=document.getElementById('social-menu'); if(!el||!sb) return;
       el.innerHTML='';
@@ -291,7 +269,68 @@
         const img=document.createElement('img'); img.src=iconUrlFor(r.platform)||globe; img.onerror=()=>{img.src=globe}; a.appendChild(img); el.appendChild(a);
       });
     }
-    window.addEventListener('load', renderSocialLinks);
+
+    function setCoinImages(){
+      const d=document.getElementById('coinD');
+      if(d) d.src=pub('images','MadaCoin_D.png');
+    }
+
+    /* YouTube */
+    function getYouTubeId(url){ if(!url) return null; try{ const u=new URL(url); if(u.hostname.includes('youtu.be')) return u.pathname.slice(1); if(u.searchParams.get('v')) return u.searchParams.get('v'); const m=url.match(/(?:embed|shorts)\/([a-zA-Z0-9_-]{6,})/); if(m) return m[1]; const seg=u.pathname.split('/').pop(); return seg&&seg.length>=6?seg:null }catch{return null} }
+    function thumbUrl(id){ return `https://i.ytimg.com/vi/${id}/hqdefault.jpg` }
+    function renderPlayer(id){
+      const el=document.getElementById('yt-player');
+      el.innerHTML=`<iframe src="https://www.youtube.com/embed/${id}" title="MadaCoin video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;"></iframe>`;
+    }
+    function renderThumbs(videos,active){
+      const wrap=document.getElementById('yt-thumbs'); wrap.innerHTML='';
+      videos.forEach(v=>{
+        const id=v._id;
+        const btn=document.createElement('button');
+        btn.style.background='transparent';
+        btn.style.border=id===active?'3px solid #f0b90b':'2px solid #333';
+        btn.style.borderRadius='12px';
+        btn.style.overflow='hidden';
+        btn.style.cursor='pointer';
+        btn.style.padding='0';
+        btn.title=v.title||'Se video';
+        btn.innerHTML=`<img src='${thumbUrl(id)}' alt='${v.title||"YouTube thumbnail"}' style="display:block;width:100%;height:100%;object-fit:cover;">`;
+        btn.onclick=()=>{ renderPlayer(id); [...wrap.children].forEach(c=>c.style.border='2px solid #333'); btn.style.border='3px solid #f0b90b'; };
+        wrap.appendChild(btn);
+      });
+    }
+    async function initYouTube(){
+      if(!sb){ document.getElementById('yt-section').style.display='none'; return; }
+      const {data,error}=await sb.from('youtube_videos')
+        .select('youtube_url,is_active,created_at,title,sort_order')
+        .eq('is_active',true).not('youtube_url','is',null).neq('youtube_url','')
+        .order('sort_order',{ascending:true,nullsFirst:false}).order('created_at',{ascending:false});
+      if(error) return;
+      const vids=(data||[]).map(v=>({...v,_id:getYouTubeId(v.youtube_url)})).filter(v=>v._id);
+      if(!vids.length){ document.getElementById('yt-section').style.display='none'; return; }
+      document.getElementById('yt-section').style.display='';
+      renderPlayer(vids[0]._id); renderThumbs(vids,vids[0]._id);
+    }
+
+    function attachHeroActions(){
+      const btn1=document.getElementById('hero-primary');
+      const btn2=document.getElementById('buy-mcd');
+      const navBuy=document.getElementById('nav-buy');   // <— (NYT)
+      if(btn1) btn1.addEventListener('click',openRampMCD);
+      if(btn2) btn2.addEventListener('click',openRampMCD);
+      if(navBuy){                                        // <— (NYT)
+        navBuy.addEventListener('click', (e)=>{ e.preventDefault(); openRampMCD(); });
+      }
+    }
+
+    window.addEventListener('load', async ()=>{
+      await applyBackground();
+      await loadSiteText();
+      await renderSocialLinks();
+      setCoinImages();
+      initYouTube();
+      attachHeroActions();
+    });
   </script>
 </body>
 </html>
