@@ -164,10 +164,8 @@
         <a href="/about" class="active" aria-current="page">Om</a>
       </div>
       <div class="nav-row">
-        <div class="nav-row">
-  <a href="https://madacoin.pro/mcd/about.html">MCD</a>
-
-
+        <!-- Kun link til MCD About -->
+        <a id="link-mcd" href="#">MCD</a>
       </div>
     </nav>
   </header>
@@ -359,6 +357,23 @@
       }catch(e){ col.style.display='none'; }
     }
 
+    /* === Robust krydslink: MCN About → MCD About === */
+    (function setCrossLinkMCNtoMCD(){
+      try{
+        const a = document.getElementById('link-mcd');
+        if(!a) return;
+
+        const path = window.location.pathname.toLowerCase();
+        // Hvis vi er i en struktur /…/mcn/…, lav søstersti /…/mcd/about.html
+        const idx = path.indexOf('/mcn/');
+        const base = (idx !== -1) ? window.location.pathname.slice(0, idx+1) : '/';
+        const target = base + 'mcd/about.html';
+
+        a.href = target;
+        a.addEventListener('click', e => { e.preventDefault(); window.location.assign(target); });
+      }catch(e){}
+    })();
+
     /* ===== Init ===== */
     (async function init(){
       await applyBranding();
@@ -368,5 +383,3 @@
   </script>
 </body>
 </html>
-
-
