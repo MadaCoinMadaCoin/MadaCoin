@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>About</title>
+  <title>MCD • About</title>
   <link rel="icon" href="/favicon_boosted.ico?v=1" type="image/x-icon" />
   <link rel="preconnect" href="https://unpkg.com" />
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -15,8 +15,6 @@
       margin:0; min-height:100vh; display:flex; flex-direction:column;
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
       color:#fff; overflow-x:hidden;
-
-      /* Lagdelt baggrund: let overlay + foto (1x/2x) + farvefallback */
       background:
         linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.14)),
         image-set(var(--bg-1x) 1x, var(--bg-2x) 2x),
@@ -33,18 +31,12 @@
       --wrap: 1680px;
       --gap: 84px;
       --left-col: 520px;
-      --center-col: 460px;
-      --right-col: 720px;
+      --center-col: 680px;     /* lidt større til rund-bordet */
+      --right-col: 520px;
 
       /* Afstande */
       --edge-pad: 24px;
       --right-gutter: 48px;
-      --center-offset: -36px;
-
-      /* Foto-størrelser (desktop) */
-      --photo-top: 144px;
-      --photo-peer: 108px;
-      --photo-sub: 102px;
 
       /* Social menu */
       --social-top: 104px;
@@ -63,6 +55,11 @@
       /* Baggrund (kan overskrives fra DB) */
       --bg-1x: var(--bg-image);
       --bg-2x: var(--bg-image);
+
+      /* Round Council */
+      --mc-gold:#d6b35a;
+      --mc-gold-deep:#997f3a;
+      --ring-size:min(900px, 92vw);
     }
 
     /* NAV */
@@ -128,63 +125,98 @@
     h2{ margin:0 0 10px; font-size:clamp(18px,2.2vw,22px) }
     .muted{ color:var(--muted) }
 
-    /* Venstre bio-kolonne */
+    /* VENSTRE kolonne */
     .bio-card{ width:360px; min-height:190px; max-width:100% }
-    #bio-top{ grid-column:1; grid-row:1; }
-    #bio-thomas{ grid-column:1; grid-row:2; }
+    #pm-card{ grid-column:1; grid-row:1; }
+    #about-info{ grid-column:1; grid-row:2; }
 
-    /* Midterkolonnen (pyramiden) */
-    .center-col{
-      grid-column:2; display:flex; flex-direction:column; align-items:center; gap:32px;
-      transform: translateX(var(--center-offset));
-    }
-    #pyr-top{ grid-row:1; }
-    #pyr-mid{ grid-row:2; }
-    #pyr-sub{ grid-row:3; }
-
-    .people-mid{ display:flex; gap:36px; align-items:flex-start; justify-content:center }
-    .person,.peer,.sub{ display:flex; flex-direction:column; align-items:center; gap:10px }
-
-    /* Fotos */
-    .photo-top{
-      width:var(--photo-top); height:var(--photo-top);
-      border-radius:8px; background-position:50% 50%; background-size:cover; background-repeat:no-repeat;
-      border:1px solid transparent; cursor:pointer;  /* klik åbner admin */
-    }
-    .photo-peer, .photo-sub{
-      border-radius:8px; background-position:50% 50%; background-size:cover; background-repeat:no-repeat;
-      border:1px solid transparent;
-    }
-    .photo-peer{ width:var(--photo-peer); height:var(--photo-peer); }
-    .photo-sub{ width:var(--photo-sub); height:var(--photo-sub); }
-    .has-photo{ border-color:#2a2a2a; box-shadow:0 8px 22px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.04) }
-    .portrait{ background-position:50% 35% }
-
-    /* Labels */
-    .label{
-      min-width:192px; max-width:220px;
-      text-align:center; padding:8px 14px; border-radius:999px;
-      background:#0d0d0f; border:1px solid #333; box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
-      line-height:1.2
-    }
-    .label .name, .label .title{ overflow-wrap:anywhere; white-space:normal }
-    .label .title{ opacity:.9; font-size:13px }
-
-    /* Underroller række */
-    .sub-row{ display:flex; justify-content:center; gap:36px; }
-
-    /* Højre kolonne – “Vores version” */
+    /* HØJRE kolonne */
     .right-col{
       grid-column:3; grid-row:1 / span 3;
-      margin-top:36px;
-      margin-left:8px;
-      padding-right: var(--right-gutter);
+      margin-top:36px; margin-left:8px; padding-right: var(--right-gutter);
       position: relative; z-index: 0;
     }
     .right-col .card{ width:100% }
     .right-col #right-main .muted{ min-height: 8rem; }
 
-    /* Partner-stribe */
+    /* === ROUND COUNCIL (midterkolonne) === */
+    .center-col{ grid-column:2; display:flex; flex-direction:column; align-items:center; gap:18px; }
+
+    .rc-head{
+      width:100%; max-width:var(--ring-size);
+      display:flex; align-items:center; justify-content:space-between; gap:16px;
+    }
+    .rc-head h2{ margin:0; }
+    .rc-sub{ color:var(--muted); margin:.25rem 0 0; }
+
+    .rc-board{
+      position:relative; width:var(--ring-size); aspect-ratio:1/1; margin:4px auto 8px;
+      border-radius:999px;
+      background:
+        radial-gradient(closest-side, rgba(214,179,90,.15), transparent 60%),
+        radial-gradient(closest-side, rgba(214,179,90,.08), transparent 72%),
+        radial-gradient(closest-side, rgba(214,179,90,.05), transparent 85%),
+        #0f1319;
+      box-shadow:0 0 0 1px rgba(214,179,90,.25) inset, 0 40px 80px rgba(0,0,0,.35);
+      overflow:visible;
+    }
+    .rc-center{
+      position:absolute; inset:50% auto auto 50%;
+      transform:translate(-50%,-50%);
+      background:linear-gradient(180deg, #151a21, #0f1319);
+      border:1px solid var(--card-border);
+      border-radius:22px;
+      padding:18px 20px;
+      width:min(52%, 520px);
+      text-align:center;
+      box-shadow:var(--shadow);
+    }
+    .rc-center h3{ margin:.2rem 0 .25rem; font-size:clamp(16px,2.4vw,20px) }
+    .rc-center p{ margin:.1rem 0 .5rem; color:var(--muted); font-size:.95rem }
+    .rc-center a{
+      display:inline-block; padding:8px 12px; border-radius:12px;
+      border:1px solid var(--mc-gold); color:var(--text); text-decoration:none;
+      background:linear-gradient(180deg, rgba(214,179,90,.22), rgba(214,179,90,.08));
+    }
+
+    .leader{
+      position:absolute; width:min(320px, 40%); max-width:340px;
+      background:linear-gradient(180deg, #151a21, #10151b);
+      border:1px solid var(--card-border); border-radius:18px; padding:16px;
+      box-shadow:var(--shadow);
+    }
+    .leader .top{ display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+    .leader img{ width:52px; height:52px; border-radius:50%; object-fit:cover; border:1px solid var(--card-border) }
+    .leader .nm{ font-weight:600; letter-spacing:.2px }
+    .leader .ti{ color:var(--muted); font-size:.92rem; margin-top:2px }
+    .leader ul{ margin:.35rem 0 0 1.1rem; color:var(--muted); line-height:1.35; }
+    .leader ul li{ margin:.22rem 0 }
+
+    /* Positioner (N/E/S/W) + “forbindelser” */
+    .leader.pos-n{ left:50%; top:7%; transform:translate(-50%, 0); }
+    .leader.pos-e{ right:3%; top:50%; transform:translate(0,-50%); }
+    .leader.pos-s{ left:50%; bottom:7%; transform:translate(-50%, 0); }
+    .leader.pos-w{ left:3%; top:50%; transform:translate(0,-50%); }
+
+    /* Teams-chips */
+    .rc-teams{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:14px auto 0; max-width:900px; }
+    .chip{
+      border:1px solid var(--card-border); background:#0f141a; color:var(--muted);
+      padding:6px 10px; border-radius:999px; font-size:.9rem;
+    }
+
+    /* PROJEKTMANAGER */
+    .pm{
+      width:100%; max-width:var(--ring-size); margin:6px auto 0;
+      background:linear-gradient(180deg, #10151b, #0f1319);
+      border:1px solid var(--card-border); border-radius:18px; padding:16px;
+      box-shadow:var(--shadow);
+    }
+    .pm .row{ display:flex; align-items:center; gap:14px; }
+    .pm .row img{ width:54px; height:54px; border-radius:50%; object-fit:cover; border:1px solid var(--card-border) }
+    .pm .muted{ color:var(--muted); }
+
+    /* PARTNERS */
     .partners{ margin: 8px auto 0; padding: 18px 0 8px; }
     .partners-title{
       margin: 0 0 10px;
@@ -238,8 +270,6 @@
       h1{ font-size: clamp(18px, 6.2vw, 22px); }
       h2{ font-size: clamp(16px, 5.2vw, 20px); }
       :root{ --social-top: 116px; }
-      .m-hero{ display:block; }
-      .m-hero .box{ padding-left: calc(16px + 76px); }
 
       .layout{
         grid-template-columns: 1fr;
@@ -248,15 +278,16 @@
         padding: 12px 16px 24px;
         padding-left: calc(16px + 76px);
       }
-      .layout > *{
-        grid-column: 1 !important;
-        grid-row: auto !important;
-        min-width: 0;
-      }
-      .center-col{ transform:none; }
-      .people-mid{ flex-direction:column; align-items:center; gap:14px; width:100%; }
-      .peer{ width:100%; }
-      .label{ max-width: 92vw; }
+      .layout > *{ grid-column: 1 !important; grid-row: auto !important; min-width: 0; }
+
+      .rc-board{ width: 100%; }
+      .rc-center{ width: min(82%, 520px); }
+      .leader{ width: min(88%, 360px); }
+      .leader.pos-n{ top:3%; }
+      .leader.pos-s{ bottom:3%; }
+      .leader.pos-w{ left:50%; top:27%; transform:translate(-50%,0); }
+      .leader.pos-e{ left:50%; top:auto; bottom:27%; right:auto; transform:translate(-50%,0); }
+
       .right-col{ margin: 0; padding: 0; }
       .right-col .card{ width:100%; margin:0; box-sizing:border-box; }
       .site-nav{ padding: 16px 0; }
@@ -283,84 +314,129 @@
   <!-- MOBIL HERO (kun mobil) -->
   <section class="m-hero" aria-hidden="true">
     <div class="box">
-      <div class="ribbon" data-text="about:hero_ribbon">NYHED: 25% hotelrabat</div>
-      <h1 data-text="about:hero_title">Om MadaCoin</h1>
-      <p data-text="about:hero_sub">Donationer til skoler, solenergi og lokale jobs — med fuld gennemsigtighed.</p>
+      <div class="ribbon" data-text="about:hero_ribbon">NGO</div>
+      <h1 data-text="about:hero_title">Om MCD (NGO)</h1>
+      <p data-text="about:hero_sub">Lokale projekter, gennemsigtighed og ansvarlig ledelse.</p>
       <div class="btns">
-        <a class="btn primary" href="/" data-text="about:hero_cta_primary">Støt med MadaCoin</a>
-        <a class="btn" href="/reports" data-text="about:hero_cta_secondary">Se rapporter</a>
+        <a class="btn primary" href="/reports" data-text="about:hero_cta_secondary">Se rapporter</a>
       </div>
     </div>
   </section>
 
   <!-- TRE-KOLONNE LAYOUT -->
   <div class="layout">
-    <!-- Venstre bio-kolonne -->
-    <article class="card pad bio-card" id="bio-top">
-      <h2 data-text="about:bio_top_title">Direktør · profil</h2>
+    <!-- Venstre kolonne -->
+    <article class="card pad bio-card" id="pm-card">
+      <h2 data-text="about:pm_title">Projektmanager</h2>
+      <div class="row" style="display:flex;gap:12px;align-items:center;margin-top:6px">
+        <div id="pm-photo" style="width:64px;height:64px;border-radius:10px;background:#0e1620;border:1px solid #2a2a2a;background-size:cover;background-position:50% 35%"></div>
+        <div>
+          <div id="pm-name" style="font-weight:600">Thomas</div>
+          <div id="pm-role" class="muted">Projektmanager (ingen økonomisk råderet)</div>
+        </div>
+      </div>
+      <p class="muted" data-text="about:pm_body" style="margin:.75rem 0 0">
+        Koordinerer projekter, indsamler status og fremlægger forslag til rådet.
+      </p>
+    </article>
+
+    <article class="card pad bio-card" id="about-info">
+      <h2 data-text="about:bio_top_title">Om NGO’en</h2>
       <div class="muted" data-text="about:bio_top">
-        <!-- Indhold hentes fra Supabase -->
+        NGO’en ledes af et råd på fire personer. Rådet godkender alle afgørelser, og projektmanageren faciliterer arbejdet.
       </div>
     </article>
 
-    <article class="card pad bio-card" id="bio-thomas">
-      <h2 data-text="about:thomas_bio_title">Om Thomas</h2>
-      <div class="muted" data-text="about:thomas_bio">
-        <!-- Indhold hentes fra Supabase -->
-      </div>
-    </article>
-
-    <!-- Midterkolonne – pyramide -->
-    <section class="center-col" id="pyr-top">
-      <div class="person">
-        <div class="photo-top" id="photo-top" role="button" tabindex="0" aria-label="Åbn admin-login (Julienne)"></div>
-        <div class="label">
-          <div class="name" id="name-top">Julienne</div>
-          <div class="title" id="title-top">Ejer og Direktør</div>
+    <!-- MIDTE: ROUND COUNCIL -->
+    <section class="center-col">
+      <div class="rc-head">
+        <div>
+          <h2 data-text="about:council_title">Rådet (4 ledere)</h2>
+          <div class="rc-sub" data-text="about:council_sub">Beslutninger tages i fællesskab af fire ligestillede ledere.</div>
         </div>
       </div>
-    </section>
 
-    <section class="center-col" id="pyr-mid">
-      <div class="people-mid">
-        <div class="peer">
-          <div class="photo-peer" id="photo-mid" aria-label="Thomas"></div>
-          <div class="label">
-            <div class="name" id="name-mid">Thomas</div>
-            <div class="title" id="title-mid">Adm. Direktør · Udvikler</div>
-          </div>
+      <div class="rc-board" id="rc-board">
+        <!-- CENTER: Charter/Vedtægter -->
+        <div class="rc-center">
+          <h3 data-text="about:charter_title">Charter & Vedtægter</h3>
+          <p data-text="about:charter_sub">Gennemsigtighed, uafhængighed og ansvarlig forvaltning.</p>
+          <a id="charter-link" href="#" target="_blank" rel="noopener" data-text="about:charter_btn">Læs dokument</a>
         </div>
-        <div class="peer">
-          <div class="photo-peer" id="photo-accounting" aria-label="Revision & Regnskab"></div>
-          <div class="label">
-            <div class="name" id="name-accounting">Revision &amp; Regnskab</div>
-            <div class="title" id="title-accounting">Partner</div>
+
+        <!-- LEDERE: N/E/S/W. Top (N) er admin-trigger (Julienne). -->
+        <article class="leader pos-n" id="leader-n" data-admin="true" role="button" tabindex="0" aria-label="Åbn admin-login">
+          <div class="top">
+            <img id="leader-n-img" alt="Leder N">
+            <div>
+              <div class="nm" id="leader-n-name">Julienne</div>
+              <div class="ti" id="leader-n-title">Leder</div>
+            </div>
           </div>
-        </div>
+          <ul id="leader-n-points">
+            <li>Overordnet tilsyn</li>
+            <li>Underskriftsret</li>
+          </ul>
+        </article>
+
+        <article class="leader pos-e" id="leader-e">
+          <div class="top">
+            <img id="leader-e-img" alt="Leder E">
+            <div>
+              <div class="nm" id="leader-e-name">Leder Øst</div>
+              <div class="ti" id="leader-e-title">Leder</div>
+            </div>
+          </div>
+          <ul id="leader-e-points">
+            <li>Projektprioritering</li>
+            <li>Lokale leverandører</li>
+          </ul>
+        </article>
+
+        <article class="leader pos-s" id="leader-s">
+          <div class="top">
+            <img id="leader-s-img" alt="Leder S">
+            <div>
+              <div class="nm" id="leader-s-name">Leder Syd</div>
+              <div class="ti" id="leader-s-title">Leder</div>
+            </div>
+          </div>
+          <ul id="leader-s-points">
+            <li>Budget & rapporter</li>
+            <li>Risiko & compliance</li>
+          </ul>
+        </article>
+
+        <article class="leader pos-w" id="leader-w">
+          <div class="top">
+            <img id="leader-w-img" alt="Leder V">
+            <div>
+              <div class="nm" id="leader-w-name">Leder Vest</div>
+              <div class="ti" id="leader-w-title">Leder</div>
+            </div>
+          </div>
+          <ul id="leader-w-points">
+            <li>Community & kommunikation</li>
+            <li>Partnere</li>
+          </ul>
+        </article>
       </div>
-    </section>
 
-    <section class="center-col" id="pyr-sub">
-      <div class="sub-row">
-        <div class="sub">
-          <div class="photo-sub" id="photo-sub-1"></div>
-          <div class="label">
-            <div class="name" id="name-sub-1">Navn</div>
-            <div class="title" id="title-sub-1">Rolle</div>
-          </div>
-        </div>
-        <div class="sub">
-          <div class="photo-sub" id="photo-sub-2"></div>
-          <div class="label">
-            <div class="name" id="name-sub-2">Navn</div>
-            <div class="title" id="title-sub-2">Rolle</div>
-          </div>
-        </div>
-        <div class="sub">
-          <div class="photo-sub" id="photo-sub-3"></div>
-          <div class="label">
-            <div class="name" id="name-sub-3">Navn</div>
-            <div class="title" id="title-sub-3">Rolle</div>
+      <!-- Teams-chips -->
+      <div class="rc-teams" id="rc-teams">
+        <span class="chip">Finans</span>
+        <span class="chip">Revision</span>
+        <span class="chip">Projekter</span>
+        <span class="chip">Community</span>
+      </div>
+
+      <!-- Projektmanager (facilitator) -->
+      <div class="pm">
+        <div class="row">
+          <img id="pm-photo-inline" alt="Projektmanager">
+          <div>
+            <div style="font-weight:600" id="pm-name-inline">Thomas</div>
+            <div class="muted" id="pm-role-inline">Projektmanager · rapporterer til rådet</div>
           </div>
         </div>
       </div>
@@ -369,9 +445,9 @@
     <!-- Højre kolonne -->
     <aside class="right-col">
       <div class="card pad" id="right-main">
-        <h2 data-text="about:right_title">Vores version</h2>
+        <h2 data-text="about:right_title">Mission & principper</h2>
         <div class="muted" data-text="about:right_body">
-          <!-- Indhold hentes fra Supabase (about:right_body) -->
+          NGO’en arbejder uafhængigt af MCN (firmaet). Denne side viser kun NGO-indhold.
         </div>
       </div>
     </aside>
@@ -436,6 +512,16 @@
         document.querySelectorAll('[data-text]').forEach(el=>{
           const k=el.getAttribute('data-text'); if(dict[k]!=null) el.innerHTML=dict[k];
         });
+
+        // Charter-link (hentes fra about:charter_url hvis sat)
+        const cl = dict['about:charter_url'];
+        if(cl){ const a=document.getElementById('charter-link'); if(a) a.href = cl; }
+        // Teams fra tekst (komma-sep)
+        const teams = (dict['about:teams']||'').split(',').map(s=>s.trim()).filter(Boolean);
+        if(teams.length){
+          const wrap=document.getElementById('rc-teams'); wrap.innerHTML='';
+          teams.forEach(t=>{ const span=document.createElement('span'); span.className='chip'; span.textContent=t; wrap.appendChild(span); });
+        }
       }catch(e){ console.warn('[about] site_text', e); }
     })();
 
@@ -480,85 +566,78 @@
       });
     }
 
-    /* ===== Personer/partnere + billeder (HUSK BILLEDER) ===== */
+    /* ===== Hent personer til Råd + PM (HUSK BILLEDER) ===== */
     (async function(){
-      if(!sb) return;
+      if(!sb) {
+        // fallback billeder, når Supabase ikke er tilgængelig
+        simpleFallbackImages();
+        return;
+      }
       try{
+        // Understøt både NYE og GAMLE slots, så siden ikke knækker før DB er opdateret
+        const wanted = ['leader_n','leader_e','leader_s','leader_w','pm'];
+        const legacy = ['top','mid','accounting','sub1','sub2','sub3'];
         const pplRes = await sb.from('org_people')
-          .select('slot,name,title,photo_url,bio,partner_id')
-          .in('slot',['top','mid','accounting','sub1','sub2','sub3']);
+          .select('slot,name,title,photo_url,bio')
+          .or(`slot.in.(${wanted.join(',')}),slot.in.(${legacy.join(',')})`);
         const ppl = pplRes.data||[];
-
-        const ids=[]; const partnersById={};
-        ppl.forEach(p=>{ if(p.partner_id) ids.push(p.partner_id); });
-        if(ids.length){
-          const prRes=await sb.from('partners')
-            .select('id,name,website,logo_url,logo_alt,category,active')
-            .in('id',ids);
-          (prRes.data||[]).forEach(x=>partnersById[x.id]=x);
-        }
 
         const bySlot={}; ppl.forEach(x=>bySlot[x.slot]=x);
 
         const STORAGE_BASE = SUPABASE_URL.replace(/\/+$/,'') + '/storage/v1/object/public';
-        const PLACEHOLDER='data:image/svg+xml;utf8,%3Csvg xmlns%3D%22http%3A//www.w3.org/2000/svg%22 viewBox%3D%220 0 256 256%22%3E%3Crect width%3D%22256%22 height%3D%22256%22 rx%3D%2216%22 fill%3D%22%230b0b0c%22/%3E%3Ctext x%3D%2250%25%22 y%3D%2255%25%22 text-anchor%3D%22middle%22 font-family%3D%22Segoe%20UI%2CArial%22 font-size%3D%2288%22 font-weight%3D%22700%22 fill%3D%22%23f7c14b%22%3EMC%3C/text%3E%3C/svg%3E';
+        function ph(s){ return STORAGE_BASE + s } // helper
 
-        function fb(slot){
-          if(slot==='top') return STORAGE_BASE+'/people/Owner.jpg';        // Julienne
-          if(slot==='mid') return STORAGE_BASE+'/people/ADM.jpg';          // Thomas
-          if(slot==='accounting') return STORAGE_BASE+'/people/Revision.jpg';
-          return '';
+        // Helper: sæt billede/tekst på lederkort
+        function setLeader(prefix, p, fallbackUrl){
+          const img = document.getElementById(`${prefix}-img`);
+          const nm  = document.getElementById(`${prefix}-name`);
+          const ti  = document.getElementById(`${prefix}-title`);
+          if(img) img.src = (p?.photo_url && p.photo_url.trim()) ? p.photo_url : fallbackUrl;
+          if(nm && (p?.name)) nm.textContent = p.name;
+          if(ti && (p?.title)) ti.textContent = p.title;
         }
-        function showPhoto(id,slot,url){
-          const el=document.getElementById(id); if(!el) return;
-          const fallback=fb(slot);
-          const has=!!(url && String(url).trim());
-          const chosen=has?url:(fallback||PLACEHOLDER);
-          el.style.backgroundImage=`url('${chosen}')`;
-          const img=new Image(); img.onload=()=>{ if(img.naturalHeight>img.naturalWidth*1.15) el.classList.add('portrait'); else el.classList.remove('portrait'); }; img.src=chosen;
-          let addFrame=has; if(!has && slot==='accounting' && fallback) addFrame=false; if(!has && !fallback) addFrame=false;
-          el.classList.toggle('has-photo', addFrame);
-        }
-        function setText(id,val){ const el=document.getElementById(id); if(el && val!=null) el.textContent=val; }
 
-        /* top (Julienne) */
-        { const p=bySlot.top||{};
-          showPhoto('photo-top','top',p.photo_url);
-          setText('name-top',p.name||document.getElementById('name-top').textContent);
-          setText('title-top',p.title||document.getElementById('title-top').textContent);
-          if(p.bio){ const el=document.querySelector('#bio-top [data-text="about:bio_top"]'); if(el) el.innerHTML=p.bio; }
-        }
-        /* mid (Thomas) */
-        { const p=bySlot.mid||{};
-          showPhoto('photo-mid','mid',p.photo_url);
-          setText('name-mid',p.name||document.getElementById('name-mid').textContent);
-          setText('title-mid',p.title||document.getElementById('title-mid').textContent);
-          if(p.bio){ const el=document.querySelector('#bio-thomas [data-text="about:thomas_bio"]'); if(el) el.innerHTML=p.bio; }
-        }
-        /* accounting (partner) */
-        { const p=bySlot.accounting||{};
-          const partner=p.partner_id?partnersById[p.partner_id]:null;
-          const name=(partner&&partner.name)||p.name||document.getElementById('name-accounting').textContent;
-          const title=partner?(partner.category||'Partner'):(p.title||document.getElementById('title-accounting').textContent);
-          const logo=(partner&&partner.logo_url)||p.photo_url||'';
-          showPhoto('photo-accounting','accounting',logo);
-          setText('name-accounting',name); setText('title-accounting',title);
-        }
-        /* subs */
-        [{slot:'sub1',photo:'photo-sub-1',name:'name-sub-1',title:'title-sub-1'},
-         {slot:'sub2',photo:'photo-sub-2',name:'name-sub-2',title:'title-sub-2'},
-         {slot:'sub3',photo:'photo-sub-3',name:'name-sub-3',title:'title-sub-3'}]
-         .forEach(m=>{
-           const p=bySlot[m.slot]||{};
-           const partner=p.partner_id?partnersById[p.partner_id]:null;
-           const name=(partner&&partner.name)||p.name||document.getElementById(m.name).textContent;
-           const title=partner?(partner.category||'Partner'):(p.title||document.getElementById(m.title).textContent);
-           const logo=(partner&&partner.logo_url)||p.photo_url||'';
-           showPhoto(m.photo,'sub',logo);
-           setText(m.name,name); setText(m.title,title);
-         });
-      }catch(e){ console.warn('[about] org_people', e); }
+        // Map NY → data
+        setLeader('leader-n', bySlot['leader_n'] || bySlot['top'] || null, ph('/people/Owner.jpg'));
+        setLeader('leader-e', bySlot['leader_e'] || bySlot['sub1'] || null, ph('/people/LeaderE.jpg'));
+        setLeader('leader-s', bySlot['leader_s'] || bySlot['accounting'] || null, ph('/people/Revision.jpg'));
+        setLeader('leader-w', bySlot['leader_w'] || bySlot['sub2'] || null, ph('/people/LeaderW.jpg'));
+
+        // PM
+        const pm = bySlot['pm'] || bySlot['mid'] || null;
+        const pmUrl = (pm?.photo_url && pm.photo_url.trim()) ? pm.photo_url : ph('/people/ADM.jpg');
+        ['pm-photo','pm-photo-inline'].forEach(id=>{
+          const el=document.getElementById(id);
+          if(!el) return;
+          if(el.tagName === 'IMG'){ el.src = pmUrl; }
+          else { el.style.backgroundImage = `url('${pmUrl}')`; }
+        });
+        if(pm?.name) { const a=document.getElementById('pm-name'); if(a) a.textContent=pm.name; const b=document.getElementById('pm-name-inline'); if(b) b.textContent=pm.name; }
+        if(pm?.title){ const a=document.getElementById('pm-role'); if(a) a.textContent=pm.title; const b=document.getElementById('pm-role-inline'); if(b) b.textContent=pm.title + ' · rapporterer til rådet'; }
+
+      }catch(e){
+        console.warn('[about] org_people', e);
+        simpleFallbackImages();
+      }
     })();
+
+    function simpleFallbackImages(){
+      const base = SUPABASE_URL.replace(/\/+$/,'') + '/storage/v1/object/public';
+      const fb = {
+        n: base+'/people/Owner.jpg',
+        e: base+'/people/LeaderE.jpg',
+        s: base+'/people/Revision.jpg',
+        w: base+'/people/LeaderW.jpg',
+        pm: base+'/people/ADM.jpg'
+      };
+      const map = [['leader-n-img','n'],['leader-e-img','e'],['leader-s-img','s'],['leader-w-img','w']];
+      map.forEach(([id,k])=>{ const el=document.getElementById(id); if(el) el.src=fb[k]; });
+      ['pm-photo','pm-photo-inline'].forEach(id=>{
+        const el=document.getElementById(id);
+        if(!el) return;
+        if(el.tagName==='IMG') el.src=fb.pm; else el.style.backgroundImage=`url('${fb.pm}')`;
+      });
+    }
 
     /* ===== Partners strip ===== */
     (async function(){
@@ -583,7 +662,7 @@
       }catch(e){ console.warn('[partners] exception:', e); }
     })();
 
-    /* ===== Admin modal via Juliennes foto ===== */
+    /* ===== Admin modal – Julienne/leder-N er “trykknap” ===== */
     const $ = s=>document.querySelector(s);
     const modal = $('#admin-modal');
     const openModal = ()=>{ modal.style.display='flex'; modal.setAttribute('aria-hidden','false'); $('#adm-email')?.focus(); };
@@ -591,12 +670,10 @@
     $('#mdl-close')?.addEventListener('click', closeModal);
     $('#mdl-cancel')?.addEventListener('click', closeModal);
 
-    const ownerPic = document.getElementById('photo-top');
-    if(ownerPic){
-      // Enkelt klik åbner modal (ønske: “trykknap”)
-      ownerPic.addEventListener('click', openModal);
-      // Tastatur (Enter/Space)
-      ownerPic.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openModal(); }});
+    const adminTrigger = document.getElementById('leader-n');
+    if(adminTrigger){
+      adminTrigger.addEventListener('click', openModal);
+      adminTrigger.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openModal(); }});
     }
 
     async function isAdmin(session){
@@ -611,7 +688,7 @@
       if(error){ $('#adm-msg').textContent = error.message; return; }
       const { data:{session} } = await sb.auth.getSession();
       if(!(await isAdmin(session))){ $('#adm-msg').textContent='Ingen adgang.'; await sb.auth.signOut(); return; }
-      window.location.href = '/adm'; // clean URL (rewrite til adm.html)
+      window.location.href = '/adm';
     });
 
     /* Init: sociale links */
