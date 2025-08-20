@@ -56,7 +56,7 @@
     /* NAV (to linjer) */
     .site-nav{ position: sticky; top: 0; z-index: 9999; padding: 18px 0; background: transparent }
     .nav-inner{ padding-left:var(--edge); padding-right:var(--edge) }
-    .site-nav nav{ display:flex; flex-direction:column; gap:8px } /* ændret til kolonne for 2 linjer */
+    .site-nav nav{ display:flex; flex-direction:column; gap:8px }
     .nav-row{ display:flex; gap:var(--nav-gap); align-items:center; flex-wrap:wrap }
     .site-nav nav a{
       display:inline-flex; align-items:center; justify-content:center;
@@ -71,7 +71,7 @@
     }
 
     /* Sociale links (venstre side) */
-    .social-menu{ position:fixed; top:160px; left:16px; display:flex; flex-direction:column; gap:10px; z-index:1000 } /* top forhøjet pga. 2. nav-linje */
+    .social-menu{ position:fixed; top:160px; left:16px; display:flex; flex-direction:column; gap:10px; z-index:1000 }
     .social-menu a{
       display:flex; align-items:center; justify-content:center;
       width:42px; height:42px; background:rgba(0,0,0,.7);
@@ -162,7 +162,7 @@
     .site-footer{ margin-top:auto; padding:12px 16px; text-align:center; background:rgba(0,0,0,.75); border-top:1px solid rgba(255,255,255,.06) }
   </style>
 
-  <!-- Tighter layout overrides (så The Mission altid er synlig ved 100%) -->
+  <!-- Tighter layout overrides -->
   <style>
     :root{
       --gap: 16px;              /* var 64px */
@@ -174,15 +174,15 @@
       :root{ --left-col: 440px; --right-col: 480px; }
       .leaders-grid{ gap:12px; }
     }
-    .social-menu{ left:8px; }                 /* tættere på indholdet */
-    .social-menu a{ width:36px; height:36px; }/* mindre ikoner */
+    .social-menu{ left:8px; }
+    .social-menu a{ width:36px; height:36px; }
     .layout{ padding: 16px var(--edge) 28px; }
     .leaders-grid{ margin: 0 auto 4px; }
     .info-row{ margin: 4px auto 8px; gap:14px; }
     .below{ gap:18px; }
   </style>
 
-  <!-- Responsiv/touch-optimering for tablets/mobiler -->
+  <!-- Responsiv/touch -->
   <style>
     :root{
       --gap: clamp(12px, 2vw, 24px);
@@ -218,11 +218,9 @@
           <a href="/reports" data-text="common:nav_reports">Reports</a>
         </div>
         <div class="nav-row">
-          <!-- KUN link til MCN About -->
-          <div class="nav-row">
-  <a href="https://madacoin.pro/about.html">MCN</a>
-</div>
-
+          <!-- KUN link til MCN About (sættes robust ved runtime) -->
+          <a id="link-mcn" href="#">MCN</a>
+        </div>
       </nav>
     </div>
   </header>
@@ -425,7 +423,6 @@
 
     /* Site-tekster (common + about) – DB + Admin override */
     (async function(){
-      // Admin-override (vind altid over DB)
       const admin = window.MCD_CONTENT || null;
 
       if(!sb){
@@ -573,7 +570,7 @@
       }catch(e){ console.warn('[partners] exception:', e); }
     })();
 
-    /* ===== BRANDING fra bucket 'logo': favicon (MCD-favicon.* → fallback MCD.*) ===== */
+    /* ===== BRANDING fra bucket 'logo': favicon ===== */
     const LOGO_BUCKET = 'logo';
     const BRAND_EXTS  = ['svg','png','webp','jpg','jpeg'];
     const FAV_EXTS    = ['svg','png','ico'];
@@ -639,13 +636,29 @@
 
     /* Init (About) */
     window.addEventListener('load', async ()=>{
-      await applyBrandingFromBucket('MCD'); // ← favicon fra bucket 'logo'
+      await applyBrandingFromBucket('MCD');
     });
+
+    /* === Robust krydslink: MCD About → MCN About === */
+    (function setCrossLinkMCDtoMCN(){
+      try{
+        const a = document.getElementById('link-mcn');
+        if(!a) return;
+
+        const { origin, pathname } = window.location;
+        // Find site-rod (alt før /mcd/) – fungerer på domæne, subfolder og lokalt
+        const basePath = pathname.includes('/mcd/') ? pathname.split('/mcd/')[0] : pathname.replace(/\/[^\/]*$/, '') || '/';
+        const root = basePath.endsWith('/') ? basePath : basePath + '/';
+        const url  = new URL(root + 'about.html', origin).href; // MCN about.html ved sitets rod
+
+        a.href = url;
+        a.addEventListener('click', (e)=>{ e.preventDefault(); location.assign(url); });
+      }catch(e){}
+    })();
   </script>
 
   <!-- Admin Panel: klient-side override (kan sættes af CMS uden deploy) -->
   <script>
-    /* Hvis Admin-panel sætter window.MCD_CONTENT, overskriver det teksterne */
     (function hydrateFromAdmin(){
       try{
         const dict = window.MCD_CONTENT; if(!dict) return;
@@ -660,5 +673,3 @@
   </script>
 </body>
 </html>
-
-
