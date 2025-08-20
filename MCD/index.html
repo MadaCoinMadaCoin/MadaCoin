@@ -6,7 +6,7 @@
 
   <title>MadaCoin MCD</title>
   <meta name="description" content="MadaCoin støtter udvikling i Madagaskar gennem donationer og gennemsigtighed.">
-  <link rel="icon" href="/favicon_boosted.ico?v=1" type="image/x-icon">
+  <link id="favicon" rel="icon" href="/favicon_boosted.ico?v=1" type="image/x-icon">
 
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
@@ -15,6 +15,7 @@
     html,body{ height:100% }
 
     :root{
+      /* Layout */
       --edge:24px;
       --container:1200px;
 
@@ -32,9 +33,17 @@
       /* Højre kolonne (mønter+YouTube) – låst */
       --right-rail-left: 538px;
 
+      /* Body gradient */
       --base-top:#eff3fb;
       --base-bot:#e2ebf7;
 
+      /* Baggrund (samme motor som About) */
+      --bg:#061a2b;
+      --bg-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
+      --bg-1x: var(--bg-image);
+      --bg-2x: var(--bg-image);
+
+      /* Pos tweak til baggrund (kan justeres) */
       --bg-x: 0px;
       --bg-y: 0px;
     }
@@ -43,9 +52,11 @@
     body{
       display:flex; flex-direction:column; margin:0; color:#fff;
       font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+
+      /* Lag: overlay + image-set (1x/2x) + gradient */
       background:
         linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.14)),
-        var(--mcd-bg-image, none),
+        image-set(var(--bg-1x) 1x, var(--bg-2x) 2x),
         linear-gradient(var(--base-top), var(--base-bot));
       background-repeat: no-repeat, no-repeat, no-repeat;
       background-size: auto, cover, auto;
@@ -54,6 +65,7 @@
         center center,
         calc(50% + var(--bg-x)) calc(0% + var(--bg-y)),
         center center;
+
       overflow-x:hidden;
     }
 
@@ -62,7 +74,8 @@
     /* ===================== NAV ===================== */
     .site-nav{ position:sticky; top:0; z-index:1000; padding:20px 0 }
     .nav{
-      display:flex; gap:var(--nav-gap); padding-left:var(--edge); padding-right:var(--edge);
+      display:flex; gap:var(--nav-gap);
+      padding-left:var(--edge); padding-right:var(--edge);
       align-items:center;
     }
     .nav a{
@@ -70,16 +83,15 @@
       background:var(--nav-bg); border:1px solid var(--nav-b); color:#fff
     }
     .nav a:hover{ background:var(--nav-hover) }
-
-    /* (NYT) Nav CTA – “Køb MCD” */
+    /* Nav CTA – “Køb MCD” */
     .nav .cta{
-      margin-left:auto;                      /* skub helt til højre */
+      margin-left:auto;
       background:linear-gradient(135deg,#FFD700,#DAA520);
       color:#1c2630; border-color:#865c10; font-weight:800;
     }
     .nav .cta:hover{ filter:brightness(1.06) }
 
-    /* ===================== SOCIAL LINKS ===================== */
+    /* ===================== SOCIALE LINKS ===================== */
     .social-menu{ position:fixed; top:var(--social-top); left:var(--edge); display:flex; flex-direction:column; gap:10px; z-index:999 }
     .social-menu a{ width:42px; height:42px; display:grid; place-items:center; background:rgba(0,0,0,.7); border-radius:8px; text-decoration:none }
     .social-menu a img{ width:22px; height:22px }
@@ -112,6 +124,18 @@
     .hero .btn{ padding:9px 14px; border-radius:12px; text-decoration:none; background:#0d0d0f; border:1px solid #333; color:#fff }
     .hero .btn.primary{ background:linear-gradient(135deg,#FFD700,#DAA520); color:#1c2630 }
 
+    /* (NYT) Brand-logo under Hero */
+    .brand-hero{
+      margin-top:12px;
+      background:#0b0b0c; border:1px solid #2a2a2a; border-radius:16px;
+      box-shadow:0 12px 26px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06);
+      padding:14px 16px; display:flex; align-items:center; justify-content:center;
+    }
+    .brand-hero img{
+      display:block; width:min(420px, 92%); height:auto; object-fit:contain;
+      filter: drop-shadow(0 8px 18px rgba(0,0,0,.45));
+    }
+
     /* Højre kolonne (mønter+YouTube) */
     .right-rail{ margin-left: var(--right-rail-left); position:relative; z-index:3 }
     .right-stack{ display:inline-block; vertical-align:top }
@@ -132,6 +156,7 @@
 
     footer{ margin-top:auto; text-align:center; padding:16px; background:#e4e6c5; color:#000 }
 
+    /* Responsiv */
     @media (max-width:1150px){
       .left-rail-box{ position:static; width:auto }
       .right-rail{ margin-left:0 }
@@ -150,9 +175,7 @@
       <a href="/about" data-text="common:nav_about">About</a>
       <a href="/roadmap" data-text="common:nav_roadmap">Roadmap</a>
       <a href="/reports" data-text="common:nav_reports">Reports</a>
-      <!-- (NYT) KØB-KNAP I NAV -->
       <a href="#" id="nav-buy" class="cta">Køb MCD</a>
-      <!-- Hvis du hellere vil have en /buy-side: skift href="/buy" og fjern JS-handleren i bunden -->
     </nav>
   </header>
 
@@ -162,7 +185,7 @@
 
     <!-- Scene -->
     <section class="stage">
-      <!-- Venstre kolonne (kun hero på donate) -->
+      <!-- Venstre kolonne -->
       <div class="left-rail-box">
         <section class="hero" id="home-hero">
           <div class="ribbon">NYHED: 25% hotelrabat til MCD-holders</div>
@@ -177,6 +200,11 @@
             <button class="btn primary" id="hero-primary">Støt med MadaCoin</button>
             <a class="btn" href="/reports">Se rapporter</a>
           </div>
+        </section>
+
+        <!-- (NYT) Brand-logo under Hero -->
+        <section class="brand-hero" aria-label="MCD logo">
+          <img id="brand-hero-img" alt="MCD logo" />
         </section>
       </div>
 
@@ -208,31 +236,18 @@
     const SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
     const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON) : null;
 
-    /* ===== BAGGRUND (sætter --mcd-bg-image) ===== */
-    const storeBase = `${SUPABASE_URL}/storage/v1/object/public`;
-    const pub = (...p)=>`${storeBase}/${p.map(encodeURIComponent).join('/')}`;
-
-    async function resolveMcdBgUrl(){
-      if(!sb) return null;
+    /* ===== Baggrund via site_settings (samme som About) ===== */
+    async function applyBackgroundForPage(pageKey='home'){
+      if(!sb) return;
       try{
-        let { data:media } = await sb.from('site_media')
-          .select('page,key,url,bucket,path')
-          .eq('page','MCD').eq('key','bg').limit(1).maybeSingle();
-        if(media){
-          if(media.url) return media.url;
-          if(media.bucket && media.path) return pub(media.bucket, media.path);
-        }
-      }catch(e){}
-      try{
-        let { data:text } = await sb.from('site_text')
-          .select('value').eq('page','MCD').eq('key','bg_url').limit(1).maybeSingle();
-        if(text?.value) return text.value;
-      }catch(e){}
-      return pub('images','MCD_bg.webp');
-    }
-    async function applyBackground(){
-      const url = await resolveMcdBgUrl();
-      if(url){ document.documentElement.style.setProperty('--mcd-bg-image', `url("${url}")`); }
+        const keys=[`bg_${pageKey}_1x`,`bg_${pageKey}_2x`,`bg_default_1x`,`bg_default_2x`];
+        const { data } = await sb.from('site_settings').select('key,value').in('key', keys);
+        const map = Object.fromEntries((data||[]).map(r=>[r.key,r.value]));
+        const one = map[`bg_${pageKey}_1x`] || map['bg_default_1x'] || '';
+        const two = map[`bg_${pageKey}_2x`] || map['bg_default_2x'] || '';
+        if(one) document.body.style.setProperty('--bg-1x', `url("${one}")`);
+        if(two) document.body.style.setProperty('--bg-2x', `url("${two}")`);
+      }catch(e){ console.warn('[home] background', e); }
     }
 
     /* ===== On-ramp (Ramp) ===== */
@@ -246,8 +261,13 @@
     async function loadSiteText(){
       if(!sb) return {};
       try{
-        const { data } = await sb.from('site_text').select('page,key,value').in('page',['common','home','MCD']);
-        const dict={}; (data||[]).forEach(r=>dict[`${r.page}:${r.key}`]=r.value);
+        const { data } = await sb.from('site_text').select('page,key,value,content,project,is_active')
+          .in('page',['common','home']).eq('project','MCD').eq('is_active',true);
+        const dict={};
+        (data||[]).forEach(r=>{
+          const v = (r.value ?? r.content ?? '').toString();
+          if(v) dict[`${r.page}:${r.key}`]=v;
+        });
         document.querySelectorAll('[data-text]').forEach(el=>{
           const k=el.getAttribute('data-text'); if(dict[k]!=null) el.innerHTML=dict[k];
         });
@@ -270,9 +290,43 @@
       });
     }
 
+    /* Billeder (mønt) */
+    const storeBase = `${SUPABASE_URL}/storage/v1/object/public`;
+    const pub = (...p)=>`${storeBase}/${p.map(encodeURIComponent).join('/')}`;
     function setCoinImages(){
       const d=document.getElementById('coinD');
       if(d) d.src=pub('images','MadaCoin_D.png');
+    }
+
+    /* (NYT) Branding – hero-logo + favicon fra site_settings */
+    function setPlaceholderLogo(){
+      const img=document.getElementById('brand-hero-img'); if(!img) return;
+      img.src=`data:image/svg+xml;utf8,` +
+        encodeURIComponent(`
+          <svg xmlns='http://www.w3.org/2000/svg' width='800' height='220'>
+            <rect width='100%' height='100%' rx='18' fill='#0d0f12'/>
+            <text x='50%' y='54%' text-anchor='middle' font-family='Segoe UI, Arial' font-size='84' font-weight='900' fill='#FFD700'>MCD</text>
+            <text x='50%' y='82%' text-anchor='middle' font-family='Segoe UI, Arial' font-size='24' fill='#d6d6d6'>Logo placeholder</text>
+          </svg>
+        `);
+    }
+    async function applyBranding(){
+      setPlaceholderLogo(); // vis noget pænt indtil vi evt. finder ægte logo
+      if(!sb) return;
+      try{
+        const keys = ['logo_mcd_hero','logo_mcd_nav','logo_mcd_mark','logo_mark_mcd','favicon_mcd'];
+        const { data } = await sb.from('site_settings').select('key,value').in('key', keys);
+        const map = Object.fromEntries((data||[]).map(r=>[r.key,r.value]));
+        const logo = map['logo_mcd_hero'] || map['logo_mcd_nav'] || map['logo_mcd_mark'] || map['logo_mark_mcd'] || '';
+        const img = document.getElementById('brand-hero-img');
+        if(img && logo){ img.src = logo; }
+
+        const fav = map['favicon_mcd'];
+        if(fav){
+          const link = document.getElementById('favicon');
+          if(link) link.href = fav;
+        }
+      }catch(e){ console.warn('[home] branding', e); }
     }
 
     /* YouTube */
@@ -312,22 +366,23 @@
       renderPlayer(vids[0]._id); renderThumbs(vids,vids[0]._id);
     }
 
+    /* Knap-handlers */
     function attachHeroActions(){
       const btn1=document.getElementById('hero-primary');
       const btn2=document.getElementById('buy-mcd');
-      const navBuy=document.getElementById('nav-buy');   // <— (NYT)
+      const navBuy=document.getElementById('nav-buy');
       if(btn1) btn1.addEventListener('click',openRampMCD);
       if(btn2) btn2.addEventListener('click',openRampMCD);
-      if(navBuy){                                        // <— (NYT)
-        navBuy.addEventListener('click', (e)=>{ e.preventDefault(); openRampMCD(); });
-      }
+      if(navBuy){ navBuy.addEventListener('click', (e)=>{ e.preventDefault(); openRampMCD(); }); }
     }
 
+    /* Init */
     window.addEventListener('load', async ()=>{
-      await applyBackground();
+      await applyBackgroundForPage('home');  // baggrund (samme som About)
       await loadSiteText();
       await renderSocialLinks();
       setCoinImages();
+      await applyBranding();                 // (NYT) hero-logo + favicon
       initYouTube();
       attachHeroActions();
     });
