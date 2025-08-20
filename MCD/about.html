@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MCD • About</title>
-  <link rel="icon" href="/favicon_boosted.ico?v=1" type="image/x-icon" />
+  <title>MCD • About (NGO)</title>
+  <link rel="icon" href="/favicon_boosted.ico?v=3" type="image/x-icon" />
   <link rel="preconnect" href="https://unpkg.com" />
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
-  <style>
+  <style id="rc-v3-styles">
     *,*::before,*::after{ box-sizing:border-box }
     html{ font-size:16px }
     body{
@@ -27,123 +27,78 @@
     @media (max-width:900px){ body{ background-attachment:scroll,scroll,scroll } }
 
     :root{
-      /* Lærred/kolonner */
       --wrap: 1680px;
       --gap: 84px;
       --left-col: 520px;
       --right-col: 520px;
-
-      /* Afstande */
       --edge-pad: 24px;
       --right-gutter: 48px;
-
-      /* Social menu */
       --social-top: 104px;
 
-      /* Farver/stil */
       --bg:#061a2b;
       --bg-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
-      --text:#fff; --muted:#cfd3d7; --primary:#9ad4ff;
+      --text:#fff; --muted:#cfd3d7;
       --card:#0b0b0c; --card-border:#2a2a2a; --shadow:0 12px 26px rgba(0,0,0,.5); --radius:16px;
 
-      /* Nav */
-      --nav-gap:14px; --nav-pad-x:14px; --nav-pad-y:8px;
-      --nav-text:#fff; --nav-bg:#0d0d0f; --nav-border:#333;
-      --nav-hover-bg:#151517; --nav-hover-border:#444; --nav-active:#5aa9ff;
+      --nav-gap:14px; --nav-pad-x:14px; --nav-pad-y:8px; --nav-text:#fff; --nav-bg:#0d0d0f; --nav-border:#333; --nav-hover-bg:#151517; --nav-hover-border:#444; --nav-active:#5aa9ff;
 
-      /* Baggrund (kan overskrives fra DB) */
-      --bg-1x: var(--bg-image);
-      --bg-2x: var(--bg-image);
+      --bg-1x: var(--bg-image); --bg-2x: var(--bg-image);
 
-      /* Round Council – basisstørrelser (auto-scale sørger for resten) */
+      /* Rådet + kort (ens størrelse) */
       --mc-gold:#d6b35a;
-      --ring-size: clamp(280px, 36vh, 420px); /* mål i forhold til skærmhøjde */
-      --leader-w: clamp(360px, 28vw, 480px);
-      --leader-h: 200px;
+      --ring-size:min(400px, 40vw);
+      --leader-w: clamp(340px, 28vw, 460px);
+      --leader-h: 198px;
       --avatar: 72px;
-      --leader-side-offset: clamp(24px, 6vw, 120px);
-      --leader-vert-offset: 14%;
+      --leader-side-offset: 7vw;   /* vandret afstand fra ring */
+      --leader-vert-offset: 24%;   /* lodret afstand over/under ring */
     }
 
     /* NAV */
-    .site-nav{
-      position: sticky; top: 0; z-index: 9999; padding: 24px 0;
-      background: transparent !important; border:0 !important; box-shadow:none !important;
-    }
-    .site-nav::before,.site-nav::after{ display:none !important; content:none !important; }
+    .site-nav{ position: sticky; top: 0; z-index: 9999; padding: 24px 0; }
     .nav-inner{ padding-left:var(--edge-pad); padding-right:var(--edge-pad); }
-    .site-nav nav{
-      display:flex; gap:var(--nav-gap); align-items:center; flex-wrap:wrap;
-      justify-content:flex-start; transform:translateY(-2px);
-    }
+    .site-nav nav{ display:flex; gap:var(--nav-gap); align-items:center; flex-wrap:wrap; transform:translateY(-2px); }
     .site-nav nav a{
       display:inline-flex; align-items:center; justify-content:center;
       padding:var(--nav-pad-y) var(--nav-pad-x);
       color:var(--nav-text); background:var(--nav-bg); border:1px solid var(--nav-border);
       border-radius:12px; text-decoration:none; opacity:.96; box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
-      -webkit-tap-highlight-color:rgba(255,255,255,.15);
-      font-size:1rem;
     }
     .site-nav nav a:hover{ background:var(--nav-hover-bg); border-color:var(--nav-hover-border); }
-    .site-nav nav a.active,
-    .site-nav nav a[aria-current="page"]{
-      border-color:var(--nav-active);
-      box-shadow:0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset;
-    }
+    .site-nav nav a[aria-current="page"]{ border-color:var(--nav-active); box-shadow:0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset; }
 
     /* Sociale links */
-    .social-menu{
-      position:fixed; top:var(--social-top); left:var(--edge-pad);
-      display:flex; flex-direction:column; gap:10px; z-index:1000;
-    }
-    .social-menu a{ display:flex; align-items:center; justify-content:center; width:42px; height:42px; background:rgba(0,0,0,.7); border-radius:8px; text-decoration:none; transition:background-color .2s, transform .15s; }
-    .social-menu a:hover{ background:rgba(0,0,0,.85); transform:translateY(-2px); }
+    .social-menu{ position:fixed; top:var(--social-top); left:var(--edge-pad); display:flex; flex-direction:column; gap:10px; z-index:1000; }
+    .social-menu a{ display:flex; align-items:center; justify-content:center; width:42px; height:42px; background:rgba(0,0,0,.7); border-radius:8px; text-decoration:none }
+    .social-menu a:hover{ background:rgba(0,0,0,.85); transform:translateY(-2px) }
     .social-menu a img{ width:22px; height:22px }
 
-    /* Grid layout */
+    /* Layout */
     .layout{
       max-width:var(--wrap); margin:0 auto; padding:24px var(--edge-pad);
       display:grid; grid-template-columns: var(--left-col) 1fr var(--right-col);
-      grid-auto-rows:auto; gap:var(--gap); align-items:start; flex:1; position:relative; z-index:0;
+      gap:var(--gap); align-items:start; flex:1;
     }
-
-    /* Kort */
     .card{ background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius); box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,.06) }
     .card.pad{ padding:18px }
-    h1{ font-size:clamp(22px,2.6vw,26px); line-height:1.25; margin:0 0 .5em; }
     h2{ margin:0 0 10px; font-size:clamp(18px,2.2vw,22px) }
     .muted{ color:var(--muted) }
 
-    /* Venstre/højre kolonne */
-    #about-info{ grid-column:1; }
-    .right-col{ grid-column:3; margin-top:36px; margin-left:8px; padding-right: var(--right-gutter); position: relative; z-index: 0; }
-    .right-col .card{ width:100% }
-    .right-col #right-main .muted{ min-height: 8rem; }
-
-    /* === COUNCIL – spænder hele bredden === */
+    /* Council */
     .council{ grid-column:1 / -1; display:flex; flex-direction:column; align-items:center; gap:18px; }
+    .rc-head{ width:100%; max-width:1200px; }
+    .rc-sub{ color:#cfd3d7; opacity:.9 }
 
-    .rc-head{ width:100%; max-width:1200px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
-    .rc-sub{ color:var(--muted); margin:.25rem 0 0; }
-
-    /* Scalable stage */
     .rc-stage{ width:100%; display:flex; justify-content:center; }
-    .rc-stage > .rc-inner{
-      position:relative;
-      width: max(920px, 60vw);        /* “design size” – auto-scale sørger for fit */
-      padding: 40px 0 60px;           /* lidt luft rundt om selve brættet */
-    }
-    .rc-scale{ transform-origin: top center; }
+    .rc-inner{ position:relative; width:max(980px, 62vw); padding: 20px 0 20px; }
 
     .rc-board{
-      position:relative; width:var(--ring-size); aspect-ratio:1/1; margin:0 auto;
+      position:relative; width:var(--ring-size); aspect-ratio:1/1; margin:0 auto 42px;
       border-radius:999px;
-      background:
-        radial-gradient(closest-side, rgba(214,179,90,.16), transparent 60%),
-        radial-gradient(closest-side, rgba(214,179,90,.08), transparent 76%),
-        radial-gradient(closest-side, rgba(214,179,90,.05), transparent 90%),
-        #0f1319;
-      box-shadow:0 0 0 1px rgba(214,179,90,.25) inset, 0 40px 80px rgba(0,0,0,.35);
+      background: radial-gradient(closest-side, rgba(214,179,90,.16), transparent 60%), #0f1319;
+      box-shadow:
+        0 0 0 8px rgba(214,179,90,.6) inset,   /* tyk guldkant */
+        0 30px 60px rgba(0,0,0,.35);           /* skygge */
       overflow:visible;
     }
     .rc-center{
@@ -152,57 +107,53 @@
       border:1px solid var(--card-border); border-radius:20px; padding:18px 20px;
       width:min(62%, 520px); text-align:center; box-shadow:var(--shadow);
     }
-    .rc-center h3{ margin:.2rem 0 .25rem; font-size:clamp(16px,2.2vw,20px) }
-    .rc-center p{ margin:.1rem 0 .5rem; color:var(--muted); font-size:.95rem }
-    .rc-center a{
-      display:inline-block; padding:8px 12px; border-radius:12px;
-      border:1px solid var(--mc-gold); color:var(--text); text-decoration:none;
-      background:linear-gradient(180deg, rgba(214,179,90,.22), rgba(214,179,90,.08));
-    }
+    .rc-center a{ display:inline-block; margin-top:.35rem; padding:8px 12px; border-radius:12px; border:1px solid var(--mc-gold); background:linear-gradient(180deg, rgba(214,179,90,.22), rgba(214,179,90,.08)); color:#fff; text-decoration:none }
 
-    /* Lederkort – udenfor ringen, ENS STØRRELSE */
+    /* Lederkort — ENS størrelse og udenfor ringen */
     .leader{
       position:absolute;
-      width:var(--leader-w);
-      min-height:var(--leader-h);
-      display:grid; grid-template-columns:auto 1fr; grid-template-rows:auto 1fr;
-      gap:12px 14px; align-content:start;
+      width:var(--leader-w); min-height:var(--leader-h);
+      display:grid; grid-template-columns:auto 1fr; grid-template-rows:auto 1fr; gap:12px 14px; align-content:start;
       background:linear-gradient(180deg, #151a21, #10151b);
       border:1px solid var(--card-border); border-radius:18px; padding:16px; box-shadow:var(--shadow);
     }
-    .leader .top{ grid-column:1 / -1; display:grid; grid-template-columns:var(--avatar) 1fr; align-items:center; column-gap:14px; margin:0; }
+    .leader .top{ grid-column:1/-1; display:grid; grid-template-columns:var(--avatar) 1fr; align-items:center; column-gap:14px; margin:0 }
     .leader img{ width:var(--avatar); height:var(--avatar); border-radius:50%; object-fit:cover; border:1px solid var(--card-border) }
     .leader .nm{ font-weight:700; letter-spacing:.2px; font-size:1.05rem; line-height:1.2 }
-    .leader .ti{ color:var(--muted); font-size:.96rem; margin-top:2px }
-    .leader ul{ grid-column:1 / -1; list-style:disc; margin:.25rem 0 0 1.2rem; color:var(--muted); line-height:1.4; }
+    .leader .ti{ color:#cfd3d7; font-size:.96rem; margin-top:2px }
+    .leader ul{ grid-column:1/-1; list-style:disc; margin:.25rem 0 0 1.2rem; color:#cfd3d7; line-height:1.4 }
     .leader ul li{ margin:.22rem 0 }
-    .leader::after{ content:""; position:absolute; pointer-events:none; opacity:.9; }
+    .leader::after{ content:""; position:absolute; pointer-events:none; opacity:.9 }
 
     /* Positioner udenfor ringen */
-    .leader.pos-n{ left:50%; top: calc(-1 * var(--leader-vert-offset)); transform:translate(-50%,0); }
-    .leader.pos-n::after{ left:50%; top:100%; transform:translateX(-50%); width:2px; height:22px; background:linear-gradient(180deg, rgba(214,179,90,.85), rgba(214,179,90,0)); }
+    .leader.pos-n{ left:50%; top: calc(-1 * var(--leader-vert-offset)); transform:translate(-50%,0) }
+    .leader.pos-n::after{ left:50%; top:100%; transform:translateX(-50%); width:2px; height:22px; background:linear-gradient(180deg, rgba(214,179,90,.85), rgba(214,179,90,0)) }
 
-    .leader.pos-s{ left:50%; bottom: calc(-1 * var(--leader-vert-offset)); transform:translate(-50%,0); }
-    .leader.pos-s::after{ left:50%; bottom:100%; transform:translateX(-50%); width:2px; height:22px; background:linear-gradient(0deg, rgba(214,179,90,.85), rgba(214,179,90,0)); }
+    .leader.pos-s{ left:50%; bottom: calc(-1 * var(--leader-vert-offset)); transform:translate(-50%,0) }
+    .leader.pos-s::after{ left:50%; bottom:100%; transform:translateX(-50%); width:2px; height:22px; background:linear-gradient(0deg, rgba(214,179,90,.85), rgba(214,179,90,0)) }
 
-    .leader.pos-w{ right: calc(100% + var(--leader-side-offset)); top:50%; transform:translateY(-50%); }
-    .leader.pos-w::after{ left:100%; top:50%; transform:translateY(-50%); width:26px; height:2px; background:linear-gradient(90deg, rgba(214,179,90,.85), rgba(214,179,90,0)); }
+    .leader.pos-w{ right: calc(100% + var(--leader-side-offset)); top:50%; transform:translateY(-50%) }
+    .leader.pos-w::after{ left:100%; top:50%; transform:translateY(-50%); width:26px; height:2px; background:linear-gradient(90deg, rgba(214,179,90,.85), rgba(214,179,90,0)) }
 
-    .leader.pos-e{ left: calc(100% + var(--leader-side-offset)); top:50%; transform:translateY(-50%); }
-    .leader.pos-e::after{ right:100%; top:50%; transform:translateY(-50%); width:26px; height:2px; background:linear-gradient(90deg, rgba(214,179,90,0), rgba(214,179,90,.85)); }
+    .leader.pos-e{ left: calc(100% + var(--leader-side-offset)); top:50%; transform:translateY(-50%) }
+    .leader.pos-e::after{ right:100%; top:50%; transform:translateY(-50%); width:26px; height:2px; background:linear-gradient(90deg, rgba(214,179,90,0), rgba(214,179,90,.85)) }
 
-    /* Teams */
-    .rc-teams{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:6px auto 0; max-width:1200px; }
-    .chip{ border:1px solid var(--card-border); background:#0f141a; color:#cfd3d7; padding:6px 10px; border-radius:999px; font-size:.9rem; }
+    /* Rækken under ringen: Budget (venstre) + PM (højre) */
+    .below-row{
+      width:min(1200px, 86vw);
+      margin:0 auto;
+      display:flex; gap:24px; align-items:stretch; justify-content:space-between;
+    }
+    .below-card{ flex:1 1 0; background:linear-gradient(180deg, #10151b, #0f1319); border:1px solid var(--card-border); border-radius:18px; padding:16px; box-shadow:var(--shadow) }
+    .below-card h3{ margin:.1rem 0 .4rem; font-size:1rem }
+    .below-card p{ margin:.2rem 0; color:#cfd3d7; line-height:1.35 }
+    .pm h3{ color:#8ef7a6 } /* grøn accent som på dit billede */
 
-    /* PM */
-    .pm{ width:100%; max-width:1200px; margin:12px auto 0; background:linear-gradient(180deg, #10151b, #0f1319);
-         border:1px solid var(--card-border); border-radius:18px; padding:12px 16px; box-shadow:var(--shadow); }
-    .pm .row{ display:flex; align-items:center; gap:12px; }
-    .pm .row img{ width:54px; height:54px; border-radius:50%; object-fit:cover; border:1px solid var(--card-border) }
-    .pm .muted{ color:var(--muted); }
+    /* Sidekolonne */
+    .right-col{ grid-column:3; margin-top:36px; margin-left:8px; padding-right: var(--right-gutter); }
+    .right-col .card{ width:100% }
 
-    /* Partners + footer */
+    /* Partners & footer */
     .partners{ margin: 8px auto 0; padding: 18px 0 8px; }
     .partners-title{ margin: 0 0 10px; font-size: clamp(16px, 1.8vw, 18px); color: #cfd3d7; opacity: .95; }
     .partners-list{ display:flex; flex-wrap:wrap; gap:18px; align-items:center; border-top:1px solid rgba(255,255,255,.06); padding-top:14px; }
@@ -211,74 +162,60 @@
     .partner img{ max-width:100%; max-height:100%; display:block; object-fit:contain; filter: saturate(.9) contrast(1.05); }
     .site-footer{ margin-top:auto; padding:12px 16px; color:#fff; text-align:center; background:rgba(0,0,0,.75); border-top:1px solid rgba(255,255,255,.06); }
 
-    /* MOBIL */
-    .m-hero{ display:none; }
+    /* Mobil */
     @media (max-width: 900px){
-      :root{ --social-top: 116px; }
-      .layout{ grid-template-columns: 1fr; gap: 18px; padding: 12px 16px 24px; padding-left: calc(16px + 76px); }
-      .layout > *{ grid-column: 1 !important; min-width: 0; }
-      .right-col{ margin: 0; padding: 0; }
-      .right-col .card{ width:100%; margin:0; box-sizing:border-box; }
-      .site-nav{ padding: 16px 0; }
-      .nav-inner{ padding-left:16px; padding-right:24px; }
-
-      /* På mobil – ingen scaling, ringen først, kort som liste bagefter */
-      .rc-stage > .rc-inner{ width:100%; padding:12px 0; }
-      .rc-scale{ transform:none !important; }
-      .rc-board{ width:min(360px, 74vw); margin-bottom:12px; }
-      .leader{ position:static; width:100%; transform:none !important; margin:8px 0; }
-      .leader::after{ display:none; }
-      .rc-teams{ justify-content:flex-start; }
+      :root{ --social-top: 116px; --ring-size:min(300px, 66vw); --leader-w:92vw; --leader-side-offset: 0; --leader-vert-offset: 16%; }
+      .layout{ grid-template-columns:1fr; gap:18px; padding:12px 16px 24px; padding-left: calc(16px + 76px); }
+      .right-col{ grid-column:1; margin:0; padding:0 }
+      .rc-inner{ width:100%; }
+      .rc-board{ margin-bottom:12px }
+      .leader{ position:static; width:100%; transform:none !important; margin:8px 0 }
+      .leader::after{ display:none }
+      .below-row{ flex-direction:column }
     }
   </style>
 </head>
-<body>
+<body class="rc-v3">
   <!-- NAV -->
   <header class="site-nav">
     <div class="nav-inner">
       <nav class="nav">
         <a href="/" data-text="common:nav_home">Home</a>
-        <a href="/about" data-text="common:nav_about">About</a>
+        <a href="/about" data-text="common:nav_about" aria-current="page">About</a>
         <a href="/roadmap" data-text="common:nav_roadmap">Roadmap</a>
         <a href="/reports" data-text="common:nav_reports">Reports</a>
       </nav>
     </div>
   </header>
 
-  <!-- VENSTRE: Sociale links -->
+  <!-- Sociale links -->
   <div class="social-menu" id="social-menu"></div>
 
   <!-- GRID -->
   <div class="layout">
-    <!-- Venstre kolonne -->
+    <!-- Venstre info -->
     <article class="card pad" id="about-info">
-      <h2 data-text="about:bio_top_title">Om NGO’en</h2>
-      <div class="muted" data-text="about:bio_top">
-        NGO’en ledes af et råd på fire personer. Rådet godkender alle afgørelser. Projektmanageren faciliterer og rapporterer til rådet.
-      </div>
+      <h2>Om NGO’en</h2>
+      <div class="muted">NGO’en ledes af et råd på fire personer. Rådet godkender alle afgørelser. Projektmanageren faciliterer og rapporterer til rådet.</div>
     </article>
 
-    <!-- COUNCIL – spænder hele bredden -->
+    <!-- COUNCIL -->
     <section class="council">
       <div class="rc-head">
-        <div>
-          <h2 data-text="about:council_title">Rådet (4 ledere)</h2>
-          <div class="rc-sub" data-text="about:council_sub">Beslutninger tages i fællesskab af fire ligestillede ledere.</div>
-        </div>
+        <h2>Rådet (4 ledere)</h2>
+        <div class="rc-sub">Beslutninger tages i fællesskab af fire ligestillede ledere.</div>
       </div>
 
-      <!-- Scalable stage -->
       <div class="rc-stage">
-        <div class="rc-inner rc-scale" id="rc-stage-inner">
-          <div class="rc-board" id="rc-board">
-            <!-- CENTER: Charter/Vedtægter -->
+        <div class="rc-inner">
+          <div class="rc-board">
             <div class="rc-center">
-              <h3 data-text="about:charter_title">Charter & Vedtægter</h3>
-              <p data-text="about:charter_sub">Gennemsigtighed, uafhængighed og ansvarlig forvaltning.</p>
-              <a id="charter-link" href="#" target="_blank" rel="noopener" data-text="about:charter_btn">Læs dokument</a>
+              <h3>Charter &amp; Vedtægter</h3>
+              <p>Gennemsigtighed, uafhængighed og ansvarlig forvaltning.</p>
+              <a id="charter-link" href="#" target="_blank" rel="noopener">Læs dokument</a>
             </div>
 
-            <!-- LEDERE (udenfor ringen). N = admin-trigger -->
+            <!-- Udenfor ringen -->
             <article class="leader pos-n" id="leader-n" data-admin="true" role="button" tabindex="0" aria-label="Åbn admin-login">
               <div class="top">
                 <img id="leader-n-img" alt="Leder N">
@@ -316,8 +253,8 @@
                 </div>
               </div>
               <ul id="leader-s-points">
-                <li>Budget & rapporter</li>
-                <li>Risiko & compliance</li>
+                <li>Budget &amp; rapporter</li>
+                <li>Risiko &amp; compliance</li>
               </ul>
             </article>
 
@@ -330,30 +267,35 @@
                 </div>
               </div>
               <ul id="leader-w-points">
-                <li>Community & kommunikation</li>
+                <li>Community &amp; kommunikation</li>
                 <li>Partnere</li>
               </ul>
             </article>
-          </div> <!-- /rc-board -->
-        </div> <!-- /rc-inner -->
-      </div> <!-- /rc-stage -->
-
-      <!-- Teams -->
-      <div class="rc-teams" id="rc-teams">
-        <span class="chip">Finans</span>
-        <span class="chip">Revision</span>
-        <span class="chip">Projekter</span>
-        <span class="chip">Community</span>
+          </div>
+        </div>
       </div>
 
-      <!-- Projektmanager (under ledelsen) -->
-      <div class="pm">
-        <div class="row">
-          <img id="pm-photo-inline" alt="Projektmanager">
-          <div>
-            <div style="font-weight:700" id="pm-name-inline">Thomas</div>
-            <div class="muted" id="pm-role-inline">Projektmanager · rapporterer til Rådet (ingen økonomisk råderet)</div>
-          </div>
+      <!-- Rækken under ringen: BUDGET (venstre) + PM (højre) -->
+      <div class="below-row">
+        <article class="below-card budget" id="budget-box">
+          <h3>Ansat Budget ansvarlig</h3>
+          <p>Denne post kan dækkes af bestyrelsen, midlertidig indtil en professionel uddannet overtager posten.</p>
+        </article>
+
+        <article class="below-card pm" id="pm-box">
+          <h3>Projekt Manager</h3>
+          <p id="pm-box-text">Hyret ind fra MadaCoin, til projektudvikling, fremlæggelse af rapporter og projekter. Ansvarlig for byggeri og vedligeholdelse af bygninger (rapporterer til Rådet).</p>
+        </article>
+      </div>
+
+      <!-- Teams (valgfrit) -->
+      <div class="partners" style="padding-top:8px">
+        <h3 class="partners-title">Funktioner</h3>
+        <div class="partners-list" id="rc-teams">
+          <span class="partner" style="width:auto;height:auto;padding:6px 12px;border-radius:999px">Finans</span>
+          <span class="partner" style="width:auto;height:auto;padding:6px 12px;border-radius:999px">Revision</span>
+          <span class="partner" style="width:auto;height:auto;padding:6px 12px;border-radius:999px">Projekter</span>
+          <span class="partner" style="width:auto;height:auto;padding:6px 12px;border-radius:999px">Community</span>
         </div>
       </div>
     </section>
@@ -361,10 +303,8 @@
     <!-- Højre kolonne -->
     <aside class="right-col">
       <div class="card pad" id="right-main">
-        <h2 data-text="about:right_title">Mission & principper</h2>
-        <div class="muted" data-text="about:right_body">
-          NGO’en arbejder uafhængigt af MCN (firmaet). Denne side viser kun NGO-indhold.
-        </div>
+        <h2>Mission &amp; principper</h2>
+        <div class="muted">NGO’en arbejder uafhængigt af MCN (firmaet). Denne side viser kun NGO-indhold.</div>
       </div>
     </aside>
   </div>
@@ -376,7 +316,7 @@
   </section>
 
   <footer class="site-footer">
-    <span data-text="common:footer">© 2025 MadaCoin. All rights reserved.</span>
+    <span>© 2025 MadaCoin. All rights reserved.</span>
   </footer>
 
   <!-- ADMIN LOGIN MODAL -->
@@ -402,46 +342,12 @@
   </div>
 
   <script>
-    /* ===== Supabase klient ===== */
+    /* ===== Supabase ===== */
     const SUPABASE_URL = "https://byrlebjwknppjbtbkozt.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
     const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null;
 
-    /* ===== Aktiv menumarkering ===== */
-    (function markActive(){
-      try{
-        const here = location.pathname.replace(/\/index\.html?$/,'/');
-        document.querySelectorAll('header .nav a').forEach(a=>{
-          const to = a.getAttribute('href');
-          if (to === here || (here === '/' && to === '/')) a.setAttribute('aria-current','page');
-          else a.removeAttribute('aria-current');
-        });
-      }catch(e){}
-    })();
-
-    /* ===== Site-tekster (common + about) ===== */
-    (async function(){
-      if(!sb) return;
-      try{
-        const { data } = await sb.from('site_text').select('page,key,value').in('page',['common','about']);
-        const dict={}; (data||[]).forEach(r=>dict[`${r.page}:${r.key}`]=r.value);
-        document.querySelectorAll('[data-text]').forEach(el=>{
-          const k=el.getAttribute('data-text'); if(dict[k]!=null) el.innerHTML=dict[k];
-        });
-
-        // Charter-link
-        const cl = dict['about:charter_url'];
-        if(cl){ const a=document.getElementById('charter-link'); if(a) a.href = cl; }
-        // Teams (komma-sep)
-        const teams = (dict['about:teams']||'').split(',').map(s=>s.trim()).filter(Boolean);
-        if(teams.length){
-          const wrap=document.getElementById('rc-teams'); wrap.innerHTML='';
-          teams.forEach(t=>{ const span=document.createElement('span'); span.className='chip'; span.textContent=t; wrap.appendChild(span); });
-        }
-      }catch(e){ console.warn('[about] site_text', e); }
-    })();
-
-    /* ===== Baggrund pr. side (site_settings) ===== */
+    /* Baggrund */
     async function applyBackgroundForPage(pageKey='about'){
       if(!sb) return;
       try{
@@ -456,7 +362,7 @@
     }
     applyBackgroundForPage('about');
 
-    /* ===== Sociale links ===== */
+    /* Sociale links */
     function normalizeUrl(u){ if(!u) return null; const t=u.trim(); return /^https?:\/\//i.test(t)?t:'https://'+t }
     function iconUrlFor(p){
       if(!sb) return null;
@@ -481,16 +387,15 @@
         const img=document.createElement('img'); img.src=iconUrlFor(r.platform)||globe; img.onerror=()=>{img.src=globe}; a.appendChild(img); el.appendChild(a);
       });
     }
+    window.addEventListener('load', renderSocialLinks);
 
-    /* ===== Personer til Rådet + PM ===== */
+    /* Lederne + PM fra org_people (fald tilbage til standardbilleder) */
     (async function(){
       if(!sb) { simpleFallbackImages(); return; }
       try{
         const wanted = ['leader_n','leader_e','leader_s','leader_w','pm'];
         const legacy = ['top','mid','accounting','sub1','sub2','sub3'];
-        const pplRes = await sb.from('org_people')
-          .select('slot,name,title,photo_url,bio')
-          .or(`slot.in.(${wanted.join(',')}),slot.in.(${legacy.join(',')})`);
+        const pplRes = await sb.from('org_people').select('slot,name,title,photo_url').or(`slot.in.(${wanted.join(',')}),slot.in.(${legacy.join(',')})`);
         const ppl = pplRes.data||[];
         const bySlot={}; ppl.forEach(x=>bySlot[x.slot]=x);
 
@@ -505,7 +410,6 @@
           if(nm && (p?.name)) nm.textContent = p.name;
           if(ti && (p?.title)) ti.textContent = p.title;
         }
-
         setLeader('leader-n', bySlot['leader_n'] || bySlot['top'] || null, ph('/people/Owner.jpg'));
         setLeader('leader-e', bySlot['leader_e'] || bySlot['sub1'] || null, ph('/people/LeaderE.jpg'));
         setLeader('leader-s', bySlot['leader_s'] || bySlot['accounting'] || null, ph('/people/Revision.jpg'));
@@ -513,10 +417,7 @@
 
         const pm = bySlot['pm'] || bySlot['mid'] || null;
         const pmUrl = (pm?.photo_url && pm.photo_url.trim()) ? pm.photo_url : ph('/people/ADM.jpg');
-        const pmImg = document.getElementById('pm-photo-inline');
-        if(pmImg) pmImg.src = pmUrl;
-        if(pm?.name){ const n=document.getElementById('pm-name-inline'); if(n) n.textContent=pm.name; }
-        if(pm?.title){ const r=document.getElementById('pm-role-inline'); if(r) r.textContent=pm.title + ' · rapporterer til Rådet'; }
+        const pmImg = new Image(); pmImg.src = pmUrl; // prefetch
       }catch(e){
         console.warn('[about] org_people', e);
         simpleFallbackImages();
@@ -525,92 +426,39 @@
 
     function simpleFallbackImages(){
       const base = SUPABASE_URL.replace(/\/+$/,'') + '/storage/v1/object/public';
-      const fb = {
-        n: base+'/people/Owner.jpg',
-        e: base+'/people/LeaderE.jpg',
-        s: base+'/people/Revision.jpg',
-        w: base+'/people/LeaderW.jpg',
-        pm: base+'/people/ADM.jpg'
-      };
-      [['leader-n-img','n'],['leader-e-img','e'],['leader-s-img','s'],['leader-w-img','w']]
-        .forEach(([id,k])=>{ const el=document.getElementById(id); if(el) el.src=fb[k]; });
-      const pmImg = document.getElementById('pm-photo-inline');
-      if(pmImg) pmImg.src = fb.pm;
+      const fb = { n: base+'/people/Owner.jpg', e: base+'/people/LeaderE.jpg', s: base+'/people/Revision.jpg', w: base+'/people/LeaderW.jpg' };
+      [['leader-n-img','n'],['leader-e-img','e'],['leader-s-img','s'],['leader-w-img','w']].forEach(([id,k])=>{ const el=document.getElementById(id); if(el) el.src=fb[k]; });
     }
 
-    /* ===== Partners strip ===== */
+    /* site_text overrides (valgfrit) */
     (async function(){
       if(!sb) return;
-      const elSection = document.getElementById('partners');
-      const elList = document.getElementById('partners-list');
-      if(!elSection || !elList) return;
       try{
-        const { data, error } = await sb
-          .from('partners')
-          .select('id,name,website,logo_url,logo_alt,active')
-          .eq('active', true)
-          .order('name', { ascending: true })
-          .limit(12);
-        if(error || !data?.length){ elSection.style.display='none'; return; }
-        data.forEach(p=>{
-          const a=document.createElement('a'); a.className='partner';
-          a.href=p.website||'#'; a.target='_blank'; a.rel='noopener noreferrer'; a.title=p.name||'Partner';
-          const img=document.createElement('img'); img.alt=p.logo_alt||p.name||'Partner logo';
-          img.src=(p.logo_url&&p.logo_url.trim())?p.logo_url:(SUPABASE_URL.replace(/\/+$/,'') + '/storage/v1/object/public/people/Revision.jpg');
-          a.appendChild(img); elList.appendChild(a);
-        });
-      }catch(e){ console.warn('[partners] exception:', e); }
+        const { data } = await sb.from('site_text').select('key,value').eq('page','about');
+        const map = Object.fromEntries((data||[]).map(r=>[`about:${r.key}`, r.value]));
+        // Charter-link
+        if(map['about:charter_url']) document.getElementById('charter-link').href = map['about:charter_url'];
+        // Budget-boks
+        if(map['about:budget_box']) document.getElementById('budget-box').innerHTML = map['about:budget_box'];
+        // PM-boks
+        if(map['about:pm_box']) document.getElementById('pm-box').innerHTML = map['about:pm_box'];
+      }catch(e){ console.warn('[about] site_text', e); }
     })();
 
-    /* ===== Admin modal – N-leder (Julienne) er “trykknap” ===== */
+    /* Admin modal (åbnes ved klik på “N”-lederen) */
     const $ = s=>document.querySelector(s);
     const modal = $('#admin-modal');
-    const openModal = ()=>{ modal.style.display='flex'; modal.setAttribute('aria-hidden','false'); $('#adm-email')?.focus(); };
+    const openModal = ()=>{ modal.style.display='flex'; modal.setAttribute('aria-hidden','false'); };
     const closeModal = ()=>{ modal.style.display='none'; modal.setAttribute('aria-hidden','true'); $('#adm-msg').textContent=''; };
     $('#mdl-close')?.addEventListener('click', closeModal);
     $('#mdl-cancel')?.addEventListener('click', closeModal);
-
     const adminTrigger = document.getElementById('leader-n');
     if(adminTrigger){
       adminTrigger.addEventListener('click', openModal);
       adminTrigger.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openModal(); }});
     }
 
-    /* ===== Auto-scale: sørger for at hele scenen kan ses ved 100% zoom ===== */
-    function fitRoundCouncil(){
-      const stage = document.getElementById('rc-stage-inner'); if(!stage) return;
-      const scaleHost = stage;                // element der får transform
-      const rect = stage.getBoundingClientRect();
-
-      // tilgængelig bredde/højde
-      const viewportH = window.innerHeight;
-      // hvor langt nede er vi før scenen starter?
-      const top = stage.getBoundingClientRect().top + window.scrollY;
-      // fri højde = skærmhøjde minus (afstand fra top til scenens top) minus bund-margin
-      const freeH = viewportH - (stage.getBoundingClientRect().top) - 40;
-      const freeW = Math.min(document.documentElement.clientWidth, stage.parentElement.clientWidth) - 32;
-
-      // rå størrelse (uden skala)
-      const rawW = rect.width;
-      const rawH = rect.height;
-
-      let s = Math.min(1, freeW / rawW, freeH / rawH);
-      if(!isFinite(s) || s <= 0) s = 1;
-
-      scaleHost.style.transform = `scale(${s})`;
-      scaleHost.style.height = (rawH * s) + 'px'; // reserver plads i flowet
-    }
-
-    window.addEventListener('load', ()=>{
-      // Markér element som skal scales
-      const el = document.getElementById('rc-stage-inner');
-      if(el) el.classList.add('rc-scale');
-      fitRoundCouncil();
-      renderSocialLinks();
-    });
-    window.addEventListener('resize', fitRoundCouncil);
-
-    /* ===== Login ===== */
+    /* Login */
     async function isAdmin(session){
       if(!session) return false;
       const { data, error } = await sb.from('admins').select('id').eq('id', session.user.id).maybeSingle();
