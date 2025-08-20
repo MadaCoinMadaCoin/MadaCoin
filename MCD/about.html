@@ -161,36 +161,49 @@
     .site-footer{ margin-top:auto; padding:12px 16px; text-align:center; background:rgba(0,0,0,.75); border-top:1px solid rgba(255,255,255,.06) }
   </style>
 
+  <!-- Tighter layout overrides (så The Mission altid er synlig ved 100%) -->
   <style>
-/* --- Tighter layout: mindre kolonner + mindre gaps --- */
-:root{
-  --gap: 16px;              /* var 64px → 75% mindre vandret afstand */
-  --edge: 10px;             /* var 24px → mindre venstre/højre padding */
-  --left-col: 480px;        /* var 520px */
-  --right-col: 520px;       /* var 640px (Mission-boks smal nok til 100% zoom) */
-}
+    :root{
+      --gap: 16px;              /* var 64px */
+      --edge: 10px;             /* var 24px */
+      --left-col: 480px;        /* var 520px */
+      --right-col: 520px;       /* var 640px */
+    }
+    @media (max-width: 1400px){
+      :root{ --left-col: 440px; --right-col: 480px; }
+      .leaders-grid{ gap:12px; }
+    }
+    .social-menu{ left:8px; }                 /* tættere på indholdet */
+    .social-menu a{ width:36px; height:36px; }/* mindre ikoner */
+    .layout{ padding: 16px var(--edge) 28px; }
+    .leaders-grid{ margin: 0 auto 4px; }
+    .info-row{ margin: 4px auto 8px; gap:14px; }
+    .below{ gap:18px; }
+  </style>
 
-/* Ekstra tilpasning når skærmen er lidt smallere (1366–1400 bred) */
-@media (max-width: 1400px){
-  :root{
-    --left-col: 440px;
-    --right-col: 480px;
-  }
-  .leaders-grid{ gap:12px; }
-}
-
-/* Bring indhold tættere på de sociale links (–75% luft) */
-.social-menu{ left:8px; }                  /* var 16px */
-.social-menu a{ width:36px; height:36px; } /* var 42px */
-
-/* Lidt mere kompakt spacing rundt om sektionerne */
-.layout{ padding: 16px var(--edge) 28px; } /* var 20px/40px */
-.leaders-grid{ margin: 0 auto 4px; }       /* var 8–10px */
-.info-row{ margin: 4px auto 8px; gap:14px; }
-.below{ gap:18px; }
-</style>
-
-  
+  <!-- Responsiv/touch-optimering for tablets/mobiler -->
+  <style>
+    :root{
+      --gap: clamp(12px, 2vw, 24px);
+      --edge: clamp(8px, 1.5vw, 16px);
+      --left-col: clamp(380px, 32vw, 500px);
+      --right-col: clamp(420px, 28vw, 520px);
+    }
+    @media (max-width: 1200px){
+      :root{ --left-col: 420px; --right-col: 460px; }
+      .leaders-grid{ gap:12px; }
+    }
+    @media (max-width: 1024px){
+      .layout{ grid-template-columns: 1fr; }
+      .leaders, .info-row, .below, .right-col{ grid-column: 1 !important; }
+      .right-col{ position: static; top:auto; }
+      .leaders-grid{ grid-template-columns: repeat(2, minmax(220px,1fr)); }
+    }
+    @media (max-width: 640px){
+      .leaders-grid{ grid-template-columns: 1fr; }
+      .social-menu{ left:6px; top:88px; }
+    }
+  </style>
 </head>
 <body>
   <!-- NAV -->
@@ -401,16 +414,34 @@
       }catch(e){}
     })();
 
-    /* Site-tekster (common + about) – valgfrit override fra DB */
+    /* Site-tekster (common + about) – DB + Admin override */
     (async function(){
-      if(!sb) return;
+      // Admin-override (vind altid over DB)
+      const admin = window.MCD_CONTENT || null;
+
+      if(!sb){
+        if(admin){
+          document.querySelectorAll('[data-text]').forEach(el=>{
+            const k=el.getAttribute('data-text'); if(admin[k]!=null) el.innerHTML=admin[k];
+          });
+          if(admin && admin['about:charter_url']){
+            const a=document.getElementById('charter-link'); if(a) a.href = admin['about:charter_url'];
+          }
+        }
+        return;
+      }
       try{
         const { data } = await sb.from('site_text').select('page,key,value').in('page',['common','about']);
-        const dict={}; (data||[]).forEach(r=>dict[`${r.page}:${r.key}`]=r.value);
+        const db={}; (data||[]).forEach(r=>db[`${r.page}:${r.key}`]=r.value);
+
         document.querySelectorAll('[data-text]').forEach(el=>{
-          const k=el.getAttribute('data-text'); if(dict[k]!=null) el.innerHTML=dict[k];
+          const k=el.getAttribute('data-text');
+          const val = (admin && admin[k]!=null) ? admin[k] : db[k];
+          if(val!=null) el.innerHTML = val;
         });
-        if(dict['about:charter_url']) document.getElementById('charter-link').href = dict['about:charter_url'];
+
+        const charterUrl = (admin && admin['about:charter_url']!=null) ? admin['about:charter_url'] : db['about:charter_url'];
+        if(charterUrl){ const a=document.getElementById('charter-link'); if(a) a.href = charterUrl; }
       }catch(e){ console.warn('[about] site_text', e); }
     })();
 
@@ -562,6 +593,21 @@
       window.location.href = '/adm';
     });
   </script>
+
+  <!-- Admin Panel: klient-side override (kan sættes af CMS uden deploy) -->
+  <script>
+    /* Hvis Admin-panel sætter window.MCD_CONTENT, overskriver det teksterne */
+    (function hydrateFromAdmin(){
+      try{
+        const dict = window.MCD_CONTENT; if(!dict) return;
+        document.querySelectorAll('[data-text]').forEach(el=>{
+          const k = el.getAttribute('data-text'); if(dict[k]!=null) el.innerHTML = dict[k];
+        });
+        if(dict['about:charter_url']){
+          const a=document.getElementById('charter-link'); if(a) a.href = dict['about:charter_url'];
+        }
+      }catch(e){ console.warn('[about] admin hydration (late)', e); }
+    })();
+  </script>
 </body>
 </html>
-
