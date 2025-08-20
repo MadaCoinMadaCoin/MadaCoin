@@ -4,29 +4,45 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MadaCoin – Roadmap</title>
-  <link rel="icon" href="/favicon_boosted.ico?v=1" type="image/x-icon">
+  <link id="favicon" rel="icon" href="/favicon_boosted.ico?v=1" type="image/x-icon">
   <link rel="preconnect" href="https://unpkg.com" />
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
   <style>
     *,*::before,*::after{ box-sizing:border-box }
     html{ font-size:16px }
-    body{
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
-      font-size:1rem; line-height:1.5; margin:0; padding:0; color:#fff;
-      background:#061a2b no-repeat center/cover fixed;
-      background-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
-      min-height:100svh;
-      display:flex; flex-direction:column;
-    }
-    @media (max-width:800px){ body{ background-attachment:scroll } }
 
-    /* NAV */
     :root{
+      /* NAV */
       --edge-pad:24px; --nav-gap:14px; --nav-pad-x:14px; --nav-pad-y:8px;
       --nav-text:#fff; --nav-bg:#0d0d0f; --nav-border:#333;
       --nav-hover-bg:#151517; --nav-hover-border:#444; --nav-active:#5aa9ff;
+
+      /* BG (samme motor som About/Index) */
+      --bg:#061a2b;
+      --bg-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
+      --bg-1x: var(--bg-image);
+      --bg-2x: var(--bg-image);
     }
+
+    body{
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+      font-size:1rem; line-height:1.5; margin:0; padding:0; color:#fff;
+      min-height:100svh; display:flex; flex-direction:column;
+
+      /* overlay + responsive image-set + fallback color */
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.14)),
+        image-set(var(--bg-1x) 1x, var(--bg-2x) 2x),
+        var(--bg);
+      background-repeat:no-repeat,no-repeat,no-repeat;
+      background-size:auto,cover,auto;
+      background-attachment:fixed,fixed,fixed;
+      background-position:center center, center top, center center;
+    }
+    @media (max-width:800px){ body{ background-attachment:scroll,scroll,scroll } }
+
+    /* NAV */
     .site-nav{ position:sticky; top:0; z-index:9999; padding:24px 0; background:transparent }
     .site-nav .nav-inner{ padding-left:var(--edge-pad); padding-right:var(--edge-pad) }
     .nav{ display:flex; gap:var(--nav-gap); align-items:center; flex-wrap:wrap; justify-content:flex-start; transform:translateY(-2px) }
@@ -41,6 +57,17 @@
       border-color:var(--nav-active);
       box-shadow:0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset
     }
+
+    /* Sociale links (venstre side) */
+    .social-menu{ position:fixed; top:110px; left:16px; display:flex; flex-direction:column; gap:10px; z-index:1000 }
+    .social-menu a{
+      display:flex; align-items:center; justify-content:center;
+      width:42px; height:42px; background:rgba(0,0,0,.7);
+      border:1px solid #2a2f36; border-radius:8px;
+      text-decoration:none; transition:background .15s, transform .15s;
+    }
+    .social-menu a:hover{ background:rgba(0,0,0,.85); transform:translateY(-2px) }
+    .social-menu a img{ width:22px; height:22px }
 
     /* WRAP */
     .wrap{ flex:1; display:flex; align-items:center; justify-content:center; padding:24px; }
@@ -89,6 +116,9 @@
     </div>
   </header>
 
+  <!-- Sociale links -->
+  <div class="social-menu" id="social-menu" aria-label="Sociale medier"></div>
+
   <!-- MIDTSTILLET ROADMAP -->
   <main class="wrap">
     <section class="roadmap" id="roadmap"></section>
@@ -103,15 +133,15 @@
   <footer><span id="footer-text" data-text="common:footer">© 2025 MadaCoin. All rights reserved.</span></footer>
 
   <script>
-    // Supabase init
+    /* ===== Supabase init ===== */
     const SUPABASE_URL="https://byrlebjwknppjbtbkozt.supabase.co";
     const SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
     const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON) : null;
 
-    // ===== Markér aktivt menupunkt (virker på alle sider) =====
+    /* ===== Aktiv nav ===== */
     (function markActive(){
       try{
-        const here = location.pathname.replace(/\/index\.html?$/,'/'); // normaliser
+        const here = location.pathname.replace(/\/index\.html?$/,'/');
         document.querySelectorAll('header .nav a').forEach(a=>{
           const to = a.getAttribute('href');
           if (to === here || (here === '/' && to === '/')) a.setAttribute('aria-current','page');
@@ -120,7 +150,86 @@
       }catch(e){}
     })();
 
-    // Roadmap buckets
+    /* ===== Baggrund via site_settings ===== */
+    async function applyBackgroundForPage(pageKey='roadmap'){
+      if(!sb) return;
+      try{
+        const keys=[`bg_${pageKey}_1x`,`bg_${pageKey}_2x`,`bg_default_1x`,`bg_default_2x`];
+        const { data } = await sb.from('site_settings').select('key,value').in('key', keys);
+        const map = Object.fromEntries((data||[]).map(r=>[r.key,r.value]));
+        const one = map[`bg_${pageKey}_1x`] || map['bg_default_1x'] || '';
+        const two = map[`bg_${pageKey}_2x`] || map['bg_default_2x'] || '';
+        if(one) document.body.style.setProperty('--bg-1x', `url("${one}")`);
+        if(two) document.body.style.setProperty('--bg-2x', `url("${two}")`);
+      }catch(e){ console.warn('[roadmap] background', e); }
+    }
+
+    /* ===== Branding: favicon fra bucket 'logo' ===== */
+    const LOGO_BUCKET='logo';
+    const BRAND_EXTS=['svg','png','webp','jpg','jpeg'];
+    const FAV_EXTS=['svg','png','ico'];
+    function publicUrl(bucket,path){ const {data}=sb.storage.from(bucket).getPublicUrl(path); return data?.publicUrl||null }
+    function probeImage(url,timeoutMs=6000){
+      return new Promise((resolve)=>{
+        if(!url) return resolve(null);
+        const img=new Image(); let done=false;
+        const finish=ok=>{ if(!done){ done=true; resolve(ok?url:null); } };
+        const t=setTimeout(()=>finish(false),timeoutMs);
+        img.onload=()=>{ clearTimeout(t); finish(true); };
+        img.onerror=()=>{ clearTimeout(t); finish(false); };
+        const cb=Math.floor(Date.now()/(12*60*60*1000));
+        img.src=url+(url.includes('?')?`&cb=${cb}`:`?cb=${cb}`);
+      });
+    }
+    async function firstExisting(baseName,exts){
+      for(const ext of exts){
+        const u=publicUrl(LOGO_BUCKET,`${baseName}.${ext}`);
+        if(await probeImage(u)) return u;
+      }
+      return null;
+    }
+    async function applyBrandingFromBucket(project='MCD'){
+      if(!sb) return;
+      const base=(project||'MCD').toUpperCase();
+      const fav = await firstExisting(`${base}-favicon`,FAV_EXTS) || await firstExisting(base,BRAND_EXTS);
+      const favEl=document.getElementById('favicon'); if(favEl && fav) favEl.href=fav;
+    }
+
+    /* ===== Nav/foot tekster ===== */
+    async function loadSiteText(){
+      if(!sb) return {};
+      try{
+        const { data } = await sb.from('site_text').select('page,key,value,content,project,is_active')
+          .in('page',['common']).eq('is_active',true);
+        const dict={}; (data||[]).forEach(r=>{
+          const v=(r.value ?? r.content ?? '').toString();
+          if(v) dict[`${r.page}:${r.key}`]=v;
+        });
+        document.querySelectorAll('[data-text]').forEach(el=>{
+          const k=el.getAttribute('data-text'); if(dict[k]!=null) el.innerHTML=dict[k];
+        });
+        return dict;
+      }catch(e){ console.warn('[roadmap] site_text',e); return {}; }
+    }
+
+    /* ===== Sociale links ===== */
+    function normalizeUrl(u){ if(!u) return null; const t=u.trim(); return /^https?:\/\//i.test(t)?t:'https://'+t }
+    function iconUrlFor(p){ if(!sb) return null; const name=p.charAt(0).toUpperCase()+p.slice(1).toLowerCase(); const {data}=sb.storage.from('social.icons').getPublicUrl(`${name}.svg`); return data?.publicUrl||null }
+    function fallbackIconUrl(){ if(!sb) return ''; const {data}=sb.storage.from('social.icons').getPublicUrl('Globe.svg'); return data?.publicUrl||'' }
+    async function renderSocialLinks(){
+      const el=document.getElementById('social-menu'); if(!el||!sb) return;
+      el.innerHTML='';
+      const {data}=await sb.from('social_links').select('platform,url,is_active,sort_order')
+        .eq('is_active',true).order('sort_order',{ascending:true});
+      const globe=fallbackIconUrl();
+      (data||[]).filter(r=>r.url&&r.url.trim()!=='').forEach(r=>{
+        const a=document.createElement('a'); const href=normalizeUrl(r.url); if(!href) return;
+        a.href=href; a.target='_blank'; a.rel='noopener noreferrer'; a.title=r.platform; a.setAttribute('aria-label',r.platform);
+        const img=document.createElement('img'); img.src=iconUrlFor(r.platform)||globe; img.onerror=()=>{img.src=globe}; a.appendChild(img); el.appendChild(a);
+      });
+    }
+
+    /* ===== Roadmap (billeder + lightbox) ===== */
     const base="https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public";
     const buckets=["roadmap1","roadmap2","roadmap3","roadmap4"];
     const steps=[
@@ -161,7 +270,7 @@
       });
     }
 
-    // Lightbox logic
+    // Lightbox & gestures
     let rmBox, rmImg, scale=1, tx=0, ty=0; const MIN_SCALE=1, MAX_SCALE=4;
     function applyTransform(){ if(!rmImg) return; rmImg.style.transform=`translate(${tx}px, ${ty}px) scale(${scale})` }
     function centerReset(){ scale=1; tx=0; ty=0; applyTransform() }
@@ -173,7 +282,8 @@
     function rmTouchMove(e){ if(e.touches.length===2){ e.preventDefault(); const[a,b]=e.touches; const d=Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY); scale=Math.max(MIN_SCALE,Math.min(MAX_SCALE,pinchStartScale*(d/pinchStartDist))); applyTransform(); touchMoved=true; } else if(e.touches.length===1 && panning){ e.preventDefault(); const t=e.touches[0]; tx=t.clientX-panStartX; ty=t.clientY-panStartY; applyTransform(); touchMoved=true; } }
     function rmTouchEnd(){ panning=false; if(!touchMoved){ if(scale>1) centerReset(); else closeLightbox(); } }
 
-    window.addEventListener('load',()=>{
+    /* ===== Init ===== */
+    window.addEventListener('load', async ()=>{
       rmBox=document.getElementById('rm-lightbox'); rmImg=document.getElementById('rm-image');
       if(rmBox&&rmImg){
         rmBox.addEventListener('click',(e)=>{ const backdrop=e.target===rmBox||e.target.classList.contains('rm-backdrop'); const img=e.target===rmImg; if(backdrop||img) closeLightbox(); },{passive:true});
@@ -183,10 +293,14 @@
         rmImg.addEventListener('touchmove',rmTouchMove,{passive:false});
         rmImg.addEventListener('touchend',rmTouchEnd,{passive:true});
         rmImg.addEventListener('contextmenu',(e)=>e.preventDefault());
-        // ESC for at lukke
         window.addEventListener('keydown',(e)=>{ if(e.key==='Escape' && rmBox.classList.contains('active')) closeLightbox(); });
       }
-      renderRoadmap();
+
+      await applyBackgroundForPage('roadmap'); // dynamisk baggrund
+      await loadSiteText();                    // nav/foot tekster
+      await applyBrandingFromBucket('MCD');    // favicon fra 'logo'
+      await renderSocialLinks();               // sociale links
+      renderRoadmap();                         // billeder + thumbs
     });
   </script>
 </body>
