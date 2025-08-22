@@ -165,6 +165,20 @@
       .yt-wrap{ width:100% }
       .stage{ padding:0 16px }
     }
+
+    /* ==== PATCH: Kun disse 2 ændringer ==== */
+    /* 1) Gør kortet bag Lemuren usynligt uden at flytte layout */
+    .brand-hero{
+      background: transparent !important;
+      border-color: transparent !important; /* beholder 1px border-tykkelse, men usynlig */
+      box-shadow: none !important;
+    }
+
+    /* 2) Skjul “Køb MCD” i topnav helt, men bevar pladsen */
+    #nav-buy{
+      visibility: hidden !important;  /* fylder stadig pladsen i flex-linjen */
+      pointer-events: none !important; /* kan ikke klikkes */
+    }
   </style>
 </head>
 <body>
@@ -342,12 +356,12 @@
       if(!sb) return;
       const base = (project||'MCD').toUpperCase();
 
-      // Hero-logo
+      /* Hero-logo */
       const hero = await firstExisting(base, BRAND_EXTS);
       const heroEl = document.getElementById('brand-hero-img');
       if(heroEl && hero) heroEl.src = hero;
 
-      // Favicon (særskilt fil → ellers logo)
+      /* Favicon (særskilt fil → ellers logo) */
       const fav = await firstExisting(`${base}-favicon`, FAV_EXTS) || hero;
       const favEl = document.getElementById('favicon');
       if(favEl && fav) favEl.href = fav;
