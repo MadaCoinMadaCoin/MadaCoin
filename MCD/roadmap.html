@@ -13,12 +13,9 @@
     html{ font-size:16px }
 
     :root{
-      /* NAV */
       --edge-pad:24px; --nav-gap:14px; --nav-pad-x:14px; --nav-pad-y:8px;
       --nav-text:#fff; --nav-bg:#0d0d0f; --nav-border:#333;
       --nav-hover-bg:#151517; --nav-hover-border:#444; --nav-active:#5aa9ff;
-
-      /* BG (samme motor som About/Index) */
       --bg:#061a2b;
       --bg-image:url('https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public/backgrounds/ocean.png');
       --bg-1x: var(--bg-image);
@@ -27,10 +24,8 @@
 
     body{
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
-      font-size:1rem; line-height:1.5; margin:0; padding:0; color:#fff;
+      font-size:1rem; line-height:1.5; margin:0; color:#fff;
       min-height:100svh; display:flex; flex-direction:column;
-
-      /* overlay + responsive image-set + fallback color */
       background:
         linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.14)),
         image-set(var(--bg-1x) 1x, var(--bg-2x) 2x),
@@ -42,8 +37,7 @@
     }
     @media (max-width:800px){ body{ background-attachment:scroll,scroll,scroll } }
 
-    /* NAV */
-    .site-nav{ position:sticky; top:0; z-index:9999; padding:24px 0; background:transparent }
+    .site-nav{ position:sticky; top:0; z-index:9999; padding:12px 0; background:transparent }
     .site-nav .nav-inner{ padding-left:var(--edge-pad); padding-right:var(--edge-pad) }
     .nav{ display:flex; gap:var(--nav-gap); align-items:center; flex-wrap:wrap; justify-content:flex-start; transform:translateY(-2px) }
     .nav a{
@@ -55,10 +49,9 @@
     .nav a:hover{ background:var(--nav-hover-bg); border-color:var(--nav-hover-border) }
     .nav a[aria-current="page"]{
       border-color:var(--nav-active);
-      box-shadow:0 0 0 2px color-mix(in srgb, var(--nav-active) 25%, transparent) inset
+      box-shadow:0 0 0 2px rgba(90,169,255,.25) inset;
     }
 
-    /* Sociale links (venstre side) */
     .social-menu{ position:fixed; top:110px; left:16px; display:flex; flex-direction:column; gap:10px; z-index:1000 }
     .social-menu a{
       display:flex; align-items:center; justify-content:center;
@@ -69,34 +62,34 @@
     .social-menu a:hover{ background:rgba(0,0,0,.85); transform:translateY(-2px) }
     .social-menu a img{ width:22px; height:22px }
 
-    /* WRAP */
-    .wrap{ flex:1; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .wrap{ flex:1; display:flex; align-items:center; justify-content:center; padding:12px 24px 24px; }
 
-    /* ROADMAP */
     .roadmap{
       margin:0 auto;
-      max-width:1440px; /* øget, så hver kolonne har mere tekstbredde */
+      max-width:1440px;
       padding:0 20px;
-      display:grid;               /* 2×2 layout */
+      display:grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap:24px;                   /* afstand mellem boksene */
+      gap:24px;
       align-items:start;
     }
     .roadmap-box{
-      background:rgba(255,248,220,.95); padding:18px 24px; border-radius:20px; border:2px solid #e5c100;
-      box-shadow:0 0 12px rgba(0,0,0,.1); display:flex; flex-direction:column; gap:10px;
-      width:100%; max-width:none; /* udfyld kolonne fuldt ud */
+      background:rgba(255,248,220,.95);
+      padding:18px 24px;
+      border-radius:20px;
+      border:2px solid #e5c100;
+      box-shadow:0 0 12px rgba(0,0,0,.1);
+      display:flex; flex-direction:column; gap:10px;
+      width:100%; max-width:none;
     }
     .roadmap-box h2{ margin:0; color:#444; font-size:1.2rem }
     .description{ font-size:.8rem; margin:0; color:#555 }
-    .step-images{ display:flex; flex-wrap:wrap; gap:10px; max-width:100%; justify-content:flex-start; margin-top:10px }
+    .step-images{ display:flex; flex-wrap:wrap; gap:10px; max-width:100%; justify-content:flex-start; margin-top:22px }
     .step-images img{ width:80px; height:80px; object-fit:cover; cursor:pointer; margin:5px; transition:transform .3s }
     .roadmap-thumb{ cursor:zoom-in }
 
-    /* FOOTER */
     footer{ text-align:center; padding:16px 20px; background:#e4e6c5; color:#000; margin-top:auto }
 
-    /* Lightbox */
     #rm-lightbox{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:100000 }
     #rm-lightbox.active{ display:flex }
     #rm-lightbox .rm-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.85) }
@@ -106,7 +99,6 @@
       transform-origin:center; touch-action:none; user-select:none; -webkit-user-drag:none; cursor:zoom-out
     }
 
-    /* Eksplicit placering på desktop: 1 & 2 øverst, 3 & 4 nederst */
     @media (min-width:901px){
       .roadmap-box:nth-child(1){ grid-column:1; grid-row:1; }
       .roadmap-box:nth-child(2){ grid-column:2; grid-row:1; }
@@ -115,14 +107,13 @@
     }
 
     @media (max-width:900px){
-      .roadmap{ grid-template-columns:1fr; max-width:820px; } /* mobil/tabl: 1 kolonne */
+      .roadmap{ grid-template-columns:1fr; max-width:820px; }
       .roadmap-box{ padding:14px 16px }
       .step-images img{ width:72px; height:72px }
     }
   </style>
 </head>
 <body>
-  <!-- NAV -->
   <header class="site-nav">
     <div class="nav-inner">
       <nav class="nav">
@@ -134,15 +125,12 @@
     </div>
   </header>
 
-  <!-- Sociale links -->
   <div class="social-menu" id="social-menu" aria-label="Sociale medier"></div>
 
-  <!-- MIDTSTILLET ROADMAP -->
   <main class="wrap">
     <section class="roadmap" id="roadmap"></section>
   </main>
 
-  <!-- Lightbox -->
   <div id="rm-lightbox" aria-hidden="true">
     <div class="rm-backdrop"></div>
     <img id="rm-image" alt="Roadmap" />
@@ -151,12 +139,10 @@
   <footer><span id="footer-text" data-text="common:footer">© 2025 MadaCoin. All rights reserved.</span></footer>
 
   <script>
-    /* ===== Supabase init ===== */
     const SUPABASE_URL="https://byrlebjwknppjbtbkozt.supabase.co";
     const SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cmxlYmp3a25wcGpidGJrb3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE3NjcyNjYsImV4cCI6MjA2NzM0MzI2Nn0.3aoQMQgmxXouUfpqrwfSgcUgedjZEue6s3ZkGoqvQYY";
     const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON) : null;
 
-    /* ===== Aktiv nav ===== */
     (function markActive(){
       try{
         const here = location.pathname.replace(/\/index\.html?$/,'/');
@@ -168,7 +154,6 @@
       }catch(e){}
     })();
 
-    /* ===== Baggrund via site_settings ===== */
     async function applyBackgroundForPage(pageKey='roadmap'){
       if(!sb) return;
       try{
@@ -182,7 +167,6 @@
       }catch(e){ console.warn('[roadmap] background', e); }
     }
 
-    /* ===== Branding: favicon fra bucket 'logo' ===== */
     const LOGO_BUCKET='logo';
     const BRAND_EXTS=['svg','png','webp','jpg','jpeg'];
     const FAV_EXTS=['svg','png','ico'];
@@ -213,7 +197,6 @@
       const favEl=document.getElementById('favicon'); if(favEl && fav) favEl.href=fav;
     }
 
-    /* ===== Nav/foot tekster ===== */
     async function loadSiteText(){
       if(!sb) return {};
       try{
@@ -230,7 +213,6 @@
       }catch(e){ console.warn('[roadmap] site_text',e); return {}; }
     }
 
-    /* ===== Sociale links ===== */
     function normalizeUrl(u){ if(!u) return null; const t=u.trim(); return /^https?:\/\//i.test(t)?t:'https://'+t }
     function iconUrlFor(p){ if(!sb) return null; const name=p.charAt(0).toUpperCase()+p.slice(1).toLowerCase(); const {data}=sb.storage.from('social.icons').getPublicUrl(`${name}.svg`); return data?.publicUrl||null }
     function fallbackIconUrl(){ if(!sb) return ''; const {data}=sb.storage.from('social.icons').getPublicUrl('Globe.svg'); return data?.publicUrl||'' }
@@ -247,7 +229,6 @@
       });
     }
 
-    /* ===== Roadmap (billeder + lightbox) ===== */
     const base="https://byrlebjwknppjbtbkozt.supabase.co/storage/v1/object/public";
     const buckets=["roadmap1","roadmap2","roadmap3","roadmap4"];
     const steps=[
@@ -288,7 +269,6 @@
       });
     }
 
-    // Lightbox & gestures
     let rmBox, rmImg, scale=1, tx=0, ty=0; const MIN_SCALE=1, MAX_SCALE=4;
     function applyTransform(){ if(!rmImg) return; rmImg.style.transform=`translate(${tx}px, ${ty}px) scale(${scale})` }
     function centerReset(){ scale=1; tx=0; ty=0; applyTransform() }
@@ -300,19 +280,18 @@
     function rmTouchMove(e){ if(e.touches.length===2){ e.preventDefault(); const[a,b]=e.touches; const d=Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY); scale=Math.max(MIN_SCALE,Math.min(MAX_SCALE,pinchStartScale*(d/pinchStartDist))); applyTransform(); touchMoved=true; } else if(e.touches.length===1 && panning){ e.preventDefault(); const t=e.touches[0]; tx=t.clientX-panStartX; ty=t.clientY-panStartY; applyTransform(); touchMoved=true; } }
     function rmTouchEnd(){ panning=false; if(!touchMoved){ if(scale>1) centerReset(); else closeLightbox(); } }
 
-    // === Equalize heights across all roadmap boxes (desktop 2×2) ===
     function equalizeRoadmapHeights(){
       const mq = window.matchMedia('(min-width:901px)');
       const boxes = Array.from(document.querySelectorAll('.roadmap-box'));
-      // reset first
       boxes.forEach(b => b.style.minHeight = '');
-      if(!mq.matches) return; // only equalize on desktop 2×2
+      if(!mq.matches) return;
       let max = 0;
       boxes.forEach(b => { max = Math.max(max, b.offsetHeight); });
       boxes.forEach(b => { b.style.minHeight = max + 'px'; });
     }
 
-    /* ===== Init ===== */
+    function openLightbox(src){ rmImg.src=src; centerReset(); document.body.classList.add('modal-open'); rmBox.classList.add('active'); rmBox.setAttribute('aria-hidden','false') }
+
     window.addEventListener('load', async ()=>{
       rmBox=document.getElementById('rm-lightbox'); rmImg=document.getElementById('rm-image');
       if(rmBox&&rmImg){
@@ -326,15 +305,15 @@
         window.addEventListener('keydown',(e)=>{ if(e.key==='Escape' && rmBox.classList.contains('active')) closeLightbox(); });
       }
 
-      await applyBackgroundForPage('roadmap'); // dynamisk baggrund
-      await loadSiteText();                    // nav/foot tekster
-      await applyBrandingFromBucket('MCD');    // favicon fra 'logo'
-      await renderSocialLinks();               // sociale links
-      renderRoadmap();                         // billeder + thumbs
-      // Equalize heights now, on image load, and on resize
+      await applyBackgroundForPage('roadmap');
+      await loadSiteText();
+      await applyBrandingFromBucket('MCD');
+      await renderSocialLinks();
+      renderRoadmap();
+
       equalizeRoadmapHeights();
-      const _imgs = document.querySelectorAll('.step-images img');
-      _imgs.forEach(im=>{ im.addEventListener('load', equalizeRoadmapHeights); im.addEventListener('error', equalizeRoadmapHeights); });
+      const imgs = document.querySelectorAll('.step-images img');
+      imgs.forEach(im=>{ im.addEventListener('load', equalizeRoadmapHeights); im.addEventListener('error', equalizeRoadmapHeights); });
       window.addEventListener('resize', equalizeRoadmapHeights);
       setTimeout(equalizeRoadmapHeights, 400);
       setTimeout(equalizeRoadmapHeights, 1200);
